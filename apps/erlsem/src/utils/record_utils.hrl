@@ -2,11 +2,11 @@
 -define(RECORD, ty).
 -endif.
 
+
 % these helper function assume a fixed order for records in Erlang
 % with the first index being the record name
 
 % inefficient (rebuilds record everytime) but dynamic
-% but should be ok since tuple elements are hash-consed in Erlang
 map(Map, Record) ->
   Fields = record_info(fields, ?RECORD),
   lists:foldl(
