@@ -12,22 +12,31 @@
 % -spec function(ty_function()) -> dnf_ty_function().
 % function(TyFunction) -> node(TyFunction).
 
-leq(T1, T2) ->
-  is_empty(difference(T1, T2)).
-
-is_empty(Ty) ->
+% leq(T1, T2) ->
+%   is_empty(difference(T1, T2)).
+ 
+% -> {boolean(), local_cache()}.
+is_empty(Ty, LocalCache) ->
   Dnf = dnf(Ty),
-  lists:all(fun is_empty_line/1, Dnf).
+  lists:foldl(fun
+    (_Line, {false, LC}) -> {false, LC};
+    (Line, {true, LC}) -> is_empty_line(Line, LC)
+  end, {true, LocalCache}, Dnf).
 
-is_empty_line({AllPos, Neg, T}) ->
+% -> {boolean(), local_cache()}.
+is_empty_line({AllPos, Neg, T}, LocalCache) ->
   case {AllPos, Neg, ?LEAF:empty()} of
-    {_, _, T} -> true;
+    {_, _, T} -> {true, LocalCache};
     {Ps, Ns, _} ->
       % continue searching for any arrow ∈ N such that the line becomes empty
-      lists:any(fun(NegatedFun) -> is_empty_cont(Ps, NegatedFun) end, Ns)
+      lists:foldl(
+        fun(_NegatedFun, {true, LC}) -> {true, LC}; (NegatedFun, {false, LC}) -> is_empty_cont(Ps, NegatedFun, LC) end, 
+        {false, LocalCache}, 
+        Ns)
   end.
 
-is_empty_cont(Ps, NegatedFun) ->
+% -> {boolean(), local_cache()}.
+is_empty_cont(Ps, NegatedFun, LocalCache) ->
   %% ∃ Ts-->T2 ∈ N s.t.
   %%    Ts is in the domains of the function
   T1 = ty_function:domain(NegatedFun),

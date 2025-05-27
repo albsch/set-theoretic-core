@@ -2,9 +2,13 @@
 
 -compile([export_all, nowarn_export_all]).
 
+-export_type([local_cache/0]).
+
 -behaviour(global_state).
 
 % -record(ty_node, {id :: integer(), definition :: term()}).
+-type type() :: any(). %TODO
+-opaque local_cache() :: #{}. % TODO type cache is only allowed to be inspected in this module
 
 compare({node, Id1}, {node, Id2}) when Id1 < Id2 -> lt;
 compare({node, Id1}, {node, Id2}) when Id1 > Id2 -> gt;
@@ -62,57 +66,51 @@ load(TyNode) ->
 leq(T1, T2) ->
   is_empty(difference(T1, T2)).
 
+-spec is_empty(type()) -> boolean().
+is_empty(TyNode) ->
+  % TODO update global cache with local cache entries
+  {Result, _LocalCache} = is_empty(TyNode, #{}),
+  Result.
+
 % see Frisch PhD thesis
 % TODO merge P and N into one ETS table
 % TODO implement backtracking-free algorithm
-is_empty(TyNode) ->
-  (S = #{p := P, n := N, s := Stack}) = global_state:get_state(?MODULE),
+-spec is_empty(type(), local_cache()) -> {boolean(), local_cache()}.
+is_empty(TyNode, LocalCache) ->
+  (#{p := P, n := N}) = global_state:get_state(?MODULE), % TODO measure if it is enough to check only at the start of the chain
   Ty = load(TyNode),
 
-  % stack keeps track of the same items in N
-  true = length(Stack) =:= length(maps:keys(N)),
-
-  case {P, N} of
-    {#{Ty := false}, _} -> 
+  case {{P, N}, LocalCache} of
+    {{#{Ty := false}, _}, _} -> 
       % io:format(user,"p", []),
-      false; % cache hit
-    {_, #{Ty := true}} -> 
+      {false, LocalCache}; % global cache hit
+    {{_, #{Ty := true}}, _} -> 
       % io:format(user,"n", []),
-      true; % cache hit
+      {true, LocalCache}; % global cache hit
+    {{_, _}, #{Ty := Res}} -> 
+      % local cache hit
+      {Res, LocalCache};
     _ -> 
-      % assume type is empty
-      % and add to state
-
-      % update global cache
-      % N U {t}, put t on stack
-      global_state:set_state(?MODULE, S#{n => N#{Ty => true}, s => stack:push(Ty, Stack)}),
-      
-      Result = ty_rec:is_empty(Ty),
+      % assume type is empty and add to state
+      % N U {t}
+      {Result, LC_0} = ty_rec:is_empty(Ty, LocalCache#{Ty => true}),
 
       case Result of 
-        % empty; global cache can be kept as is (i.e. TyNode is empty is now cached)
-        true -> true;
+        % empty; 
+        % local cache can be kept as is 
+        % Ty is empty is now cached, and all intermediate results are also cached
+        true -> 
+          {true, LC_0};
 
         % not empty;
         % invalidate all types that were assumed to be empty
-        % we need to recover initial N via the stack
-        % TODO since we are in the immutable Erlang world anyway, use the N in Line 25...
+        %  => recover initial N
+        % and add Ty to be non-empty to the cache
+        % we don't need to backtrack (there is no single global cache), 
+        % use the LocalCache from the arguments
         false -> 
-          backtrack(Ty),
-          false
+          {false, LocalCache#{Ty => false}}
       end
-  end.
-
-backtrack(Ty) ->
-  (S = #{p := P, n := N, s := Stack}) = global_state:get_state(?MODULE),
-  case stack:pop(Stack) of
-    {Ty, Rest} ->
-      global_state:set_state(?MODULE, S#{ p => P#{Ty => false}, n => maps:remove(Ty, N), s => Rest}),
-      ok;
-    {OtherNode, Rest} ->
-      global_state:set_state(?MODULE, S#{n => maps:remove(OtherNode, N), s => Rest}),
-      backtrack(Ty);
-    empty -> error(empty_stack)
   end.
 
 negate(T) ->

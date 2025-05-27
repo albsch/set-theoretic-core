@@ -11,6 +11,7 @@
   }).
 
 -type type() :: #ty{}.
+-type local_cache() :: ty_node:local_cache().
 
 -define(RECORD, ty).
 -include("utils/record_utils.hrl").
@@ -32,13 +33,13 @@ any() ->
 empty() ->
   map(fun(Field, _Value) -> Field:empty() end, #ty{}).
 
--spec is_empty(type()) -> boolean().
-is_empty(Ty) ->
+-spec is_empty(type(), local_cache()) -> {boolean(), local_cache()}.
+is_empty(Ty, Cache) ->
   fold(fun
-        (_, _, true) -> true;
-        (Module, Value, false) -> Module:is_empty(Value)      
+        (_, _, {true, LC0}) -> {true, LC0};
+        (Module, Value, {false, LC0}) -> Module:is_empty(Value, LC0)
       end, 
-      false,
+      {false, Cache},
       Ty).
 
 -spec negate(type()) -> type().
