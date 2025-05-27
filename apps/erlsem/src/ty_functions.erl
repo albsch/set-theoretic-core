@@ -11,10 +11,14 @@ empty() ->
 any() ->
   {dnf_ty_function:any(), #{}}.
 
-is_empty({Default, AllFunctions}) ->
-  dnf_ty_function:is_empty(Default)
-    andalso
-    maps:fold(fun(_Size, V, Acc) -> Acc andalso dnf_ty_function:is_empty(V) end, true, AllFunctions).
+is_empty({Default, AllFunctions}, ST) ->
+  maybe
+    {false, ST1} ?= dnf_ty_function:is_empty(Default, ST),
+    maps:fold(fun
+      (_Size, _V, {false, ST0}) -> {false, ST0};
+      (_Size, V, {true, ST0}) -> dnf_ty_function:is_empty(V, ST0) 
+    end, {true, ST1}, AllFunctions)
+  end.
 
 singleton(Length, FunctionDnf) when is_integer(Length) ->
   {dnf_ty_function:empty(), #{Length => FunctionDnf}}.

@@ -8,78 +8,84 @@
 
 -include("dnf/bdd.hrl").
 
-
+-type type() :: any(). % TODO
 % -spec function(ty_function()) -> dnf_ty_function().
 % function(TyFunction) -> node(TyFunction).
 
 % leq(T1, T2) ->
 %   is_empty(difference(T1, T2)).
  
-% -> {boolean(), local_cache()}.
-is_empty(Ty, LocalCache) ->
+% -type is_empty(type(), X) :: {boolean(), X}.
+is_empty(Ty, ST) ->
   Dnf = dnf(Ty),
   lists:foldl(fun
-    (_Line, {false, LC}) -> {false, LC};
-    (Line, {true, LC}) -> is_empty_line(Line, LC)
-  end, {true, LocalCache}, Dnf).
+    (_Line, {false, ST0}) -> {false, ST0};
+    (Line, {true, ST0}) -> is_empty_line(Line, ST0)
+  end, {true, ST}, Dnf).
 
 % -> {boolean(), local_cache()}.
-is_empty_line({AllPos, Neg, T}, LocalCache) ->
+is_empty_line({AllPos, Neg, T}, ST) ->
   case {AllPos, Neg, ?LEAF:empty()} of
-    {_, _, T} -> {true, LocalCache};
+    {_, _, T} -> {true, ST};
     {Ps, Ns, _} ->
       % continue searching for any arrow ∈ N such that the line becomes empty
       lists:foldl(
-        fun(_NegatedFun, {true, LC}) -> {true, LC}; (NegatedFun, {false, LC}) -> is_empty_cont(Ps, NegatedFun, LC) end, 
-        {false, LocalCache}, 
-        Ns)
+        fun
+          (_NegatedFun, {true, ST0}) -> {true, ST0}; 
+          (NegatedFun, {false, ST0}) -> is_empty_cont(Ps, NegatedFun, ST0) 
+        end, 
+        {false, ST}, 
+        Ns
+      )
   end.
 
 % -> {boolean(), local_cache()}.
-is_empty_cont(Ps, NegatedFun, LocalCache) ->
+is_empty_cont(Ps, NegatedFun, ST0) ->
   %% ∃ Ts-->T2 ∈ N s.t.
   %%    Ts is in the domains of the function
   T1 = ty_function:domain(NegatedFun),
 
   AllDomains = lists:map(fun ty_function:domain/1, Ps),
   Disj = ?NODE:disjunction(AllDomains),
-  ?NODE:leq(
-    T1,
-    Disj
-  ) 
-  % if so, check if output matches
-  andalso
-  explore_function(T1, ?NODE:negate(ty_function:codomain(NegatedFun)), Ps).
-
-
+  maybe 
+    {true, ST1} ?= ?NODE:leq(T1, Disj, ST0),
+    NegatedCodomain = ?NODE:negate(ty_function:codomain(NegatedFun)),
+    explore_function(T1, NegatedCodomain, Ps, ST1)
+  end.
 
 % optimized phi' (4.10) from paper covariance and contravariance
 % justification for this version of phi can be found in `prop_phi_function.erl`
 %-spec explore_function(ty_ref(), ty_ref(), [term()]) -> boolean().
-explore_function(_T1, _T2, []) ->
-  true; 
-explore_function(T1, T2, [Function | Ps]) ->
+explore_function(_T1, _T2, [], ST) ->
+  {true, ST};
+explore_function(T1, T2, [Function | Ps], ST0) ->
   {S1, S2} = {ty_function:domain(Function), ty_function:codomain(Function)},
-  phi(T1, (?NODE:intersect(T2, S2)), Ps)
-  andalso
-  phi((?NODE:difference(T1, S1)), T2, Ps).
+  maybe 
+    {true, ST1} ?= phi(T1, ?NODE:intersect(T2, S2), Ps, ST0),
+    phi(?NODE:difference(T1, S1), T2, Ps, ST1)
+  end.
 
-phi(T1, T2, []) ->
-  ?NODE:is_empty(T1) orelse ?NODE:is_empty(T2);
-phi(T1, T2, [Function | Ps]) ->
+phi(T1, T2, [], ST0) ->
+  maybe
+    {false, ST1} ?= ?NODE:is_empty(T1, ST0),
+    ?NODE:is_empty(T2, ST1)
+  end;
+phi(T1, T2, [Function | Ps], ST0) ->
   {S1, S2} = {ty_function:domain(Function), ty_function:codomain(Function)},
-  ?NODE:is_empty(T1) 
-  orelse ?NODE:is_empty(T2)
-  orelse (
-    ?NODE:leq(T1, S1) 
-    orelse 
-    ?NODE:leq(
-      ?NODE:conjunction(lists:map(fun ty_function:codomain/1, Ps)), 
-      ?NODE:negate(T2)
-    )
-  ) 
-  andalso phi(T1, ?NODE:intersect(T2, S2), Ps)
-  andalso phi(?NODE:difference(T1, S1), T2, Ps).
+  Or = maybe 
+    {false, ST1} ?= ?NODE:is_empty(T1, ST0),
+    {false, ST2} ?= ?NODE:is_empty(T2, ST1),
+    {false, ST3} ?= ?NODE:leq(T1, S1, ST2),
+    Codomains = lists:map(fun ty_function:codomain/1, Ps),
+    Conj = ?NODE:conjunction(Codomains),
+    ?NODE:leq(Conj, ?NODE:negate(T2), ST3)
+  end,
+  maybe 
+    {true, ST4} ?= Or,
+    {true, ST5} ?= phi(T1, ?NODE:intersect(T2, S2), Ps, ST4),
+    T1Diff = ?NODE:difference(T1, S1),
+    phi(T1Diff, T2, Ps, ST5)
+  end.
 
 % TODO tally
 % normalize_corec(_Size, DnfTyFunction, [], [], Fixed, M) ->
