@@ -1,0 +1,11 @@
+===> Verifying dependencies...
+===> Analyzing applications...
+===> Compiling recsys
+===> Compiling erlsem
+===> Compiling musem
+    ┌─ apps/erlsem/test/prop_equiv.erl:
+    │
+ 98 │          {T, V} = timer:tc(fun() -> 
+    │              ╰── Warning: variable 'V' is unused
+
+

@@ -109,7 +109,7 @@ is_empty(TyNode, LocalCache) ->
         % we don't need to backtrack (there is no single global cache), 
         % use the LocalCache from the arguments
         false -> 
-          {false, LocalCache#{Ty => false}}
+          {false, LocalCache}
       end
   end.
 

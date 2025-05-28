@@ -10,6 +10,7 @@ tempty() -> {predef, none}.
 tunion(A, B) -> {union, [A, B]}.
 tintersection(A, B) -> {intersection, [A, B]}.
 tarrow(A, B) -> {fun_full, [A], B}.
+tfun(As, B) -> {fun_full, As, B}.
 tvar() ->
   ?LET(Varname, oneof(types()), {named, 0, {ty_ref, '.', Varname, 0}, []}).
 
@@ -31,17 +32,20 @@ limited_formula(Size, Mode) when Size =< 1 ->
 );
 limited_formula(Size, Mode) ->
   frequency([
-    {1, tempty()},
-    {1, tany()},
-    {2, ?LAZY(?LET({A, B}, 
+    {2, tempty()},
+    {2, tany()},
+    {4, ?LAZY(?LET({A, B}, 
         {limited_formula(Size div 2, Mode), limited_formula(Size div 2, Mode)}, 
         tunion(A, B)))  },
-    {2, ?LAZY(?LET({A, B}, 
+    {4, ?LAZY(?LET({A, B}, 
         {limited_formula(Size div 2, Mode), limited_formula(Size div 2, Mode)}, 
         tintersection(A, B)))  },
-    {2, ?LAZY(?LET({A, B}, 
+    {4, ?LAZY(?LET({A, B}, 
         {limited_formula(Size div 2, inside), limited_formula(Size div 2, inside)}, 
-        tarrow(A, B)))  }
+        tarrow(A, B)))  },
+    {1, ?LAZY(?LET({As, B}, 
+        {list(limited_formula(Size div 2, inside)), limited_formula(Size div 2, inside)}, 
+        tfun(As, B)))  }
   ] ++ tvar_if_not_toplevel(Mode)
 ).
 
@@ -85,6 +89,7 @@ prop_parse_and_emptiness() ->
   ?FORALL(X, system(types()), begin 
     global_state:with_new_state(fun() ->
       maps:foreach(fun(VarName, AstTy) ->
+        io:format(user,"~p~n", [AstTy]),
         ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy})
       end, X),
 
@@ -94,11 +99,18 @@ prop_parse_and_emptiness() ->
       maps:map(fun(Name, _) -> 
         Ty = {named, noloc, {ty_ref, '.', Name, 0}, []},
         % parse
-        Parsed = ty_parser:parse(Ty),
+        {T2, Parsed} = timer:tc(fun() -> ty_parser:parse(Ty) end),
         {T, V} = timer:tc(fun() -> 
           ty_node:is_empty(Parsed)
         end),
-        io:format(user,"~p~n", [T]),
+            io:format(user,"~p -> ~p~n", [T2, T]),
+        case (T2 > 5000000) of
+          true -> 
+            io:format(user, "Set a new system of equations...~n", []),
+            io:format(user, "~p~n==~n", [X]),
+            erlang:halt();
+          _ -> ok
+        end,
         true
         % ty_node:is_empty()
       end, X),
