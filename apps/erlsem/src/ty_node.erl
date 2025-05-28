@@ -77,16 +77,16 @@ is_empty(TyNode) ->
 % TODO implement backtracking-free algorithm
 -spec is_empty(type(), local_cache()) -> {boolean(), local_cache()}.
 is_empty(TyNode, LocalCache) ->
-  (#{p := P, n := N}) = global_state:get_state(?MODULE), % TODO measure if it is enough to check only at the start of the chain
+  % (#{p := P, n := N}) = global_state:get_state(?MODULE), % TODO measure if it is enough to check only at the start of the chain
   Ty = load(TyNode),
 
-  case {{P, N}, LocalCache} of
-    {{#{Ty := false}, _}, _} -> 
-      % io:format(user,"p", []),
-      {false, LocalCache}; % global cache hit
-    {{_, #{Ty := true}}, _} -> 
-      % io:format(user,"n", []),
-      {true, LocalCache}; % global cache hit
+  case {{ok, ok}, LocalCache} of
+    % {{#{Ty := false}, _}, _} -> 
+    %   io:format(user,"X", []),
+    %   {false, LocalCache}; % global cache hit
+    % {{_, #{Ty := true}}, _} -> 
+    %   io:format(user,"X", []),
+    %   {true, LocalCache}; % global cache hit
     {{_, _}, #{Ty := Res}} -> 
       % local cache hit
       {Res, LocalCache};
