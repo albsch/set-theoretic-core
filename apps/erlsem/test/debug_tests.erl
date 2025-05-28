@@ -525,12 +525,26 @@ System =
       ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy})
     end, System),
 
-    lists:map(fun({Name, _}) -> 
-      Ty = {named, noloc, {ty_ref, '.', Name, 0}, []},
-      % parse
-      io:format(user,"Parsing ~p~n", [Name]),
-      {T2, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty) end),
-      io:format(user,"~p~n", [T2])
-    end, lists:sort(maps:to_list(System)))
+    Ty1 = {named, noloc, {ty_ref, '.', t1, 0}, []},
+    {T1, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    io:format(user,"~p~n", [T1]),
+    {T2, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    io:format(user,"~p~n", [T2]),
+    {T3, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    io:format(user,"~p~n", [T3]),
+    {T4, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    io:format(user,"~p~n", [T4]),
+    {T5, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    io:format(user,"~p~n", [T5]),
+    {T6, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    io:format(user,"~p~n", [T6]),
+    {T7, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    io:format(user,"~p~n", [T7]),
+    {T8, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    io:format(user,"~p~n", [T8]),
+    {T9, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    io:format(user,"~p~n", [T9]),
 
+
+    ok
   end).
