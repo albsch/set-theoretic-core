@@ -44,6 +44,12 @@ t1_test() ->
   end),
   ok.
 
+slow_test_() ->
+  {timeout, 60, fun() -> 
+    slow_test(),
+    ok 
+  end}.
+
 slow_test() ->
 System = 
 #{t9 =>
@@ -545,6 +551,13 @@ System =
     {T9, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
     io:format(user,"~p~n", [T9]),
 
+    [
+     begin
+      {TT, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+      io:format(user,"<all> ~pms~n~n", [TT/1000])
+     end
+     || _ <- lists:seq(1, 100)
+    ],
 
     ok
   end).

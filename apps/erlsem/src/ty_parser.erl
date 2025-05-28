@@ -70,15 +70,20 @@ lookup_ty({ty_ref, _, Ref, _}) ->
 parse(Ty) ->
   % io:format(user, "Parsing ~p~n", [Ty]),
   % io:format(user, "State ~p~n", [gett()]),
+  
+  Z0 = erlang:now(),
   (S = #{unify := U, ref_to_ty := RefToTy, ty_to_ref := TyToRef}) = global_state:get_state(?MODULE),
+  io:format(user,"(1) ~pms~n", [timer:now_diff(now(), Z0)/1000]),
   % io:format(user, "Parsing ~p~nReusing parser cache:~n~p~n~p~n", [Ty, RefToTy, TyToRef]),
   % 1. Convert to temporary local representation
   % Create a temporary type equation with a first entrypoint LocalRef = ...
   % and parse the type layer by layer
   % use local type references stored in a local map
+  Z1 = erlang:now(),
   LocalRef = new_local_ref(Ty),
   (Result = {NewR,NewT}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}),
   % io:format(user, "Result:~n~p~n", [{LocalRef, Result}]),
+  io:format(user,"(2) ~pms~nState: ~p~n~p => ~p~n", [timer:now_diff(now(), Z1)/1000, erlang:phash2({RefToTy, TyToRef}), erlang:phash2(LocalRef), erlang:phash2(Result)]),
  
   % 2. Unify the results
   % There can be many duplicate type references;
@@ -86,13 +91,17 @@ parse(Ty) ->
   case U of
     #{LocalRef := ReplacedRef} -> 
       % save cache for future
+      Z2 = erlang:now(),
       global_state:set_state(?MODULE, S#{ref_to_ty => NewR, ty_to_ref => NewT}),
+      io:format(user,"(3) ~pms~n", [timer:now_diff(now(), Z2)/1000]),
       
       % io:format(user,"Unify cache hit~n", []),
       ReplacedRef;
     _ ->
       % really unify
+      Z3 = erlang:now(),
       {UnifiedRef, UnifiedResult} = unify(LocalRef, Result),
+      io:format(user,";~p", [timer:now_diff(now(), Z3)]),
       % {M1, _} = Result,
       % {UnifiedRef, UnifiedResult} = {LocalRef, M1},
       % io:format(user, "Unified Result:~n~p~n", [{UnifiedRef, UnifiedResult}]),
@@ -100,15 +109,21 @@ parse(Ty) ->
 
       % 3. create new type references and replace temporary ones
       %    return result reference
+      Z4 = erlang:now(),
       ReplaceRefs = maps:from_list([{Ref, ty_node:new_ty_node()} || Ref <- maps:keys(UnifiedResult)]),
       {ReplacedRef, ReplacedResults} = replace_all({UnifiedRef, UnifiedResult}, ReplaceRefs),
       % io:format(user,"Replaced:~n~p~n~p~n", [ReplacedRef, ReplacedResults]),
+      io:format(user,";~p", [timer:now_diff(now(), Z4)]),
 
+      Z5 = erlang:now(),
       % 4. define types
       [ty_node:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
+      io:format(user,";~p", [timer:now_diff(now(), Z5)]),
 
+      Z6 = erlang:now(),
       % save unify cache
       global_state:set_state(?MODULE, S#{unify => U#{LocalRef => ReplacedRef}, ref_to_ty => NewR, ty_to_ref => NewT}),
+      io:format(user,";~p", [timer:now_diff(now(), Z6)]),
       
       ReplacedRef
   end.
