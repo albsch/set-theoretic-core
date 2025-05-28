@@ -72,19 +72,19 @@ phi(T1, T2, [], ST0) ->
   end;
 phi(T1, T2, [Function | Ps], ST0) ->
   {S1, S2} = {ty_function:domain(Function), ty_function:codomain(Function)},
-  Or = maybe 
+  maybe 
     {false, ST1} ?= ?NODE:is_empty(T1, ST0),
     {false, ST2} ?= ?NODE:is_empty(T2, ST1),
-    {false, ST3} ?= ?NODE:leq(T1, S1, ST2),
-    Codomains = lists:map(fun ty_function:codomain/1, Ps),
-    Conj = ?NODE:conjunction(Codomains),
-    ?NODE:leq(Conj, ?NODE:negate(T2), ST3)
-  end,
-  maybe 
-    {true, ST4} ?= Or,
-    {true, ST5} ?= phi(T1, ?NODE:intersect(T2, S2), Ps, ST4),
-    T1Diff = ?NODE:difference(T1, S1),
-    phi(T1Diff, T2, Ps, ST5)
+    maybe
+      {true, ST4} ?= maybe
+        {false, ST3} ?= ?NODE:leq(T1, S1, ST2),
+        Codomains = lists:map(fun ty_function:codomain/1, Ps),
+        Conj = ?NODE:conjunction(Codomains),
+        ?NODE:leq(Conj, ?NODE:negate(T2), ST3)
+      end,
+      {true, ST5} ?= phi(T1, ?NODE:intersect(T2, S2), Ps, ST4),
+      phi(?NODE:difference(T1, S1), T2, Ps, ST5)
+    end
   end.
 
 % TODO tally

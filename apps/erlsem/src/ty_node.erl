@@ -38,7 +38,7 @@ init() ->
   case ets:whereis(?MODULE) of
       undefined -> 
         ets:new(?MODULE, [set, named_table, {keypos, 1}]),
-        ets:insert(?MODULE, {state, #{id => 0, system => #{}, p => #{}, n => #{}, s => stack:new()}});
+        ets:insert(?MODULE, {state, #{id => 0, system => #{}, p => #{}, n => #{}}});
       _ -> 
         ok % cleanup()
   end,

@@ -95,7 +95,10 @@ prop_parse_and_emptiness() ->
         Ty = {named, noloc, {ty_ref, '.', Name, 0}, []},
         % parse
         Parsed = ty_parser:parse(Ty),
-        ty_node:is_empty(Parsed),
+        {T, V} = timer:tc(fun() -> 
+          ty_node:is_empty(Parsed)
+        end),
+        io:format(user,"~p~n", [T]),
         true
         % ty_node:is_empty()
       end, X),
