@@ -26,6 +26,19 @@ make(Ty) ->
 
 new_ty_node() ->
   {node, next_id()}.
+  
+      % [ty_node:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
+define_all(ReplacedResults) ->
+  io:format(user,"~p~n", [length(ReplacedResults)]),
+  (S = #{system := System}) = global_state:get_state(?MODULE),
+  New = lists:foldl(
+    fun({Ref, ToDefineTy}, Acc) -> Acc#{Ref => ToDefineTy} end, 
+    System, 
+    ReplacedResults
+  ),
+  % New = System#{Reference => Node},
+  global_state:set_state(?MODULE, S#{system => New}),
+  ok.
 
 define(Reference, Node) ->
   (S = #{system := System}) = global_state:get_state(?MODULE),

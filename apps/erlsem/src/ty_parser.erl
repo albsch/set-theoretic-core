@@ -25,8 +25,7 @@ clean() ->
   end.
 
 -type temporary_ref() :: 
-    {local_ref, integer()} % fresh type references created for the queue
-  | {named_ref, {Ref :: term(), Args :: term()}}.
+    {local_ref, integer()}. % fresh type references created for the queue
 
 -spec new_local_ref() -> temporary_ref().
 new_local_ref() -> {local_ref, erlang:unique_integer()}.
@@ -49,9 +48,6 @@ set_symtab(Symtab) ->
 
 % -spec var_ref(ast:ty_var()) -> temporary_ref().
 % var_ref(Var) -> {mu_ref, Var}.
-
-% -spec named_ref(ast:ty_ref(), [ast:ty()]) -> temporary_ref().
-named_ref(Def, Args) -> {named_ref, {Def, Args}}.
 
 % -define(CACHE, ty_parser_local_cache).
 % % local state
@@ -81,7 +77,7 @@ parse(Ty) ->
   (Result = {NewR,NewT}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}),
   % io:format(user, "Result:~n~p~n", [{LocalRef, Result}]),
   io:format(user,"[2:Convert] ~p: ~p ms~n~w~n", [
-    LocalRef, timer:now_diff(now(), Z1)/1000, maps:keys(NewR)
+    LocalRef, timer:now_diff(now(), Z1)/1000, {maps:size(NewR), maps:size(NewT)}
   ]),
  
   % 2. Unify the results
@@ -101,6 +97,7 @@ parse(Ty) ->
       % really unify
       Z3 = erlang:now(),
       {UnifiedRef, UnifiedResult} = unify(LocalRef, Result),
+      io:format(user,"~w~n", [ {maps:size(NewR), maps:size(NewT)} ]),
       io:format(user,"<unify> ~p ms~n", [timer:now_diff(now(), Z3)/1000]),
       % {M1, _} = Result,
       % {UnifiedRef, UnifiedResult} = {LocalRef, M1},
@@ -112,13 +109,15 @@ parse(Ty) ->
       Z4 = erlang:now(),
       ReplaceRefs = maps:from_list([{Ref, ty_node:new_ty_node()} || Ref <- maps:keys(UnifiedResult)]),
       {ReplacedRef, ReplacedResults} = replace_all({UnifiedRef, UnifiedResult}, ReplaceRefs),
+      % io:format(user,"~p~n", [ {LocalRef, UnifiedRef} ]),
       % io:format(user,"Replaced:~n~p~n~p~n", [ReplacedRef, ReplacedResults]),
-      % io:format(user,";~p", [timer:now_diff(now(), Z4)]),
+      io:format(user,"replace ~p ms~n", [timer:now_diff(now(), Z4)/ 1000]),
 
       Z5 = erlang:now(),
       % 4. define types
-      [ty_node:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
-      % io:format(user,";~p", [timer:now_diff(now(), Z5)]),
+      % [ty_node:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
+      ty_node:define_all(maps:to_list(ReplacedResults)),
+      io:format(user,"define ~p ms~n", [timer:now_diff(now(), Z5)/ 1000]),
 
       Z6 = erlang:now(),
       % save unify cache
@@ -133,7 +132,7 @@ parse(Ty) ->
 
 replace_all({Ref, All}, Map) ->
   utils:everywhere(fun
-    (RRef = {X, _}) when X == local_ref; X == mu_ref; X == named_ref -> 
+    (RRef = {X, _}) when X == local_ref; X == mu_ref ->
       case Map of
         #{RRef := Replace} -> {ok, Replace};
         _ -> error
@@ -158,6 +157,9 @@ group(M, Key, Value) ->
 
 % -spec convert(queue(), symtab:t(), result()) -> result().
 convert(Queue, Res) ->
+  % io:format(user, "~p~n", [
+  %   queue:len(Queue)
+  % ]),
   case queue:is_empty(Queue) of
     true -> 
       Res; 
@@ -171,7 +173,7 @@ convert(Queue, Res) ->
 
 % entrypoint for recursion
 % named
-do_convert({{named, _, Ref, Args}, R = {IdTy, _}}, Q) ->
+do_convert({X = {named, _, Ref, Args}, R = {IdTy, _}}, Q) ->
   (S = #{cache := M}) = global_state:get_state(?MODULE),
   case M of
     #{{Ref, Args} := NewRef} ->
@@ -188,11 +190,11 @@ do_convert({{named, _, Ref, Args}, R = {IdTy, _}}, Q) ->
       NewTy = Ty,
       
       % create a new reference (ref args pair) and memoize
-      NewRef = named_ref(Ref, Args),
+      NewRef = new_local_ref(X),
 
       % new cache
       global_state:set_state(?MODULE, S#{cache => M#{{Ref, Args} => NewRef}}),
-      io:format(user,"e~n~p~n~w~n", [Ref, lists:sort(maps:keys(IdTy))]),
+      % io:format(user,"e~n~p~n~w~n", [Ref, lists:sort(maps:keys(IdTy))]),
       
 
       {InternalTy, NewQ, {R0, R1}} = do_convert({NewTy, R}, Q),
@@ -278,16 +280,19 @@ do_convert(T, _Q) ->
 unify(Ref, {IdToTy, TyToIds}) ->
   % map with references to unify, pick representatives
   %ToUnify = maps:to_list(#{K => choose_representative(V) || K := V <- TyToIds, length(V) > 1}), 
+  T1 = erlang:now(),
   ToUnify = maps:to_list(maps:filtermap(fun(_K, V) when length(V) =< 1 -> false;(_K, V) -> {true, choose_representative(V)} end, TyToIds)),
+  io:format(user,"choose ~p~n", [timer:now_diff(now(), T1)/1000]),
   % replace equivalent refs with representative
+  T2 = erlang:now(),
   {UnifiedRef, {UnifiedIdToTy, _UnifiedTyToIds}} = unify(Ref, {IdToTy, TyToIds}, ToUnify),
+  io:format(user,"unify ~p~n", [timer:now_diff(now(), T2)/1000]),
   {UnifiedRef, UnifiedIdToTy}.
 
 % -spec choose_representative([temporary_ref()]) -> {temporary_ref(), [temporary_ref()]}.
 choose_representative(Refs) ->
   [Representative | Others] = lists:usort(
     fun
-      ({Other, _}, {named_ref, _}) when Other == local_ref; Other == mu_ref -> false;
       ({local_ref, _}, {mu_ref, _}) -> false;
       ({_, X}, {_, Y}) -> X =< Y
     end, 
@@ -301,7 +306,7 @@ choose_representative(Refs) ->
 unify(Ref, {IdToTy, TyToIds}, [{_Ty, {Representative, Duplicates}} | Xs])->
   {NewRef, {NewIdToTy, NewTyToIds}} =
   utils:everywhere(fun
-    (RRef = {X, _}) when X == local_ref; X == mu_ref; X == named_ref -> 
+    (RRef = {X, _}) when X == local_ref; X == mu_ref -> 
       case lists:member(RRef, Duplicates) of
         true -> {ok, Representative};
         false -> error
