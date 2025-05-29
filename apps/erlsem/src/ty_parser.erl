@@ -128,9 +128,7 @@ parse(Ty) ->
       ReplacedRef
   end
   end),
-  io:format(user,"[3:Unify] ~p ms~n~n", [
-    timer:now_diff(now(), Z1)/1000
-  ]),
+  io:format(user,"[3:Unify] ~p ms~n~n", [ Tim/1000 ]),
   Res.
 
 replace_all({Ref, All}, Map) ->
