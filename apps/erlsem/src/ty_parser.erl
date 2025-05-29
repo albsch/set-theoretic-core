@@ -80,8 +80,8 @@ parse(Ty) ->
   LocalRef = new_local_ref(Ty),
   (Result = {NewR,NewT}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}),
   % io:format(user, "Result:~n~p~n", [{LocalRef, Result}]),
-  io:format(user,"[2:Convert] ~p ms~n", [
-    timer:now_diff(now(), Z1)/1000
+  io:format(user,"[2:Convert] ~p: ~p ms~n~w~n", [
+    LocalRef, timer:now_diff(now(), Z1)/1000, maps:keys(NewR)
   ]),
  
   % 2. Unify the results
@@ -101,7 +101,7 @@ parse(Ty) ->
       % really unify
       Z3 = erlang:now(),
       {UnifiedRef, UnifiedResult} = unify(LocalRef, Result),
-      % io:format(user,";~p", [timer:now_diff(now(), Z3)]),
+      io:format(user,"<unify> ~p ms~n", [timer:now_diff(now(), Z3)/1000]),
       % {M1, _} = Result,
       % {UnifiedRef, UnifiedResult} = {LocalRef, M1},
       % io:format(user, "Unified Result:~n~p~n", [{UnifiedRef, UnifiedResult}]),
@@ -192,6 +192,7 @@ do_convert({{named, _, Ref, Args}, R = {IdTy, _}}, Q) ->
 
       % new cache
       global_state:set_state(?MODULE, S#{cache => M#{{Ref, Args} => NewRef}}),
+      io:format(user,"e~n~p~n~w~n", [Ref, lists:sort(maps:keys(IdTy))]),
       
 
       {InternalTy, NewQ, {R0, R1}} = do_convert({NewTy, R}, Q),
