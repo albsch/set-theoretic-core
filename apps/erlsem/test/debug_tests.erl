@@ -532,32 +532,32 @@ System =
     end, System),
 
     Ty1 = {named, noloc, {ty_ref, '.', t1, 0}, []},
-    {T1, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
-    io:format(user,"~p~n", [T1]),
-    {T2, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
-    io:format(user,"~p~n", [T2]),
-    {T3, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
-    io:format(user,"~p~n", [T3]),
-    {T4, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
-    io:format(user,"~p~n", [T4]),
-    {T5, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
-    io:format(user,"~p~n", [T5]),
-    {T6, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
-    io:format(user,"~p~n", [T6]),
-    {T7, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
-    io:format(user,"~p~n", [T7]),
-    {T8, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
-    io:format(user,"~p~n", [T8]),
-    {T9, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
-    io:format(user,"~p~n", [T9]),
+    Ty2 = {named, noloc, {ty_ref, '.', t2, 0}, []},
+    Ty3 = {named, noloc, {ty_ref, '.', t3, 0}, []},
+    Ty4 = {named, noloc, {ty_ref, '.', t4, 0}, []},
+    {T1, _} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    {T2, _} = timer:tc(fun() -> ty_parser:parse(Ty2) end),
+    {T3, _} = timer:tc(fun() -> ty_parser:parse(Ty3) end),
+    {T4, _} = timer:tc(fun() -> ty_parser:parse(Ty4) end),
+    {T5, _} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    {T6, _} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    {T7, _} = timer:tc(fun() -> ty_parser:parse(Ty2) end),
+    % {T6, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    % io:format(user,"~p~n", [T6]),
+    % {T7, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    % io:format(user,"~p~n", [T7]),
+    % {T8, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    % io:format(user,"~p~n", [T8]),
+    % {T9, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    % io:format(user,"~p~n", [T9]),
 
-    [
-     begin
-      {TT, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
-      io:format(user,"<all> ~pms~n~n", [TT/1000])
-     end
-     || _ <- lists:seq(1, 100)
-    ],
+    % [
+    %  begin
+    %   {TT, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    %   io:format(user,"<all> ~pms~n~n", [TT/1000])
+    %  end
+    %  || _ <- lists:seq(1, 100)
+    % ],
 
     ok
   end).

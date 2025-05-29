@@ -32,3 +32,7 @@ everywhere(F, T) ->
         {ok, X} -> X;
         {rec, X} -> everywhere(F, X)
     end.
+
+
+size(Term) ->
+  (erts_debug:size(Term) * 8)/1024.

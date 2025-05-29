@@ -68,12 +68,9 @@ lookup_ty({ty_ref, _, Ref, _}) ->
 
 % -spec ast_to_erlang_ty(ast:ty(), symtab:t()) -> ty_rec:ty_ref().
 parse(Ty) ->
-  % io:format(user, "Parsing ~p~n", [Ty]),
-  % io:format(user, "State ~p~n", [gett()]),
-  
   Z0 = erlang:now(),
   (S = #{unify := U, ref_to_ty := RefToTy, ty_to_ref := TyToRef}) = global_state:get_state(?MODULE),
-  io:format(user,"(1) ~pms~n", [timer:now_diff(now(), Z0)/1000]),
+  io:format(user,"[1:State] ~p ms~n    Size: ~p kB~n", [timer:now_diff(now(), Z0)/1000, round(utils:size(S))]), 
   % io:format(user, "Parsing ~p~nReusing parser cache:~n~p~n~p~n", [Ty, RefToTy, TyToRef]),
   % 1. Convert to temporary local representation
   % Create a temporary type equation with a first entrypoint LocalRef = ...
@@ -83,17 +80,20 @@ parse(Ty) ->
   LocalRef = new_local_ref(Ty),
   (Result = {NewR,NewT}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}),
   % io:format(user, "Result:~n~p~n", [{LocalRef, Result}]),
-  io:format(user,"(2) ~pms~nState: ~p~n~p => ~p~n", [timer:now_diff(now(), Z1)/1000, erlang:phash2({RefToTy, TyToRef}), erlang:phash2(LocalRef), erlang:phash2(Result)]),
+  io:format(user,"[2:Convert] ~p ms~n", [
+    timer:now_diff(now(), Z1)/1000
+  ]),
  
   % 2. Unify the results
   % There can be many duplicate type references;
   % these will be substituted with their representative
+  {Tim, Res} = timer:tc(fun() -> 
   case U of
     #{LocalRef := ReplacedRef} -> 
       % save cache for future
       Z2 = erlang:now(),
       global_state:set_state(?MODULE, S#{ref_to_ty => NewR, ty_to_ref => NewT}),
-      io:format(user,"(3) ~pms~n", [timer:now_diff(now(), Z2)/1000]),
+      % io:format(user,"(3) ~pms~n", [timer:now_diff(now(), Z2)/1000]),
       
       % io:format(user,"Unify cache hit~n", []),
       ReplacedRef;
@@ -101,7 +101,7 @@ parse(Ty) ->
       % really unify
       Z3 = erlang:now(),
       {UnifiedRef, UnifiedResult} = unify(LocalRef, Result),
-      io:format(user,";~p", [timer:now_diff(now(), Z3)]),
+      % io:format(user,";~p", [timer:now_diff(now(), Z3)]),
       % {M1, _} = Result,
       % {UnifiedRef, UnifiedResult} = {LocalRef, M1},
       % io:format(user, "Unified Result:~n~p~n", [{UnifiedRef, UnifiedResult}]),
@@ -113,20 +113,25 @@ parse(Ty) ->
       ReplaceRefs = maps:from_list([{Ref, ty_node:new_ty_node()} || Ref <- maps:keys(UnifiedResult)]),
       {ReplacedRef, ReplacedResults} = replace_all({UnifiedRef, UnifiedResult}, ReplaceRefs),
       % io:format(user,"Replaced:~n~p~n~p~n", [ReplacedRef, ReplacedResults]),
-      io:format(user,";~p", [timer:now_diff(now(), Z4)]),
+      % io:format(user,";~p", [timer:now_diff(now(), Z4)]),
 
       Z5 = erlang:now(),
       % 4. define types
       [ty_node:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
-      io:format(user,";~p", [timer:now_diff(now(), Z5)]),
+      % io:format(user,";~p", [timer:now_diff(now(), Z5)]),
 
       Z6 = erlang:now(),
       % save unify cache
       global_state:set_state(?MODULE, S#{unify => U#{LocalRef => ReplacedRef}, ref_to_ty => NewR, ty_to_ref => NewT}),
-      io:format(user,";~p", [timer:now_diff(now(), Z6)]),
+      % io:format(user,";~p", [timer:now_diff(now(), Z6)]),
       
       ReplacedRef
-  end.
+  end
+  end),
+  io:format(user,"[3:Unify] ~p ms~n~n", [
+    timer:now_diff(now(), Z1)/1000
+  ]),
+  Res.
 
 replace_all({Ref, All}, Map) ->
   utils:everywhere(fun
@@ -224,12 +229,12 @@ do_convert({{fun_full, Comps, Result}, R}, Q) ->
     {ETy, Q0} = lists:foldl(
         fun(Element, {Components, OldQ}) ->
             % to be converted later, add to queue
-            Id = new_local_ref(),
+            Id = new_local_ref(Element),
             {Components ++ [Id], queue:in({Id, Element}, OldQ)}
         end, {[], Q}, Comps),
 
     % add fun result to queue
-    Id = new_local_ref(),
+    Id = new_local_ref(Result),
     Q1 = queue:in({Id, Result}, Q0),
     
     T = ty_functions:singleton(length(Comps), dnf_ty_function:singleton(ty_function:function(ETy, Id))),

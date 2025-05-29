@@ -89,7 +89,7 @@ prop_parse_and_emptiness() ->
   ?FORALL(X, system(types()), begin 
     global_state:with_new_state(fun() ->
       maps:foreach(fun(VarName, AstTy) ->
-        io:format(user,"~p~n", [AstTy]),
+        % io:format(user,"~p~n", [AstTy]),
         ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy})
       end, X),
 
@@ -103,7 +103,7 @@ prop_parse_and_emptiness() ->
         {T, V} = timer:tc(fun() -> 
           ty_node:is_empty(Parsed)
         end),
-            io:format(user,"~p -> ~p~n", [T2, T]),
+            % io:format(user,"~p -> ~p~n", [T2, T]),
         case (T2 > 5000000) of
           true -> 
             io:format(user, "Set a new system of equations...~n", []),
