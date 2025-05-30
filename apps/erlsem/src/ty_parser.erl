@@ -74,6 +74,7 @@ parse(Ty) ->
   % use local type references stored in a local map
   Z1 = erlang:now(),
   LocalRef = new_local_ref(Ty),
+  io:format(user,"[2:Convert]~n", []),
   (Result = {NewR,NewT}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}),
   % io:format(user, "Result:~n~p~n", [{LocalRef, Result}]),
   io:format(user,"[2:Convert] ~p: ~p ms~n", [
