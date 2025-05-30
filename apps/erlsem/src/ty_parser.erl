@@ -282,11 +282,11 @@ unify(Ref, {IdToTy, TyToIds}) ->
   %ToUnify = maps:to_list(#{K => choose_representative(V) || K := V <- TyToIds, length(V) > 1}), 
   T1 = erlang:now(),
   ToUnify = maps:to_list(maps:filtermap(fun(_K, V) when length(V) =< 1 -> false;(_K, V) -> {true, choose_representative(V)} end, TyToIds)),
-  io:format(user,"choose ~p~n", [timer:now_diff(now(), T1)/1000]),
+  io:format(user,"<a> choose ~p~n", [timer:now_diff(now(), T1)/1000]),
   % replace equivalent refs with representative
   T2 = erlang:now(),
   {UnifiedRef, {UnifiedIdToTy, _UnifiedTyToIds}} = unify(Ref, {IdToTy, TyToIds}, ToUnify),
-  io:format(user,"unify ~p~n", [timer:now_diff(now(), T2)/1000]),
+  io:format(user,"<b> unify ~p~n", [timer:now_diff(now(), T2)/1000]),
   {UnifiedRef, UnifiedIdToTy}.
 
 % -spec choose_representative([temporary_ref()]) -> {temporary_ref(), [temporary_ref()]}.
@@ -303,7 +303,9 @@ choose_representative(Refs) ->
 %   {temporary_ref(), result(), Worklist} 
 %   when Worklist :: [{ty_rec(), {temporary_ref(), [temporary_ref()]}}].
 % TODO utils:everywhere too slow, more efficient unify
-unify(Ref, {IdToTy, TyToIds}, [{_Ty, {Representative, Duplicates}} | Xs])->
+unify(Ref, Db = {IdToTy, TyToIds}, All = [{_Ty, {Representative, Duplicates}} | Xs])->
+  io:format(user,"UNIFY~n~nRef:~n~p~nDb:~n~p~n~p~n", [Ref, Db, All]),
+  error(todo),
   {NewRef, {NewIdToTy, NewTyToIds}} =
   utils:everywhere(fun
     (RRef = {X, _}) when X == local_ref; X == mu_ref -> 

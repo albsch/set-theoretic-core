@@ -21,10 +21,10 @@ is_empty({Default, AllFunctions}, ST) ->
   end.
 
 singleton(Length, FunctionDnf) when is_integer(Length) ->
-  {dnf_ty_function:empty(), #{Length => FunctionDnf}}.
+  remove_redundant({dnf_ty_function:empty(), #{Length => FunctionDnf}}).
 
 negate({DefaultF, F}) ->
-  {dnf_ty_function:negate(DefaultF), maps:map(fun(_K,V) -> dnf_ty_function:negate(V) end, F)}.
+  remove_redundant({dnf_ty_function:negate(DefaultF), maps:map(fun(_K,V) -> dnf_ty_function:negate(V) end, F)}).
 
 
 union({DefaultF1, F1}, {DefaultF2, F2}) ->
@@ -36,7 +36,7 @@ union({DefaultF1, F1}, {DefaultF2, F2}) ->
       maps:get(Key, F2, DefaultF2)
     )
                  end,
-  {dnf_ty_function:union(DefaultF1, DefaultF2), maps:from_list([{Key, UnionKey(Key)} || Key <- AllKeys])}.
+  remove_redundant({dnf_ty_function:union(DefaultF1, DefaultF2), maps:from_list([{Key, UnionKey(Key)} || Key <- AllKeys])}).
 
 intersect({DefaultF1, F1}, {DefaultF2, F2}) ->
   % get all keys
@@ -47,7 +47,7 @@ intersect({DefaultF1, F1}, {DefaultF2, F2}) ->
       maps:get(Key, F2, DefaultF2)
     )
                  end,
-  {dnf_ty_function:intersect(DefaultF1, DefaultF2), maps:from_list([{Key, IntersectKey(Key)} || Key <- AllKeys])}.
+  remove_redundant({dnf_ty_function:intersect(DefaultF1, DefaultF2), maps:from_list([{Key, IntersectKey(Key)} || Key <- AllKeys])}).
 
 difference({DefaultF1, F1}, {DefaultF2, F2}) ->
   % get all keys
@@ -58,7 +58,14 @@ difference({DefaultF1, F1}, {DefaultF2, F2}) ->
       maps:get(Key, F2, DefaultF2)
     )
                  end,
-  {dnf_ty_function:difference(DefaultF1, DefaultF2), maps:from_list([{Key, DifferenceKey(Key)} || Key <- AllKeys])}.
+  remove_redundant({dnf_ty_function:difference(DefaultF1, DefaultF2), maps:from_list([{Key, DifferenceKey(Key)} || Key <- AllKeys])}).
+
+% removes mappings in others which are syntactically equivalent to the default value
+remove_redundant({Default, Others}) ->
+  {
+    Default,
+    #{Arity => TypeOfArity || Arity := TypeOfArity <- Others, TypeOfArity /= Default}
+  }.
 
 % TODO tally
 % normalize_corec({Default, AllFunctions}, Fixed, M) ->
