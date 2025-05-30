@@ -6,6 +6,18 @@
 
 -behaviour(global_state).
 
+-spec init() -> _.
+init() ->
+  case ets:whereis(?MODULE) of
+      undefined -> 
+        ets:new(?MODULE, [set, named_table, {keypos, 1}]),
+        ets:insert(?MODULE, {state, #{id => 0, system => #{}, p => #{}, n => #{}}});
+      _ -> 
+        ok % cleanup()
+  end,
+  % io:format(user, "ty_node state initialized~n", []).
+  ok.
+
 % -record(ty_node, {id :: integer(), definition :: term()}).
 -type type() :: any(). %TODO
 -opaque local_cache() :: #{}. % TODO type cache is only allowed to be inspected in this module
@@ -46,21 +58,11 @@ define(Reference, Node) ->
   global_state:set_state(?MODULE, S#{system => New}),
   Reference.
 
--spec init() -> _.
-init() ->
-  case ets:whereis(?MODULE) of
-      undefined -> 
-        ets:new(?MODULE, [set, named_table, {keypos, 1}]),
-        ets:insert(?MODULE, {state, #{id => 0, system => #{}, p => #{}, n => #{}}});
-      _ -> 
-        ok % cleanup()
-  end,
-  % io:format(user, "ty_node state initialized~n", []).
-  ok.
-
 next_id() ->
+  T0 = now(),
   (S = #{id := Id}) = global_state:get_state(?MODULE),
   global_state:set_state(?MODULE, S#{id => Id + 1}),
+  io:format(user,"<~p> Generating next ID in ~p ms~n", [erts_debug:size(S), timer:now_diff(now(), T0)/1000]),
   Id + 1.
 
 -spec clean() -> _.
