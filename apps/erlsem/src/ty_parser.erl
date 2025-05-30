@@ -299,22 +299,14 @@ choose_representative(Refs) ->
     Refs),
   {Representative, Others}.
 
-% -spec unify(temporary_ref(), result(), Worklist) -> 
-%   {temporary_ref(), result(), Worklist} 
-%   when Worklist :: [{ty_rec(), {temporary_ref(), [temporary_ref()]}}].
-% TODO utils:everywhere too slow, more efficient unify
-unify(Ref, Db = {IdToTy, TyToIds}, All = [{_Ty, {Representative, Duplicates}} | Xs])->
-  io:format(user,"UNIFY~n~nRef:~n~p~nDb:~n~p~n~p~n", [Ref, Db, All]),
-  error(todo),
-  {NewRef, {NewIdToTy, NewTyToIds}} =
+unify(Ref, Db, All) ->
+  ToReplace = maps:from_list(lists:flatten([[{Single, Represent} || Single <- Dupl ] || {_, {Represent, Dupl}}<- All])),
+
   utils:everywhere(fun
     (RRef = {X, _}) when X == local_ref; X == mu_ref -> 
-      case lists:member(RRef, Duplicates) of
-        true -> {ok, Representative};
-        false -> error
+      case ToReplace of 
+        #{RRef := Representative} -> {ok, Representative};
+        _ -> error
       end;
     (_) -> error
-  end, {Ref, {IdToTy, TyToIds}}),
-  unify(NewRef, {NewIdToTy, NewTyToIds}, Xs);
-unify(Ref, Db, [])->
-  {Ref, Db}.
+  end, {Ref, Db}).
