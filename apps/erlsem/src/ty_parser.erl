@@ -76,8 +76,8 @@ parse(Ty) ->
   LocalRef = new_local_ref(Ty),
   (Result = {NewR,NewT}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}),
   % io:format(user, "Result:~n~p~n", [{LocalRef, Result}]),
-  io:format(user,"[2:Convert] ~p: ~p ms~n~w~n", [
-    LocalRef, timer:now_diff(now(), Z1)/1000, {maps:size(NewR), maps:size(NewT)}
+  io:format(user,"[2:Convert] ~p: ~p ms~n", [
+    LocalRef, timer:now_diff(now(), Z1)/1000
   ]),
  
   % 2. Unify the results
@@ -97,8 +97,8 @@ parse(Ty) ->
       % really unify
       Z3 = erlang:now(),
       {UnifiedRef, UnifiedResult} = unify(LocalRef, Result),
-      io:format(user,"~w~n", [ {maps:size(NewR), maps:size(NewT)} ]),
       io:format(user,"<unify> ~p ms~n", [timer:now_diff(now(), Z3)/1000]),
+      io:format(user,"<unify-result> ~p -> ~p~n", [ maps:size(NewR), maps:size(UnifiedResult) ]),
       % {M1, _} = Result,
       % {UnifiedRef, UnifiedResult} = {LocalRef, M1},
       % io:format(user, "Unified Result:~n~p~n", [{UnifiedRef, UnifiedResult}]),

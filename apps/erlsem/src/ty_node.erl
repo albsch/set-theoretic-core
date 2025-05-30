@@ -29,7 +29,7 @@ new_ty_node() ->
   
       % [ty_node:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
 define_all(ReplacedResults) ->
-  io:format(user,"~p~n", [length(ReplacedResults)]),
+  % io:format(user,"~p~n", [length(ReplacedResults)]),
   (S = #{system := System}) = global_state:get_state(?MODULE),
   New = lists:foldl(
     fun({Ref, ToDefineTy}, Acc) -> Acc#{Ref => ToDefineTy} end, 
