@@ -66,7 +66,7 @@ lookup_ty({ty_ref, _, Ref, _}) ->
 parse(Ty) ->
   Z0 = erlang:now(),
   (S = #{unify := U, ref_to_ty := RefToTy, ty_to_ref := TyToRef}) = global_state:get_state(?MODULE),
-  io:format(user,"[1:State] ~p ms~n    Size: ~p kB~n", [timer:now_diff(now(), Z0)/1000, round(utils:size(S))]), 
+  % io:format(user,"[1:State] ~p ms~n", [timer:now_diff(now(), Z0)/1000]), 
   % io:format(user, "Parsing ~p~nReusing parser cache:~n~p~n~p~n", [Ty, RefToTy, TyToRef]),
   % 1. Convert to temporary local representation
   % Create a temporary type equation with a first entrypoint LocalRef = ...
@@ -74,12 +74,10 @@ parse(Ty) ->
   % use local type references stored in a local map
   Z1 = erlang:now(),
   LocalRef = new_local_ref(Ty),
-  io:format(user,"[2:Convert]~n", []),
-  (Result = {NewR,NewT}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}),
+  % io:format(user,"[2:Convert]~n", []),
+  ({Result = {NewR,NewT}, _NewCache}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}, #{}), % TODO fix cache
   % io:format(user, "Result:~n~p~n", [{LocalRef, Result}]),
-  io:format(user,"[2:Convert] ~p: ~p ms~n", [
-    LocalRef, timer:now_diff(now(), Z1)/1000
-  ]),
+  % io:format(user,"[2:Convert] ~p: ~p ms~n", [ LocalRef, timer:now_diff(now(), Z1)/1000 ]),
  
   % 2. Unify the results
   % There can be many duplicate type references;
@@ -98,8 +96,8 @@ parse(Ty) ->
       % really unify
       Z3 = erlang:now(),
       {UnifiedRef, UnifiedResult} = unify(LocalRef, Result),
-      io:format(user,"<unify> ~p ms~n", [timer:now_diff(now(), Z3)/1000]),
-      io:format(user,"<unify-result> ~p -> ~p~n", [ maps:size(NewR), maps:size(UnifiedResult) ]),
+      % io:format(user,"<unify> ~p ms~n", [timer:now_diff(now(), Z3)/1000]),
+      % io:format(user,"<unify-result> ~p -> ~p~n", [ maps:size(NewR), maps:size(UnifiedResult) ]),
       % {M1, _} = Result,
       % {UnifiedRef, UnifiedResult} = {LocalRef, M1},
       % io:format(user, "Unified Result:~n~p~n", [{UnifiedRef, UnifiedResult}]),
@@ -112,13 +110,13 @@ parse(Ty) ->
       {ReplacedRef, ReplacedResults} = replace_all({UnifiedRef, UnifiedResult}, ReplaceRefs),
       % io:format(user,"~p~n", [ {LocalRef, UnifiedRef} ]),
       % io:format(user,"Replaced:~n~p~n~p~n", [ReplacedRef, ReplacedResults]),
-      io:format(user,"replace ~p ms~n", [timer:now_diff(now(), Z4)/ 1000]),
+      % io:format(user,"replace ~p ms~n", [timer:now_diff(now(), Z4)/ 1000]),
 
       Z5 = erlang:now(),
       % 4. define types
       % [ty_node:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
       ty_node:define_all(maps:to_list(ReplacedResults)),
-      io:format(user,"define ~p ms~n", [timer:now_diff(now(), Z5)/ 1000]),
+      % io:format(user,"define ~p ms~n", [timer:now_diff(now(), Z5)/ 1000]),
 
       Z6 = erlang:now(),
       % save unify cache
@@ -128,7 +126,7 @@ parse(Ty) ->
       ReplacedRef
   end
   end),
-  io:format(user,"[3:Unify] ~p ms~n~n", [ Tim/1000 ]),
+  % io:format(user,"[3:Unify] ~p ms~n~n", [ Tim/1000 ]),
   Res.
 
 replace_all({Ref, All}, Map) ->
@@ -157,30 +155,27 @@ group(M, Key, Value) ->
   end.
 
 % -spec convert(queue(), symtab:t(), result()) -> result().
-convert(Queue, Res) ->
-  % io:format(user, "~p~n", [
-  %   queue:len(Queue)
-  % ]),
+convert(Queue, Res, LocalCache) ->
   case queue:is_empty(Queue) of
     true -> 
-      Res; 
+      {Res, LocalCache}; 
     _ -> % convert next layer
       {{value, {LocalRef, Ty}}, Q} = queue:out(Queue),
-      {ErlangRecOrLocalRef, NewQ, {R1, R2}} = do_convert({Ty, Res}, Q),
-      convert(NewQ, {R1#{LocalRef => ErlangRecOrLocalRef}, group(R2, ErlangRecOrLocalRef, LocalRef)})
+      {ErlangRecOrLocalRef, NewQ, {R1, R2}, NewCache} = do_convert({Ty, Res}, Q, LocalCache),
+      convert(NewQ, {R1#{LocalRef => ErlangRecOrLocalRef}, group(R2, ErlangRecOrLocalRef, LocalRef)}, NewCache)
   end.
 
 % -spec do_convert({ast:ty(), result()}, queue(), symtab:t(), memo()) -> {ty_rec(), queue(), result()}.
 
 % entrypoint for recursion
 % named
-do_convert({X = {named, _, Ref, Args}, R = {IdTy, _}}, Q) ->
-  (S = #{cache := M}) = global_state:get_state(?MODULE),
-  case M of
+do_convert({X = {named, _, Ref, Args}, R = {IdTy, _}}, Q, Cache) ->
+  % (S = #{cache := M}) = global_state:get_state(?MODULE),
+  case Cache of
     #{{Ref, Args} := NewRef} ->
       #{NewRef := Ty} = IdTy,
       % io:format(user, "Cache hit for parse: ~p~n~p -> ~p~n", [Ref, NewRef, Ty]),
-      {Ty, Q, R};
+      {Ty, Q, R, Cache};
     _ ->
       % find ty in global table
       % io:format(user,"Lookup: ~p~n", [Ref]),
@@ -194,40 +189,40 @@ do_convert({X = {named, _, Ref, Args}, R = {IdTy, _}}, Q) ->
       NewRef = new_local_ref(X),
 
       % new cache
-      global_state:set_state(?MODULE, S#{cache => M#{{Ref, Args} => NewRef}}),
+      % global_state:set_state(?MODULE, S#{cache => M#{{Ref, Args} => NewRef}}),
       % io:format(user,"e~n~p~n~w~n", [Ref, lists:sort(maps:keys(IdTy))]),
       
 
-      {InternalTy, NewQ, {R0, R1}} = do_convert({NewTy, R}, Q),
+      {InternalTy, NewQ, {R0, R1}, C0} = do_convert({NewTy, R}, Q, Cache#{{Ref, Args} => NewRef}),
       
-      {InternalTy, NewQ, {R0#{NewRef => InternalTy}, group(R1, InternalTy, NewRef)}}
+      {InternalTy, NewQ, {R0#{NewRef => InternalTy}, group(R1, InternalTy, NewRef)}, C0}
   end;
  
 % built-ins
-do_convert({{predef, any}, R}, Q) -> {ty_rec:any(), Q, R};
-do_convert({{predef, none}, R}, Q) -> {ty_rec:empty(), Q, R};
+do_convert({{predef, any}, R}, Q, Cache) -> {ty_rec:any(), Q, R, Cache};
+do_convert({{predef, none}, R}, Q, Cache) -> {ty_rec:empty(), Q, R, Cache};
 
 % boolean operators
-do_convert({{union, []}, R}, Q) -> {ty_rec:empty(), Q, R};
-do_convert({{union, [A]}, R}, Q) -> do_convert({A, R}, Q);
-do_convert({{union, [A|T]}, R}, Q) -> 
-  {R1, Q1, RR1} = do_convert({A, R}, Q),
-  {R2, Q2, RR2} = do_convert({{union, T}, RR1}, Q1),
-  {ty_rec:union(R1, R2), Q2, RR2};
+do_convert({{union, []}, R}, Q, Cache) -> {ty_rec:empty(), Q, R, Cache};
+do_convert({{union, [A]}, R}, Q, Cache) -> do_convert({A, R}, Q, Cache);
+do_convert({{union, [A|T]}, R}, Q, Cache) -> 
+  {R1, Q1, RR1, C1} = do_convert({A, R}, Q, Cache),
+  {R2, Q2, RR2, C2} = do_convert({{union, T}, RR1}, Q1, C1),
+  {ty_rec:union(R1, R2), Q2, RR2, C2};
 
-do_convert({{intersection, []}, R}, Q) -> {ty_rec:any(), Q, R};
-do_convert({{intersection, [A]}, R}, Q) -> do_convert({A, R}, Q);
-do_convert({{intersection, [A|T]}, R}, Q) -> 
-  {R1, Q1, RR0} = do_convert({A, R}, Q),
-  {R2, Q2, RR1} = do_convert({{intersection, T}, RR0}, Q1),
-  {ty_rec:intersect(R1, R2), Q2, RR1};
+do_convert({{intersection, []}, R}, Q, Cache) -> {ty_rec:any(), Q, R, Cache};
+do_convert({{intersection, [A]}, R}, Q, Cache) -> do_convert({A, R}, Q, Cache);
+do_convert({{intersection, [A|T]}, R}, Q, Cache) -> 
+  {R1, Q1, RR0, C0} = do_convert({A, R}, Q, Cache),
+  {R2, Q2, RR1, C1} = do_convert({{intersection, T}, RR0}, Q1, C0),
+  {ty_rec:intersect(R1, R2), Q2, RR1, C1};
 
-do_convert({{negation, Ty}, R}, Q) -> 
-  {NewR, Q0, RR0} = do_convert({Ty, R}, Q),
-  {ty_rec:negate(NewR), Q0, RR0};
+do_convert({{negation, Ty}, R}, Q, Cache) -> 
+  {NewR, Q0, RR0, C0} = do_convert({Ty, R}, Q, Cache),
+  {ty_rec:negate(NewR), Q0, RR0, C0};
 
 % functions
-do_convert({{fun_full, Comps, Result}, R}, Q) ->
+do_convert({{fun_full, Comps, Result}, R}, Q, Cache) ->
     {ETy, Q0} = lists:foldl(
         fun(Element, {Components, OldQ}) ->
             % to be converted later, add to queue
@@ -240,7 +235,7 @@ do_convert({{fun_full, Comps, Result}, R}, Q) ->
     Q1 = queue:in({Id, Result}, Q0),
     
     T = ty_functions:singleton(length(Comps), dnf_ty_function:singleton(ty_function:function(ETy, Id))),
-    {ty_rec:functions(T), Q1, R};
+    {ty_rec:functions(T), Q1, R, Cache};
  
 % TODO atoms
 % do_convert({{singleton, Atom}, R}, Q) when is_atom(Atom) ->
@@ -273,7 +268,7 @@ do_convert({{fun_full, Comps, Result}, R}, Q) ->
 %   %     end
 %   % end;
 
-do_convert(T, _Q) ->
+do_convert(T, _Q, _) ->
   erlang:error({"Transformation from ast:ty() to ty_rec:ty() not implemented or malformed type", T}).
 
 
@@ -283,11 +278,11 @@ unify(Ref, {IdToTy, TyToIds}) ->
   %ToUnify = maps:to_list(#{K => choose_representative(V) || K := V <- TyToIds, length(V) > 1}), 
   T1 = erlang:now(),
   ToUnify = maps:to_list(maps:filtermap(fun(_K, V) when length(V) =< 1 -> false;(_K, V) -> {true, choose_representative(V)} end, TyToIds)),
-  io:format(user,"<a> choose ~p~n", [timer:now_diff(now(), T1)/1000]),
+  % io:format(user,"<a> choose ~p~n", [timer:now_diff(now(), T1)/1000]),
   % replace equivalent refs with representative
   T2 = erlang:now(),
   {UnifiedRef, {UnifiedIdToTy, _UnifiedTyToIds}} = unify(Ref, {IdToTy, TyToIds}, ToUnify),
-  io:format(user,"<b> unify ~p~n", [timer:now_diff(now(), T2)/1000]),
+  % io:format(user,"<b> unify ~p~n", [timer:now_diff(now(), T2)/1000]),
   {UnifiedRef, UnifiedIdToTy}.
 
 % -spec choose_representative([temporary_ref()]) -> {temporary_ref(), [temporary_ref()]}.

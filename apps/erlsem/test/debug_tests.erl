@@ -51,7 +51,7 @@ slow_test_() ->
   end}.
 
 slow_test() ->
-  {ok, [System]} = file:consult("system"),
+  {ok, [System]} = file:consult("system2"),
 
 
   global_state:with_new_state(fun() -> 
@@ -61,11 +61,25 @@ slow_test() ->
       ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy})
     end, System),
 
-    % Ty1 = {named, noloc, {ty_ref, '.', t1, 0}, []},
+    Ty1 = {named, noloc, {ty_ref, '.', t1, 0}, []},
     Ty2 = {named, noloc, {ty_ref, '.', t2, 0}, []},
-    % Ty3 = {named, noloc, {ty_ref, '.', t3, 0}, []},
-    % Ty4 = {named, noloc, {ty_ref, '.', t4, 0}, []},
-    {_T1, _} = timer:tc(fun() -> ty_parser:parse(Ty2) end),
+    Ty3 = {named, noloc, {ty_ref, '.', t3, 0}, []},
+    Ty4 = {named, noloc, {ty_ref, '.', t4, 0}, []},
+    Ty5 = {named, noloc, {ty_ref, '.', t5, 0}, []},
+    Ty6 = {named, noloc, {ty_ref, '.', t6, 0}, []},
+    Ty7 = {named, noloc, {ty_ref, '.', t7, 0}, []},
+    Ty8 = {named, noloc, {ty_ref, '.', t8, 0}, []},
+    Ty9 = {named, noloc, {ty_ref, '.', t9, 0}, []},
+    Ty10 = {named, noloc, {ty_ref, '.', t10, 0}, []},
+    [
+      begin
+        {Time, _} = timer:tc(fun() -> ty_parser:parse(TT) end),
+        io:format(user,"~p ms~n", [Time/1000])
+      end
+      || TT <- [Ty1, Ty2, Ty3, Ty4, Ty5, Ty6, Ty7, Ty8, Ty9, Ty10]
+    ],
+    {T1, _} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
+    io:format(user,"~p ms~n", [T1/1000]),
     % {T2, _} = timer:tc(fun() -> ty_parser:parse(Ty2) end),
     % {T3, _} = timer:tc(fun() -> ty_parser:parse(Ty3) end),
     % {T4, _} = timer:tc(fun() -> ty_parser:parse(Ty4) end),
@@ -76,7 +90,6 @@ slow_test() ->
     % {_, _} = timer:tc(fun() -> ty_parser:parse(Ty2) end),
     % {T7, _} = timer:tc(fun() -> ty_parser:parse(Ty2) end),
     % {T6, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
-    % io:format(user,"~p~n", [T6]),
     % {T7, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),
     % io:format(user,"~p~n", [T7]),
     % {T8, _Parsed} = timer:tc(fun() -> ty_parser:parse(Ty1) end),

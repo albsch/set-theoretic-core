@@ -104,7 +104,7 @@ prop_parse_and_emptiness() ->
           ty_node:is_empty(Parsed)
         end),
             % io:format(user,"~p -> ~p~n", [T2, T]),
-        case (T2 > 5000000) of
+        case (T2 > 1000000) of
           true -> 
             io:format(user, "Set a new system of equations...~n", []),
             io:format(user, "~p~n==~n", [X]),
