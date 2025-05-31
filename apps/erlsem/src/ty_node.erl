@@ -70,6 +70,9 @@ load(TyNode) ->
 leq(T1, T2) ->
   is_empty(difference(T1, T2)).
 
+leq(T1, T2, Cache) ->
+  is_empty(difference(T1, T2), Cache).
+
 -spec is_empty(type()) -> boolean().
 is_empty(TyNode) ->
   % TODO update global cache with local cache entries

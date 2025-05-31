@@ -3,90 +3,60 @@
 -include_lib("proper/include/proper.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
--export([limited_formula/0]).
-
 tany() -> {predef, any}.
 tempty() -> {predef, none}.
+tnegation(A) -> {negation, A}.
 tunion(A, B) -> {union, [A, B]}.
 tintersection(A, B) -> {intersection, [A, B]}.
 tarrow(A, B) -> {fun_full, [A], B}.
 tfun(As, B) -> {fun_full, As, B}.
-tvar() ->
-  ?LET(Varname, oneof(types()), {named, 0, {ty_ref, '.', Varname, 0}, []}).
+tvar(Variables) ->
+  ?LET(Varname, oneof(Variables), {named, 0, {ty_ref, '.', Varname, 0}, []}).
 
 
-types() -> [t1, t2, t3, t4, t5, t6, t7, t8, t9, t10].
+limited_formula(Variables) ->
+  ?SIZED(Size, limited_formula(Variables, Size, toplevel)).
 
-limited_formula() ->
-  ?SIZED(Size, limited_formula(Size, toplevel)).
-
-tvar_if_not_toplevel(Mode) -> 
-  case Mode of toplevel -> []; _ -> [{1, tvar()}] end.
+tvar_if_not_toplevel(Variables, Mode) -> 
+  case Mode of toplevel -> []; _ -> [{1, tvar(Variables)}] end.
 
 
-limited_formula(Size, Mode) when Size =< 1 ->
+limited_formula(Variables, Size, Mode) when Size =< 1 ->
   frequency([
     {1, tempty()},
     {1, tany()}
-  ] ++ tvar_if_not_toplevel(Mode)
+  ] ++ tvar_if_not_toplevel(Variables, Mode)
 );
-limited_formula(Size, Mode) ->
+limited_formula(Variables, Size, Mode) ->
   frequency([
     {2, tempty()},
     {2, tany()},
+    {1, ?LAZY(?LET(A, 
+        limited_formula(Variables, Size div 2, Mode), 
+        tnegation(A)))  },
     {4, ?LAZY(?LET({A, B}, 
-        {limited_formula(Size div 2, Mode), limited_formula(Size div 2, Mode)}, 
+        {limited_formula(Variables, Size div 2, Mode), limited_formula(Variables, Size div 2, Mode)}, 
         tunion(A, B)))  },
     {4, ?LAZY(?LET({A, B}, 
-        {limited_formula(Size div 2, Mode), limited_formula(Size div 2, Mode)}, 
+        {limited_formula(Variables, Size div 2, Mode), limited_formula(Variables, Size div 2, Mode)}, 
         tintersection(A, B)))  },
     {4, ?LAZY(?LET({A, B}, 
-        {limited_formula(Size div 2, inside), limited_formula(Size div 2, inside)}, 
+        {limited_formula(Variables, Size div 2, inside), limited_formula(Variables, Size div 2, inside)}, 
         tarrow(A, B)))  },
     {1, ?LAZY(?LET({As, B}, 
-        {list(limited_formula(Size div 2, inside)), limited_formula(Size div 2, inside)}, 
+        {list(limited_formula(Variables, Size div 2, inside)), limited_formula(Variables, Size div 2, inside)}, 
         tfun(As, B)))  }
-  ] ++ tvar_if_not_toplevel(Mode)
+  ] ++ tvar_if_not_toplevel(Variables, Mode)
 ).
 
 system(Variables) ->
-  ?SUCHTHAT(Ty, ?LET(Formulas, [limited_formula() || _ <- Variables], 
+  ?SUCHTHAT(Ty, ?LET(Formulas, [limited_formula(Variables) || _ <- Variables], 
     maps:from_list(lists:zip(Variables, Formulas))
   ), valid_system(Ty)).
 
-
-prop_single() ->
-  System = 
-  #{
-    t1 => {union,[
-      {fun_full,[{predef,any}],{predef,any}},
-      {fun_full,[{predef,none}],{predef,any}}
-    ]}
-  },
-  
-
-  global_state:with_new_state(fun() ->
-    maps:foreach(fun(VarName, AstTy) ->
-      ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy})
-    end, System),
-
-    maps:map(fun(Name, _) -> 
-      io:format(user, "Parsing ~p~n", [Name]),
-      Ty = {named, noloc, {ty_ref, '.', Name, 0}, []},
-      % parse
-      Node = ty_parser:parse(Ty),
-      ty_node:is_empty(Node),
-      ty_node:is_empty(Node),
-      true
-    end, System),
-    
-    true
-  end),
-  true.
-
 % property that checks if we can parse any random type
 prop_parse_and_emptiness() -> 
-  ?FORALL(X, system(types()), begin 
+  ?FORALL(X, ?LET(Types, nonempty_list(atom()), system(Types)), begin 
     global_state:with_new_state(fun() ->
       maps:foreach(fun(VarName, AstTy) ->
         ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy})
@@ -102,14 +72,12 @@ prop_parse_and_emptiness() ->
     end)
   end).
 
-
-
 valid_system(System) ->
   lists:all(fun valid_rec/1, maps:to_list(System)).
   
-
 valid_rec({_, {predef, any}}) -> true;
 valid_rec({_, {predef, none}}) -> true;
+valid_rec({Ty, {negation, L}}) -> valid_rec({Ty, L});
 valid_rec({Ty, {union, L}}) -> lists:all(fun(E) -> valid_rec({Ty, E}) end, L);
 valid_rec({Ty, {intersection, L}}) -> lists:all(fun(E) -> valid_rec({Ty, E}) end, L);
 valid_rec({_, {fun_full, _, _}}) -> true;
