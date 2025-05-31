@@ -36,3 +36,19 @@ everywhere(F, T) ->
 
 size(Term) ->
   (erts_debug:size(Term) * 8)/1024.
+
+update_ets_from_map(EtsTable, LocalMap) ->
+  % Filter LocalMap to only new/changed entries
+  ChangedEntries = maps:fold(
+      fun(K, V, Acc) ->
+          case ets:lookup(EtsTable, K) of
+              [{K, V}] -> Acc;      % Skip unchanged
+              _ -> [{K, V} | Acc]   % Collect changes
+          end
+      end,
+      [],
+      LocalMap
+  ),
+  
+  % Bulk-insert changes (faster than one-by-one)
+  ets:insert(EtsTable, ChangedEntries).

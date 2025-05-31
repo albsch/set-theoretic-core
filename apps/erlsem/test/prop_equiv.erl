@@ -89,30 +89,14 @@ prop_parse_and_emptiness() ->
   ?FORALL(X, system(types()), begin 
     global_state:with_new_state(fun() ->
       maps:foreach(fun(VarName, AstTy) ->
-        % io:format(user,"~p~n", [AstTy]),
         ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy})
       end, X),
 
-      % io:format(user, "Set a new system of equations...~n", []),
-      % io:format(user, "~p~n", [ty_parser:get_symtab()]), 
-      
       maps:map(fun(Name, _) -> 
         Ty = {named, noloc, {ty_ref, '.', Name, 0}, []},
-        % parse
-        {T2, Parsed} = timer:tc(fun() -> ty_parser:parse(Ty) end),
-        {T, V} = timer:tc(fun() -> 
-          ty_node:is_empty(Parsed)
-        end),
-            % io:format(user,"~p -> ~p~n", [T2, T]),
-        case (T2 > 1000000) of
-          true -> 
-            io:format(user, "Set a new system of equations...~n", []),
-            io:format(user, "~p~n==~n", [X]),
-            erlang:halt();
-          _ -> ok
-        end,
+        Parsed = ty_parser:parse(Ty),
+        ty_node:is_empty(Parsed),
         true
-        % ty_node:is_empty()
       end, X),
       true 
     end)

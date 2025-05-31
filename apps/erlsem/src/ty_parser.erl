@@ -2,27 +2,29 @@
 
 -compile([export_all, nowarn_export_all]).
 
+-define(SYMTAB, ty_parser_symtab).
+-define(UNIFY, ty_parser_unify).
+-define(CACHE, ty_parser_cache).
+-define(REFTOTY, ty_parser_ref_to_ty).
+-define(TYTOREF, ty_parser_ty_to_ref).
+-define(ALL_ETS, [?UNIFY, ?CACHE, ?REFTOTY, ?TYTOREF, ?SYMTAB]).
+
 % global state
 -spec init() -> _.
 init() ->
-  case ets:whereis(?MODULE) of
-      undefined -> 
-        ets:new(?MODULE, [set, named_table, {keypos, 1}]),
-        ets:insert(?MODULE, {state, #{symtab => #{}, unify => #{}, cache => #{}, ref_to_ty => #{}, ty_to_ref => #{} }});
-      _ -> 
-        ok % cleanup()
+  case ets:whereis(?SYMTAB) of
+      undefined -> [ets:new(T, [set, named_table]) || T <- ?ALL_ETS];
+      _ -> logger:info("~p state already initialized, skip init", [?MODULE])
   end,
-  % io:format(user, "ty_node state initialized~n", []).
-  ok.
+  logger:debug("~p state initialized", [?MODULE]).
 
 -spec clean() -> _.
 clean() ->
-  case ets:whereis(?MODULE) of
-      undefined -> ok;
-      _ -> 
-        % io:format(user, "ty_node state removed~n", []),
-        ets:delete(?MODULE)
-  end.
+  case ets:whereis(?SYMTAB) of
+      undefined -> logger:info("~p state already deleted, skip clean", [?MODULE]);
+      _ -> [ets:delete(T) || T <- ?ALL_ETS]
+  end,
+  logger:debug("~p state cleaned", [?MODULE]).
 
 -type temporary_ref() :: 
     {local_ref, integer()}. % fresh type references created for the queue
@@ -32,45 +34,47 @@ new_local_ref() -> {local_ref, erlang:unique_integer()}.
 
 new_local_ref(Term) -> {local_ref, erlang:phash2(Term)}.
 
-extend_symtab(Key, Value) ->
-  (S = #{symtab := Sym}) = global_state:get_state(?MODULE),
-  global_state:set_state(?MODULE, S#{symtab := Sym#{Key => Value}}).
+extend_symtab(Ref, TyScheme) ->
+  ets:insert(?SYMTAB, {Ref, TyScheme}).
+  % (S = #{symtab := Sym}) = global_state:get_state(?MODULE),
+  % global_state:set_state(?MODULE, S#{symtab := Sym#{Key => Value}}).
 
-get_symtab() ->
-  #{symtab := Sym} = global_state:get_state(?MODULE),
-  Sym.
+% get_symtab() ->
+%   #{symtab := Sym} = global_state:get_state(?MODULE),
+%   Sym.
 
 set_symtab(Symtab) ->
-  S = global_state:get_state(?MODULE),
-  global_state:set_state(?MODULE, S#{symtab := Symtab}).
+  utils:update_ets_from_map(?SYMTAB, Symtab).
 
 % -spec var_ref(ast:ty_var()) -> temporary_ref().
 % var_ref(Var) -> {mu_ref, Var}.
 
 lookup_ty({ty_ref, _, Ref, _}) ->
-  % ({ty_scheme, Vars, Ty}) = symtab:lookup_ty(Ref, Loc, Sym),
-  #{symtab := #{Ref := {ty_scheme, [], Ty}}} = global_state:get_state(?MODULE),
+  [{Ref, {ty_scheme, [], Ty}}] = ets:lookup(?SYMTAB, Ref),
   {ty_scheme, [], Ty}.
 
 % -spec ast_to_erlang_ty(ast:ty(), symtab:t()) -> ty_rec:ty_ref().
 parse(Ty) ->
-  (S = #{unify := U, ref_to_ty := RefToTy, ty_to_ref := TyToRef}) = global_state:get_state(?MODULE),
+  % 0. local snapshot of state
+  RefToTy = maps:from_list(ets:tab2list(?REFTOTY)),
+  TyToRef = maps:from_list(ets:tab2list(?TYTOREF)),
 
   % 1. Convert to temporary local representation
-  % Create a temporary type equation with a first entrypoint LocalRef = ...
-  % and parse the type layer by layer
-  % use local type references stored in a local map
+  %    Create a temporary type equation with a first entrypoint LocalRef = ...
+  %    and parse the type layer by layer
+  %    use local type references stored in a local map
   LocalRef = new_local_ref(Ty),
   ({Result = {NewR,NewT}, _NewCache}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}, #{}), % TODO fix cache
+  
+  % update global ref and ty mappings
+  utils:update_ets_from_map(?REFTOTY, NewR),
+  utils:update_ets_from_map(?TYTOREF, NewT),
  
   % 2. Unify the results
-  % There can be many duplicate type references;
-  % these will be substituted with their representative
-  case U of
-    #{LocalRef := ReplacedRef} -> 
-      % save cache for future
-      global_state:set_state(?MODULE, S#{ref_to_ty => NewR, ty_to_ref => NewT}),
-      
+  %    There can be many duplicate type references;
+  %    these will be substituted with their representative
+  case ets:lookup(?UNIFY, LocalRef) of
+    [{LocalRef, ReplacedRef}] -> 
       % io:format(user,"Unify cache hit~n", []),
       ReplacedRef;
     _ ->
@@ -85,7 +89,8 @@ parse(Ty) ->
       % 4. define types
       [ty_node:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
 
-      global_state:set_state(?MODULE, S#{unify => U#{LocalRef => ReplacedRef}, ref_to_ty => NewR, ty_to_ref => NewT}),
+      % 5. save unify result
+      ets:insert(?UNIFY, {LocalRef, ReplacedRef}),
       
       ReplacedRef
   end.

@@ -10,16 +10,14 @@
 -define(SYSTEM, ty_node_system).
 -define(P, ty_node_p).
 -define(N, ty_node_n).
+-define(ALL_ETS, [?ID, ?SYSTEM, ?P, ?N]).
 
 -spec init() -> _.
 init() ->
   case ets:whereis(?ID) of
       undefined -> 
-        ets:new(?ID, [named_table]),
-        ets:insert(?ID, {id, 0}),
-        ets:new(?SYSTEM, [named_table]),
-        ets:new(?P, [named_table]),
-        ets:new(?N, [named_table]);
+        [ets:new(T, [set, named_table]) || T <- ?ALL_ETS],
+        ets:insert(?ID, {id, 0});
       _ -> 
         ok % cleanup()
   end,
