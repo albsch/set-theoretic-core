@@ -191,6 +191,19 @@ do_convert({{fun_full, Comps, Result}, R}, Q, Cache) ->
     
     T = ty_functions:singleton(length(Comps), dnf_ty_function:singleton(ty_function:function(ETy, Id))),
     {ty_rec:functions(T), Q1, R, Cache};
+
+do_convert({{tuple, Comps}, R}, Q, Cache) ->
+  {ETy, Q0} = lists:foldl(
+    fun(Element, {Components, OldQ}) ->
+      % to be converted later, add to queue
+      Id = new_local_ref(Element),
+      {Components ++ [Id], queue:in({Id, Element}, OldQ)}
+    end, {[], Q}, Comps),
+    
+  T = ty_tuples:singleton(length(Comps), dnf_ty_tuple:singleton(ty_tuple:tuple(ETy))),
+  {ty_rec:tuples(T), Q0, R, Cache};
+
+
  
 % TODO atoms
 % do_convert({{singleton, Atom}, R}, Q) when is_atom(Atom) ->

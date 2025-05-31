@@ -20,7 +20,7 @@ compare({ty_function, Domains1, Codomain1}, {ty_function, Domains2, Codomain2}) 
   ).
 
 -spec equal(type(), type()) -> boolean().
-equal(T1, T2) -> compare(T1, T2) =:= 0.
+equal(T1, T2) -> compare(T1, T2) =:= eq.
 
 function(Refs, Ref2) when is_list(Refs) ->
   {ty_function, Refs, Ref2}.

@@ -5,11 +5,11 @@
 -endif.
 %% n-tuple representation
 
-compare(A, B) when A < B -> -1;
-compare(A, B) when A > B -> 1;
-compare(_, _) -> 0.
+compare(A, B) when A < B -> lt;
+compare(A, B) when A > B -> gt;
+compare(_, _) -> eq.
 
-equal(P1, P2) -> compare(P1, P2) =:= 0.
+equal(P1, P2) -> compare(P1, P2) =:= eq.
 
 tuple(Refs) -> {ty_tuple, length(Refs), Refs}.
 

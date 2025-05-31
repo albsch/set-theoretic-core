@@ -7,6 +7,7 @@
 -record(ty, 
   {
     % atom, 
+    ty_tuples,
     ty_functions
   }).
 
@@ -59,3 +60,6 @@ difference(T1, T2) ->
 
 functions(Fs) ->
   (empty())#ty{ty_functions = Fs}.
+
+tuples(Ts) ->
+  (empty())#ty{ty_tuples = Ts}.
