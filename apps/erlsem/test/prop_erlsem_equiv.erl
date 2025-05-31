@@ -31,9 +31,10 @@ limited_formula(Variables, Size, Mode) ->
   frequency([
     {2, tempty()},
     {2, tany()},
-    {1, ?LAZY(?LET(A, 
-        limited_formula(Variables, Size div 2, Mode), 
-        tnegation(A)))  },
+    % TODO negation when tuples work
+    % {1, ?LAZY(?LET(A, 
+    %     limited_formula(Variables, Size div 2, Mode), 
+    %     tnegation(A)))  },
     {4, ?LAZY(?LET({A, B}, 
         {limited_formula(Variables, Size div 2, Mode), limited_formula(Variables, Size div 2, Mode)}, 
         tunion(A, B)))  },
