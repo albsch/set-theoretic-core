@@ -16,12 +16,6 @@
 %   is_empty(difference(T1, T2)).
  
 % -type is_empty(type(), X) :: {boolean(), X}.
-is_empty(Ty, ST) ->
-  Dnf = dnf(Ty),
-  lists:foldl(fun
-    (_Line, {false, ST0}) -> {false, ST0};
-    (Line, {true, ST0}) -> is_empty_line(Line, ST0)
-  end, {true, ST}, Dnf).
 
 % -> {boolean(), local_cache()}.
 is_empty_line({AllPos, Neg, T}, ST) ->

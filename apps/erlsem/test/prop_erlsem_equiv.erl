@@ -9,6 +9,7 @@ tnegation(A) -> {negation, A}.
 tunion(A, B) -> {union, [A, B]}.
 tintersection(A, B) -> {intersection, [A, B]}.
 tarrow(A, B) -> {fun_full, [A], B}.
+tproduct(A, B) -> {tuple, [A, B]}.
 tfun(As, B) -> {fun_full, As, B}.
 tvar(Variables) ->
   ?LET(Varname, oneof(Variables), {named, 0, {ty_ref, '.', Varname, 0}, []}).
@@ -41,6 +42,9 @@ limited_formula(Variables, Size, Mode) ->
     {4, ?LAZY(?LET({A, B}, 
         {limited_formula(Variables, Size div 2, Mode), limited_formula(Variables, Size div 2, Mode)}, 
         tintersection(A, B)))  },
+    {8, ?LAZY(?LET({A, B}, 
+        {limited_formula(Variables, Size div 2, inside), limited_formula(Variables, Size div 2, inside)}, 
+        tproduct(A, B)))  },
     {4, ?LAZY(?LET({A, B}, 
         {limited_formula(Variables, Size div 2, inside), limited_formula(Variables, Size div 2, inside)}, 
         tarrow(A, B)))  },
@@ -82,6 +86,7 @@ valid_rec({Ty, {negation, L}}) -> valid_rec({Ty, L});
 valid_rec({Ty, {union, L}}) -> lists:all(fun(E) -> valid_rec({Ty, E}) end, L);
 valid_rec({Ty, {intersection, L}}) -> lists:all(fun(E) -> valid_rec({Ty, E}) end, L);
 valid_rec({_, {fun_full, _, _}}) -> true;
+valid_rec({_, {tuple, _}}) -> true;
 valid_rec({Ty, {named, _, {ty_ref, '.', Ty, 0}, []}}) -> false;
 valid_rec({_, {named, _, _Ty, []}}) -> false. % lets say recursion happens only under a type constructor for any variable
   

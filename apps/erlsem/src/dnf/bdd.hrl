@@ -118,6 +118,13 @@ dnf_acc(Acc, Ps, Ns, {node, A, P, N}) ->
   Acc0 = dnf_acc(Acc, [A | Ps], Ns, P),
   dnf_acc(Acc0, Ps, [A | Ns], N).
 
+is_empty(Ty, ST) ->
+  Dnf = dnf(Ty),
+  lists:foldl(fun
+    (_Line, {false, ST0}) -> {false, ST0};
+    (Line, {true, ST0}) -> is_empty_line(Line, ST0)
+  end, {true, ST}, Dnf).
+
 
 % is_empty_union(F1, F2) ->
 %   F1() andalso F2().
