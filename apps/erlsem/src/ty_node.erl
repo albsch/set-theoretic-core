@@ -46,11 +46,6 @@ make(Ty) ->
 
 new_ty_node() ->
   {node, next_id()}.
-  
-      % [ty_node:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
-define_all(ReplacedResults) ->
-  [ets:insert(?SYSTEM, {Ref, ToDefineTy}) || {Ref, ToDefineTy} <- ReplacedResults],
-  ok.
 
 define(Reference, Node) ->
   ets:insert(?SYSTEM, {Reference, Node}).

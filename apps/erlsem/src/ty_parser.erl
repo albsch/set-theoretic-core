@@ -107,7 +107,7 @@ parse(Ty) ->
       %    return result reference
       Z4 = erlang:now(),
       ReplaceRefs = maps:from_list([{Ref, ty_node:new_ty_node()} || Ref <- maps:keys(UnifiedResult)]),
-      io:format(user,"create ~p ms~n~p~n", [timer:now_diff(now(), Z4)/ 1000, maps:size(UnifiedResult)]),
+      io:format(user,"create ~p ms~n", [timer:now_diff(now(), Z4)/ 1000]),
       Z44 = erlang:now(),
       {ReplacedRef, ReplacedResults} = replace_all({UnifiedRef, UnifiedResult}, ReplaceRefs),
       % io:format(user,"~p~n", [ {LocalRef, UnifiedRef} ]),
@@ -116,8 +116,7 @@ parse(Ty) ->
 
       Z5 = erlang:now(),
       % 4. define types
-      % [ty_node:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
-      ty_node:define_all(maps:to_list(ReplacedResults)),
+      [ty_node:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
       % io:format(user,"define ~p ms~n", [timer:now_diff(now(), Z5)/ 1000]),
 
       Z6 = erlang:now(),
