@@ -1,4 +1,4 @@
--module(prop_equiv).
+-module(prop_recsys_equiv).
 
 -include_lib("proper/include/proper.hrl").
 -include_lib("eunit/include/eunit.hrl").
