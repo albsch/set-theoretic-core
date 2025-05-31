@@ -6,12 +6,20 @@
 
 -behaviour(global_state).
 
+-define(ID, ty_node_id).
+-define(SYSTEM, ty_node_system).
+-define(P, ty_node_p).
+-define(N, ty_node_n).
+
 -spec init() -> _.
 init() ->
-  case ets:whereis(?MODULE) of
+  case ets:whereis(?ID) of
       undefined -> 
-        ets:new(?MODULE, [set, named_table, {keypos, 1}]),
-        ets:insert(?MODULE, {state, #{id => 0, system => #{}, p => #{}, n => #{}}});
+        ets:new(?ID, [named_table]),
+        ets:insert(?ID, {id, 0}),
+        ets:new(?SYSTEM, [named_table]),
+        ets:new(?P, [named_table]),
+        ets:new(?N, [named_table]);
       _ -> 
         ok % cleanup()
   end,
@@ -41,41 +49,29 @@ new_ty_node() ->
   
       % [ty_node:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
 define_all(ReplacedResults) ->
-  % io:format(user,"~p~n", [length(ReplacedResults)]),
-  (S = #{system := System}) = global_state:get_state(?MODULE),
-  New = lists:foldl(
-    fun({Ref, ToDefineTy}, Acc) -> Acc#{Ref => ToDefineTy} end, 
-    System, 
-    ReplacedResults
-  ),
-  % New = System#{Reference => Node},
-  global_state:set_state(?MODULE, S#{system => New}),
+  [ets:insert(?SYSTEM, {Ref, ToDefineTy}) || {Ref, ToDefineTy} <- ReplacedResults],
   ok.
 
 define(Reference, Node) ->
-  (S = #{system := System}) = global_state:get_state(?MODULE),
-  New = System#{Reference => Node},
-  global_state:set_state(?MODULE, S#{system => New}),
-  Reference.
+  ets:insert(?SYSTEM, {Reference, Node}).
 
 next_id() ->
-  T0 = now(),
-  (S = #{id := Id}) = global_state:get_state(?MODULE),
-  global_state:set_state(?MODULE, S#{id => Id + 1}),
-  io:format(user,"<~p> Generating next ID in ~p ms~n", [erts_debug:size(S), timer:now_diff(now(), T0)/1000]),
-  Id + 1.
+  NextId = ets:update_counter(?ID, id, 1),
+  NextId.
 
 -spec clean() -> _.
 clean() ->
-  case ets:whereis(?MODULE) of
+  case ets:whereis(?ID) of
       undefined -> ok;
       _ -> 
-        % io:format(user, "ty_node state removed~n", []),
-        ets:delete(?MODULE)
+        ets:delete(?ID),
+        ets:delete(?SYSTEM),
+        ets:delete(?P),
+        ets:delete(?N)
   end.
 
 load(TyNode) ->
-  (#{system := #{TyNode := Ty}}) = global_state:get_state(?MODULE),
+  [{TyNode, Ty}] = ets:lookup(?SYSTEM, TyNode),
   Ty.
   
 leq(T1, T2) ->
