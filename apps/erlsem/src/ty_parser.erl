@@ -58,38 +58,39 @@ parse(Ty) ->
   % 0. local snapshot of state
   RefToTy = maps:from_list(ets:tab2list(?REFTOTY)),
   TyToRef = maps:from_list(ets:tab2list(?TYTOREF)),
+  Cache = maps:from_list(ets:tab2list(?CACHE)),
 
   % 1. Convert to temporary local representation
   %    Create a temporary type equation with a first entrypoint LocalRef = ...
   %    and parse the type layer by layer
   %    use local type references stored in a local map
   LocalRef = new_local_ref(Ty),
-  ({Result = {NewR,NewT}, _NewCache}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}, #{}), % TODO fix cache
+  ({Result = {NewR,NewT}, NewCache}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}, Cache),
   
-  % update global ref and ty mappings
+  % update global ref, ty mapping, and cache
   utils:update_ets_from_map(?REFTOTY, NewR),
   utils:update_ets_from_map(?TYTOREF, NewT),
+  utils:update_ets_from_map(?CACHE, NewCache),
  
   % 2. Unify the results
   %    There can be many duplicate type references;
   %    these will be substituted with their representative
   case ets:lookup(?UNIFY, LocalRef) of
     [{LocalRef, ReplacedRef}] -> 
-      % io:format(user,"Unify cache hit~n", []),
       ReplacedRef;
     _ ->
-      % really unify
+      % 2.1 unify
       {UnifiedRef, UnifiedResult} = unify(LocalRef, Result),
 
-      % 3. create new type references and replace temporary ones
-      %    return result reference
+      % 2.2 create new type references and replace temporary ones
+      %     return result reference
       ReplaceRefs = maps:from_list([{Ref, ty_node:new_ty_node()} || Ref <- maps:keys(UnifiedResult)]),
       {ReplacedRef, ReplacedResults} = replace_all({UnifiedRef, UnifiedResult}, ReplaceRefs),
 
-      % 4. define types
+      % 2.3 define types
       [ty_node:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
 
-      % 5. save unify result
+      % 2.4 save unify result
       ets:insert(?UNIFY, {LocalRef, ReplacedRef}),
       
       ReplacedRef
