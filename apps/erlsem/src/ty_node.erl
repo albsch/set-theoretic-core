@@ -46,7 +46,8 @@ new_ty_node() ->
   {node, next_id()}.
 
 define(Reference, Node) ->
-  ets:insert(?SYSTEM, {Reference, Node}).
+  ets:insert(?SYSTEM, {Reference, Node}),
+  Reference.
 
 next_id() ->
   NextId = ets:update_counter(?ID, id, 1),
@@ -100,6 +101,7 @@ is_empty(TyNode, LocalCache) ->
     _ -> 
       % assume type is empty and add to state
       % N U {t}
+      io:format(user,"Ty: ~p~n", [Ty]),
       {Result, LC_0} = ty_rec:is_empty(Ty, LocalCache#{Ty => true}),
 
       case Result of 

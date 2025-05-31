@@ -2,6 +2,7 @@
 
 -define(ATOM, ty_tuple).
 -define(LEAF, ty_bool).
+-define(NODE, ty_node).
 -define(F(Z), fun() -> Z end).
 
 % -export([is_empty_corec/2, normalize_corec/6, substitute/4, apply_to_node/3]).
@@ -12,14 +13,19 @@
 
 
 is_empty_line({AllPos, Neg, T}, ST) ->
+  io:format(user,"XXX~n~p~n", [{AllPos, Neg, T}]),
   case {AllPos, Neg, ty_bool:empty()} of
     {_, _, T} -> {true, ST};
     {[], [], _} -> {false, ST};
     {[], [TNeg | _], _} ->
       Dim = length(ty_tuple:components(TNeg)),
       PosAny = ty_tuple:any(Dim),
+  io:format(user,"PosAny~n~p~n", [PosAny]),
       BigS = ty_tuple:big_intersect([PosAny]),
-      phi(ty_tuple:components(BigS), Neg, ST);
+  io:format(user,"BigS~n~p~n", [BigS]),
+      Z = phi(ty_tuple:components(BigS), Neg, ST),
+  io:format(user,"Z~n~p~n", [Z]),
+      Z;
     {Pos, Neg, _} ->
       BigS = ty_tuple:big_intersect(Pos),
       phi(ty_tuple:components(BigS), Neg, ST)
@@ -29,7 +35,7 @@ phi(BigS, [], ST) ->
   % TODO how big of a performance hit is non-shortcut behavior of the true branch?
   lists:foldl(
     fun(_, {true, ST0}) -> {true, ST0};
-       (S, {false, ST0}) -> ty_rec:is_empty_corec(S, ST0) 
+       (S, {false, ST0}) -> ?NODE:is_empty(S, ST0) 
     end, 
     {false, ST}, 
   BigS);
@@ -41,7 +47,7 @@ phi(BigS, [Ty | N], ST) ->
       % remove pi_Index(NegativeComponents) from pi_Index(PComponents) and continue searching
         DoDiff = fun({IIndex, PComp}) ->
           case IIndex of
-            Index -> ty_rec:diff(PComp, NComponent);
+            Index -> ?NODE:diff(PComp, NComponent);
             _ -> PComp
           end
                  end,
@@ -51,7 +57,7 @@ phi(BigS, [Ty | N], ST) ->
           end,
 
   maybe
-    {false, ST1} ?= lists:foldl(fun(_S, {true, ST0}) -> {true, ST0}; (S, {false, ST0}) -> ty_rec:is_empty_corec(S, ST0) end, {false, ST}, BigS),
+    {false, ST1} ?= lists:foldl(fun(_S, {true, ST0}) -> {true, ST0}; (S, {false, ST0}) -> ?NODE:is_empty(S, ST0) end, {false, ST}, BigS),
     lists:foldl(
       Solve, 
       {true, ST1}, 
