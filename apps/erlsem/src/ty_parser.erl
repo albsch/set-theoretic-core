@@ -65,7 +65,8 @@ parse(Ty) ->
   %    and parse the type layer by layer
   %    use local type references stored in a local map
   LocalRef = new_local_ref(Ty),
-  ({Result = {NewR,NewT}, NewCache}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}, Cache),
+  ({Result = {NewR,NewTUnsorted}, NewCache}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}, Cache),
+  NewT = #{K => lists:usort(V) || K := V <- NewTUnsorted},
   
   % update global ref, ty mapping, and cache
   utils:update_ets_from_map(?REFTOTY, NewR),
@@ -110,7 +111,7 @@ replace_all({Ref, All}, Map) ->
 % -spec group(#{A => list(X)}, A, X) -> #{A := list(X)}.
 group(M, Key, Value) ->
   case M of
-    #{Key := Group} -> M#{Key => lists:usort(Group ++ [Value])};
+    #{Key := Group} -> M#{Key => ([Value | Group])};
     _ -> M#{Key => [Value]}
   end.
 
