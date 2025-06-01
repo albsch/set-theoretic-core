@@ -21,6 +21,8 @@ limited_formula(Variables) ->
 tvar_if_not_toplevel(Variables, Mode) -> 
   case Mode of toplevel -> []; _ -> [{1, tvar(Variables)}] end.
 
+-define(F, limited_formula(Variables, Size div 2, Mode)).
+-define(Fi, limited_formula(Variables, Size div 2, inside)).
 
 limited_formula(Variables, Size, Mode) when Size =< 1 ->
   frequency([
@@ -32,24 +34,12 @@ limited_formula(Variables, Size, Mode) ->
   frequency([
     {2, tempty()},
     {2, tany()},
-    {1, ?LAZY(?LET(A, 
-        limited_formula(Variables, Size div 2, Mode), 
-        tnegation(A)))  },
-    {4, ?LAZY(?LET({A, B}, 
-        {limited_formula(Variables, Size div 2, Mode), limited_formula(Variables, Size div 2, Mode)}, 
-        tunion(A, B)))  },
-    {4, ?LAZY(?LET({A, B}, 
-        {limited_formula(Variables, Size div 2, Mode), limited_formula(Variables, Size div 2, Mode)}, 
-        tintersection(A, B)))  },
-    {8, ?LAZY(?LET({A, B}, 
-        {limited_formula(Variables, Size div 2, inside), limited_formula(Variables, Size div 2, inside)}, 
-        tproduct(A, B)))  },
-    {4, ?LAZY(?LET({A, B}, 
-        {limited_formula(Variables, Size div 2, inside), limited_formula(Variables, Size div 2, inside)}, 
-        tarrow(A, B)))  },
-    {1, ?LAZY(?LET({As, B}, 
-        {list(limited_formula(Variables, Size div 2, inside)), limited_formula(Variables, Size div 2, inside)}, 
-        tfun(As, B)))  }
+    {1, ?LAZY(?LET(A, ?F, tnegation(A))) },
+    {4, ?LAZY(?LET({A, B}, {?F, ?F}, tunion(A, B))) },
+    {4, ?LAZY(?LET({A, B}, {?F, ?F}, tintersection(A, B))) },
+    {8, ?LAZY(?LET({A, B}, {?Fi, ?Fi}, tproduct(A, B))) },
+    {4, ?LAZY(?LET({A, B}, {?Fi, ?Fi}, tarrow(A, B))) },
+    {1, ?LAZY(?LET({As, B}, {list(?Fi), ?Fi}, tfun(As, B))) }
   ] ++ tvar_if_not_toplevel(Variables, Mode)
 ).
 

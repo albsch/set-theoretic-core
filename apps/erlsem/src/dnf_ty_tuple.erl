@@ -13,19 +13,14 @@
 
 
 is_empty_line({AllPos, Neg, T}, ST) ->
-  io:format(user,"XXX~n~p~n", [{AllPos, Neg, T}]),
   case {AllPos, Neg, ty_bool:empty()} of
     {_, _, T} -> {true, ST};
     {[], [], _} -> {false, ST};
     {[], [TNeg | _], _} ->
       Dim = length(ty_tuple:components(TNeg)),
       PosAny = ty_tuple:any(Dim),
-  io:format(user,"PosAny~n~p~n", [PosAny]),
       BigS = ty_tuple:big_intersect([PosAny]),
-  io:format(user,"BigS~n~p~n", [BigS]),
-      Z = phi(ty_tuple:components(BigS), Neg, ST),
-  io:format(user,"Z~n~p~n", [Z]),
-      Z;
+      phi(ty_tuple:components(BigS), Neg, ST);
     {Pos, Neg, _} ->
       BigS = ty_tuple:big_intersect(Pos),
       phi(ty_tuple:components(BigS), Neg, ST)
