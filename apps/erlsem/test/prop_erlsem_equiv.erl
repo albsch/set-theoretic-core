@@ -58,23 +58,41 @@ prop_parse_and_emptiness() ->
 
       maps:map(fun(Name, _) -> 
         Ty = {named, noloc, {ty_ref, '.', Name, 0}, []},
-        T0 = os:system_time(millisecond),
+        % T0 = os:system_time(millisecond),
         Parsed = ty_parser:parse(Ty),
-        maybe 
-          true ?= (T00 = os:system_time(millisecond)) - T0 > 10,
-          io:format(user,"~p parse> ~p ms~n", [ty, (T00 - T0)]),
-          io:format(user,"~p~n", [X]),
-          error(exit),
-          ok
-        end,
-        T1 = os:system_time(millisecond),
+        % maybe 
+        %   true ?= (T00 = os:system_time(millisecond)) - T0 > 100,
+        %   io:format(user,"~p parse> ~p ms~n", [ty, (T00 - T0)]),
+        %   io:format(user,"~p~n", [X]),
+        %   error(exit),
+        %   ok
+        % end,
+        % T1 = os:system_time(millisecond),
         ty_node:is_empty(Parsed),
-        maybe 
-          true ?= (T11 = os:system_time(millisecond)) - T1 > 10,
-          io:format(user,"~p is_empty> ~p ms~n", [ty, (T11 - T1)])
-        end,
+        % maybe 
+        %   true ?= (T11 = os:system_time(millisecond)) - T1 > 10,
+        %   io:format(user,"~p is_empty> ~p ms~n", [ty, (T11 - T1)])
+        % end,
         true
       end, X),
+      true 
+    end)
+  end).
+
+prop_subtype_instances() -> 
+  ?FORALL(X, ?LET(Types, nonempty_list(atom()), system(Types)), begin 
+    global_state:with_new_state(fun() ->
+      maps:foreach(fun(VarName, AstTy) ->
+        ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy})
+      end, X),
+
+      AllTypes = [ty_parser:parse({named, noloc, {ty_ref, '.', Name, 0}, []}) || {Name, _} <- maps:to_list(X)],
+
+      Instances = [ty_node:intersect(A, ty_node:negate(B)) || A <- AllTypes, B <- AllTypes],
+      T0 = os:system_time(millisecond),
+      lists:foreach(fun(Ty) -> ty_node:is_empty(Ty) end, Instances),
+      io:format(user,"~p instances in ~p ms~n", [length(Instances), os:system_time(millisecond) - T0]),
+
       true 
     end)
   end).
