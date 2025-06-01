@@ -58,8 +58,21 @@ prop_parse_and_emptiness() ->
 
       maps:map(fun(Name, _) -> 
         Ty = {named, noloc, {ty_ref, '.', Name, 0}, []},
+        T0 = os:system_time(millisecond),
         Parsed = ty_parser:parse(Ty),
+        maybe 
+          true ?= (T00 = os:system_time(millisecond)) - T0 > 10,
+          io:format(user,"~p parse> ~p ms~n", [ty, (T00 - T0)]),
+          io:format(user,"~p~n", [X]),
+          error(exit),
+          ok
+        end,
+        T1 = os:system_time(millisecond),
         ty_node:is_empty(Parsed),
+        maybe 
+          true ?= (T11 = os:system_time(millisecond)) - T1 > 10,
+          io:format(user,"~p is_empty> ~p ms~n", [ty, (T11 - T1)])
+        end,
         true
       end, X),
       true 
