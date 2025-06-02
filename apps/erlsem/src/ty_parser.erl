@@ -163,6 +163,8 @@ do_convert({X = {named, _, Ref, Args}, R = {IdTy, _}}, Q, Cache) ->
 % built-ins
 do_convert({{predef, any}, R}, Q, Cache) -> {ty_rec:any(), Q, R, Cache};
 do_convert({{predef, none}, R}, Q, Cache) -> {ty_rec:empty(), Q, R, Cache};
+do_convert({{predef, atom}, R}, Q, Cache) -> {ty_rec:atom(dnf_ty_atom:any()), Q, R, Cache};
+do_convert({{predef, integer}, R}, Q, Cache) -> {ty_rec:interval(dnf_ty_interval:any()), Q, R, Cache};
 
 % boolean operators
 do_convert({{union, []}, R}, Q, Cache) -> {ty_rec:empty(), Q, R, Cache};

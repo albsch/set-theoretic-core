@@ -5,6 +5,7 @@
 -record(ty, 
   {
     dnf_ty_atom,
+    dnf_ty_interval,
     ty_tuples,
     ty_functions
   }).
@@ -64,3 +65,6 @@ tuples(Ts) ->
 
 atom(A) ->
   (empty())#ty{dnf_ty_atom = A}.
+
+interval(A) ->
+  (empty())#ty{dnf_ty_interval = A}.
