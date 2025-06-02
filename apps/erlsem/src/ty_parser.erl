@@ -3,11 +3,12 @@
 -compile([export_all, nowarn_export_all]).
 
 -define(SYMTAB, ty_parser_symtab).
+-define(TERMREFS, ty_parser_term_references).
 -define(UNIFY, ty_parser_unify).
 -define(CACHE, ty_parser_cache).
 -define(REFTOTY, ty_parser_ref_to_ty).
 -define(TYTOREF, ty_parser_ty_to_ref).
--define(ALL_ETS, [?UNIFY, ?CACHE, ?REFTOTY, ?TYTOREF, ?SYMTAB]).
+-define(ALL_ETS, [?TERMREFS, ?UNIFY, ?CACHE, ?REFTOTY, ?TYTOREF, ?SYMTAB]).
 
 % global state
 -spec init() -> _.
@@ -32,16 +33,22 @@ clean() ->
 -spec new_local_ref() -> temporary_ref().
 new_local_ref() -> {local_ref, erlang:unique_integer()}.
 
-new_local_ref(Term) -> {local_ref, erlang:phash2(Term)}.
+% new_local_ref(Term) -> {local_ref, erlang:phash2(Term)}.
+new_local_ref(Term) -> 
+  % essentially, this is what we want but is too slow
+  % {local_ref, Term}.
+  % we can't use hashing, it is fast but leads to collisions
+  % {local_ref, erlang:phash2(Term)}.
+  % therefore, generate a unique reference and save in a hash table to lookup
+  case ets:lookup(?TERMREFS, Term) of
+    [{Term, Ref}] -> Ref;
+    _ -> 
+      ets:insert(?TERMREFS, {Term, UniqueRef = new_local_ref()}),
+      UniqueRef
+  end.
 
 extend_symtab(Ref, TyScheme) ->
   ets:insert(?SYMTAB, {Ref, TyScheme}).
-  % (S = #{symtab := Sym}) = global_state:get_state(?MODULE),
-  % global_state:set_state(?MODULE, S#{symtab := Sym#{Key => Value}}).
-
-% get_symtab() ->
-%   #{symtab := Sym} = global_state:get_state(?MODULE),
-%   Sym.
 
 set_symtab(Symtab) ->
   utils:update_ets_from_map(?SYMTAB, Symtab).
@@ -55,31 +62,33 @@ lookup_ty({ty_ref, _, Ref, _}) ->
 
 % -spec ast_to_erlang_ty(ast:ty(), symtab:t()) -> ty_rec:ty_ref().
 parse(Ty) ->
-  % 0. local snapshot of state
-  RefToTy = maps:from_list(ets:tab2list(?REFTOTY)),
-  TyToRef = maps:from_list(ets:tab2list(?TYTOREF)),
-  Cache = maps:from_list(ets:tab2list(?CACHE)),
-
-  % 1. Convert to temporary local representation
-  %    Create a temporary type equation with a first entrypoint LocalRef = ...
-  %    and parse the type layer by layer
-  %    use local type references stored in a local map
   LocalRef = new_local_ref(Ty),
-  ({Result = {NewR,NewTUnsorted}, NewCache}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}, Cache),
-  NewT = #{K => lists:usort(V) || K := V <- NewTUnsorted},
-  
-  % update global ref, ty mapping, and cache
-  utils:update_ets_from_map(?REFTOTY, NewR),
-  utils:update_ets_from_map(?TYTOREF, NewT),
-  utils:update_ets_from_map(?CACHE, NewCache),
- 
-  % 2. Unify the results
-  %    There can be many duplicate type references;
-  %    these will be substituted with their representative
+
+  % if parsed and unified already, return
   case ets:lookup(?UNIFY, LocalRef) of
     [{LocalRef, ReplacedRef}] -> 
       ReplacedRef;
     _ ->
+      % 0. local snapshot of state
+      RefToTy = maps:from_list(ets:tab2list(?REFTOTY)),
+      TyToRef = maps:from_list(ets:tab2list(?TYTOREF)),
+      Cache = maps:from_list(ets:tab2list(?CACHE)),
+
+      % 1. Convert to temporary local representation
+      %    Create a temporary type equation with a first entrypoint LocalRef = ...
+      %    and parse the type layer by layer
+      %    use local type references stored in a local map
+      ({Result = {NewR,NewTUnsorted}, NewCache}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}, Cache),
+      NewT = #{K => lists:usort(V) || K := V <- NewTUnsorted},
+      
+      % 2. Unify the results
+      %    There can be many duplicate type references;
+      %    these will be substituted with their representative
+      % update global ref, ty mapping, and cache
+      utils:update_ets_from_map(?REFTOTY, NewR),
+      utils:update_ets_from_map(?TYTOREF, NewT),
+      utils:update_ets_from_map(?CACHE, NewCache),
+
       % 2.1 unify
       {UnifiedRef, UnifiedResult} = unify(LocalRef, Result),
 
@@ -110,10 +119,7 @@ replace_all({Ref, All}, Map) ->
 
 % -spec group(#{A => list(X)}, A, X) -> #{A := list(X)}.
 group(M, Key, Value) ->
-  case M of
-    #{Key := Group} -> M#{Key => ([Value | Group])};
-    _ -> M#{Key => [Value]}
-  end.
+  maps:update_with(Key, fun(Group) -> [Value | Group] end, [Value], M).
 
 % -spec convert(queue(), symtab:t(), result()) -> result().
 convert(Queue, Res, LocalCache) ->
@@ -179,12 +185,13 @@ do_convert({{negation, Ty}, R}, Q, Cache) ->
 
 % functions
 do_convert({{fun_full, Comps, Result}, R}, Q, Cache) ->
-    {ETy, Q0} = lists:foldl(
+    {RevETy, Q0} = lists:foldl(
         fun(Element, {Components, OldQ}) ->
             % to be converted later, add to queue
             Id = new_local_ref(Element),
-            {Components ++ [Id], queue:in({Id, Element}, OldQ)}
+            {[Id | Components], queue:in({Id, Element}, OldQ)}
         end, {[], Q}, Comps),
+    ETy = lists:reverse(RevETy),
 
     % add fun result to queue
     Id = new_local_ref(Result),
@@ -194,12 +201,13 @@ do_convert({{fun_full, Comps, Result}, R}, Q, Cache) ->
     {ty_rec:functions(T), Q1, R, Cache};
 
 do_convert({{tuple, Comps}, R}, Q, Cache) ->
-  {ETy, Q0} = lists:foldl(
+  {RevETy, Q0} = lists:foldl(
     fun(Element, {Components, OldQ}) ->
       % to be converted later, add to queue
       Id = new_local_ref(Element),
-      {Components ++ [Id], queue:in({Id, Element}, OldQ)}
+      {[Id | Components], queue:in({Id, Element}, OldQ)}
     end, {[], Q}, Comps),
+  ETy = lists:reverse(RevETy),
     
   T = ty_tuples:singleton(length(Comps), dnf_ty_tuple:singleton(ty_tuple:tuple(ETy))),
   {ty_rec:tuples(T), Q0, R, Cache};
@@ -251,14 +259,9 @@ unify(Ref, {IdToTy, TyToIds}) ->
   {UnifiedRef, UnifiedIdToTy}.
 
 % -spec choose_representative([temporary_ref()]) -> {temporary_ref(), [temporary_ref()]}.
-choose_representative(Refs) ->
-  [Representative | Others] = lists:usort(
-    fun
-      ({local_ref, _}, {mu_ref, _}) -> false;
-      ({_, X}, {_, Y}) -> X =< Y
-    end, 
-    Refs),
-  {Representative, Others}.
+% in previous versions, named_ref existed, which was picked preferrably. 
+% now, we pick the first element
+choose_representative([H | T]) -> {H, T}.
 
 unify(Ref, Db, All) ->
   ToReplace = maps:from_list(lists:flatten([[{Single, Represent} || Single <- Dupl ] || {_, {Represent, Dupl}}<- All])),

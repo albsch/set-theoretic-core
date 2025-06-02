@@ -66,13 +66,17 @@ slow_test() ->
     % Ty10 = {named, noloc, {ty_ref, '.', t10, 0}, []},
     [
       begin
-        % fprof:trace(start),
-        {Time, Ty} = timer:tc(fun() -> ty_parser:parse(TT) end),
-        % fprof:trace(stop),
-        % fprof:profile(),
-        % fprof:analyse(),
+        {Time, Ty} = timer:tc(fun() -> 
+          % fprof:trace(start),
+          Z = ty_parser:parse(TT),
+          % fprof:trace(stop),
+          % fprof:profile(),
+          % fprof:analyse(),
+          Z
+        end),
         io:format(user,"~p parse> ~p ms~n", [TTN, Time/1000]),
-        {Time2, _} = timer:tc(fun() -> ty_node:is_empty(Ty) end),
+        {Time2, _} = timer:tc(fun() -> 
+        ty_node:is_empty(Ty) end),
         io:format(user,"~p is_empty> ~p ms~n", [TTN, Time2/1000])
       end
       || {_,_,{_,_,TTN,_},_} = TT <- 
