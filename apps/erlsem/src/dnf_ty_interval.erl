@@ -46,8 +46,8 @@ interval(_, _) -> [].
 cointerval(From, To) ->
     negate(interval(From, To)).
 
-is_empty([]) -> true;
-is_empty(_) -> false.
+is_empty([], ST) -> {true, ST};
+is_empty(_, ST) -> {false, ST}.
 
 is_any([any_int]) -> true;
 is_any(_) -> false.

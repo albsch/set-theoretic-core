@@ -10,10 +10,12 @@ tunion(A, B) -> {union, [A, B]}.
 tintersection(A, B) -> {intersection, [A, B]}.
 tarrow(A, B) -> {fun_full, [A], B}.
 tproduct(A, B) -> {tuple, [A, B]}.
+tlist(A) -> {list, A}.
 tfun(As, B) -> {fun_full, As, B}.
 tvar(Variables) ->
   ?LET(Varname, oneof(Variables), {named, 0, {ty_ref, '.', Varname, 0}, []}).
-
+tpredef() ->
+  ?LET(Predef, oneof([float, reference, pid, port]), {predef, Predef}).
 
 limited_formula(Variables) ->
   ?SIZED(Size, limited_formula(Variables, Size, toplevel)).
@@ -27,6 +29,8 @@ tvar_if_not_toplevel(Variables, Mode) ->
 limited_formula(Variables, Size, Mode) when Size =< 1 ->
   frequency([
     {1, tempty()},
+    {2, tpredef()},
+    {3, {empty_list}},
     {1, tany()}
   ] ++ tvar_if_not_toplevel(Variables, Mode)
 );
@@ -38,6 +42,7 @@ limited_formula(Variables, Size, Mode) ->
     {4, ?LAZY(?LET({A, B}, {?F, ?F}, tunion(A, B))) },
     {4, ?LAZY(?LET({A, B}, {?F, ?F}, tintersection(A, B))) },
     {8, ?LAZY(?LET({A, B}, {?Fi, ?Fi}, tproduct(A, B))) },
+    {1, ?LAZY(?LET({A}, {?Fi}, tlist(A))) },
     {4, ?LAZY(?LET({A, B}, {?Fi, ?Fi}, tarrow(A, B))) },
     {1, ?LAZY(?LET({As, B}, {list(?Fi), ?Fi}, tfun(As, B))) }
   ] ++ tvar_if_not_toplevel(Variables, Mode)
@@ -100,12 +105,13 @@ prop_subtype_instances() ->
 valid_system(System) ->
   lists:all(fun valid_rec/1, maps:to_list(System)).
   
-valid_rec({_, {predef, any}}) -> true;
-valid_rec({_, {predef, none}}) -> true;
+valid_rec({_, {empty_list}}) -> true;
+valid_rec({_, {predef, _}}) -> true;
 valid_rec({Ty, {negation, L}}) -> valid_rec({Ty, L});
 valid_rec({Ty, {union, L}}) -> lists:all(fun(E) -> valid_rec({Ty, E}) end, L);
 valid_rec({Ty, {intersection, L}}) -> lists:all(fun(E) -> valid_rec({Ty, E}) end, L);
 valid_rec({_, {fun_full, _, _}}) -> true;
+valid_rec({_, {list, _}}) -> true;
 valid_rec({_, {tuple, _}}) -> true;
 valid_rec({Ty, {named, _, {ty_ref, '.', Ty, 0}, []}}) -> false;
 valid_rec({_, {named, _, _Ty, []}}) -> false. % lets say recursion happens only under a type constructor for any variable

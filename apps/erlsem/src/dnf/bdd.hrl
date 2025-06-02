@@ -101,7 +101,9 @@ union(T1, T2) ->
   op(fun ?LEAF:union/2, T1, T2).
 
 -spec intersect(bdd(), bdd()) -> bdd().
-intersect(T1, T2) -> op(fun ?LEAF:intersect/2, T1, T2).
+intersect(T1, T2) -> 
+  % io:format(user,"~p~n",[{T1, T2}]),
+  op(fun ?LEAF:intersect/2, T1, T2).
 
 -spec difference(bdd(), bdd()) -> bdd().
 difference(T1, T2) -> op(fun ?LEAF:difference/2, T1, T2).

@@ -125,6 +125,8 @@ negate(T) ->
   make(ty_rec:negate(load(T))).
 
 intersect(T1, T2) ->
+  % io:format(user, "~p~n", [load(T1)]),
+  % io:format(user, "~p~n", [load(T2)]),
   make(ty_rec:intersect(load(T1), load(T2))).
 
 union(T1, T2) ->

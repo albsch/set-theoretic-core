@@ -57,7 +57,6 @@ set_symtab(Symtab) ->
 % var_ref(Var) -> {mu_ref, Var}.
 
 lookup_ty({ty_ref, _, Ref, _}) ->
-  io:format(user,"Lookup: ~p~n", [Ref]),
   [{Ref, {ty_scheme, [], Ty}}] = ets:lookup(?SYMTAB, Ref),
   {ty_scheme, [], Ty}.
 
@@ -225,6 +224,28 @@ do_convert({{range, From, To}, R}, Q, Cache) ->
 
 do_convert({{predef_alias, Alias}, R}, Q, Cache) ->
   do_convert({expand_predef_alias(Alias), R}, Q, Cache);
+
+do_convert({{list, Ty}, R}, Q, Cache) ->
+  do_convert({
+  {union, [
+    {improper_list, Ty, {empty_list}}, 
+    {empty_list}
+  ]}, R}, Q, Cache);
+do_convert({{nonempty_list, Ty}, R}, Q, Cache) ->
+  do_convert({{nonempty_improper_list, Ty, {empty_list}}, R}, Q, Cache);
+do_convert({{nonempty_improper_list, Ty, Term}, R}, Q, Cache) ->
+  do_convert({{intersection, [{list, Ty}, {negation, Term}]} , R}, Q, Cache);
+do_convert({{improper_list, A, B}, R}, Q, Cache) ->
+  T1 = new_local_ref(A),
+  T2 = new_local_ref(B),
+  Q0 = queue:in({T1, A}, Q),
+  Q1 = queue:in({T2, B}, Q0),
+    
+  {ty_rec:list(dnf_ty_list:singleton(ty_tuple:tuple([T1, T2]))), Q1, R, Cache};
+do_convert({{empty_list}, R}, Q, Cache) ->
+  {ty_rec:predef(dnf_ty_predef:predef('[]')), Q, R, Cache};
+do_convert({{predef, T}, R}, Q, Cache) when T == pid; T == port; T == reference; T == float ->
+  {ty_rec:predef(dnf_ty_predef:predef(T)), Q, R, Cache};
 
 % % var
 % do_convert({V = {var, A}, R = {IdTy, _}}, Q) ->

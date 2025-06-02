@@ -4,8 +4,10 @@
 
 -record(ty, 
   {
+    dnf_ty_predef,
     dnf_ty_atom,
     dnf_ty_interval,
+    dnf_ty_list,
     ty_tuples,
     ty_functions
   }).
@@ -68,3 +70,9 @@ atom(A) ->
 
 interval(A) ->
   (empty())#ty{dnf_ty_interval = A}.
+
+list(A) ->
+  (empty())#ty{dnf_ty_list = A}.
+
+predef(A) ->
+  (empty())#ty{dnf_ty_predef = A}.
