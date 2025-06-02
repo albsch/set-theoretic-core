@@ -107,7 +107,7 @@ ast_test() ->
 
     Ty = {named, noloc, {ty_ref, 'ast', ty, 0}, []},
 
-    {Time, Ty} = timer:tc(fun() -> 
+    {Time, _} = timer:tc(fun() -> 
       % fprof:trace(start),
       Z = ty_parser:parse(Ty),
       % fprof:trace(stop),

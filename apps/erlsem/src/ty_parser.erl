@@ -212,13 +212,9 @@ do_convert({{tuple, Comps}, R}, Q, Cache) ->
   T = ty_tuples:singleton(length(Comps), dnf_ty_tuple:singleton(ty_tuple:tuple(ETy))),
   {ty_rec:tuples(T), Q0, R, Cache};
 
-
- 
-% TODO atoms
-% do_convert({{singleton, Atom}, R}, Q) when is_atom(Atom) ->
-%   TyAtom = ty_atom:finite([Atom]),
-%   TAtom = dnf_var_ty_atom:ty_atom(TyAtom),
-%   {ty_rec:s_atom(TAtom), Q, R};
+do_convert({{singleton, Atom}, R}, Q, Cache) when is_atom(Atom) ->
+  TAtom = dnf_ty_atom:finite([Atom]),
+  {ty_rec:atom(TAtom), Q, R, Cache};
 
 % % var
 % do_convert({V = {var, A}, R = {IdTy, _}}, Q) ->

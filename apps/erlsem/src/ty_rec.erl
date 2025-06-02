@@ -2,11 +2,9 @@
 
 -compile([export_all, nowarn_export_all]).
 
-
-% TODO atoms
 -record(ty, 
   {
-    % atom, 
+    dnf_ty_atom,
     ty_tuples,
     ty_functions
   }).
@@ -63,3 +61,6 @@ functions(Fs) ->
 
 tuples(Ts) ->
   (empty())#ty{ty_tuples = Ts}.
+
+atom(A) ->
+  (empty())#ty{dnf_ty_atom = A}.
