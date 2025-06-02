@@ -99,6 +99,7 @@ slow_test() ->
 
 ast_test() ->
   {ok, [System]} = file:consult("system_ast"),
+  io:format(user,"~p~n", [System]),
 
   global_state:with_new_state(fun() -> 
     maps:foreach(fun({ty_key,ast,VarName,_Arity}, AstTyScheme) ->

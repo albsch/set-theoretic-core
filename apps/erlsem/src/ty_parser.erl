@@ -57,6 +57,7 @@ set_symtab(Symtab) ->
 % var_ref(Var) -> {mu_ref, Var}.
 
 lookup_ty({ty_ref, _, Ref, _}) ->
+  io:format(user,"Lookup: ~p~n", [Ref]),
   [{Ref, {ty_scheme, [], Ty}}] = ets:lookup(?SYMTAB, Ref),
   {ty_scheme, [], Ty}.
 
@@ -218,6 +219,13 @@ do_convert({{singleton, Atom}, R}, Q, Cache) when is_atom(Atom) ->
   TAtom = dnf_ty_atom:finite([Atom]),
   {ty_rec:atom(TAtom), Q, R, Cache};
 
+do_convert({{range, From, To}, R}, Q, Cache) ->
+  Int = dnf_ty_interval:interval(From, To),
+  {ty_rec:interval(Int), Q, R, Cache};
+
+do_convert({{predef_alias, Alias}, R}, Q, Cache) ->
+  do_convert({expand_predef_alias(Alias), R}, Q, Cache);
+
 % % var
 % do_convert({V = {var, A}, R = {IdTy, _}}, Q) ->
 %   error(todovar);
@@ -272,3 +280,46 @@ unify(Ref, Db, All) ->
       end;
     (_) -> error
   end, {Ref, Db}).
+
+-spec expand_predef_alias(ast:predef_alias_name()) -> ast:ty().
+expand_predef_alias(term) -> {predef, any};
+% TODO better binaries
+expand_predef_alias(binary) -> {bitstring};
+expand_predef_alias(nonempty_binary) -> {bitstring};
+expand_predef_alias(bitstring) -> {bitstring};
+expand_predef_alias(nonempty_bitstring) -> {bitstring};
+expand_predef_alias(boolean) -> {union, [{singleton, true}, {singleton, false}]};
+expand_predef_alias(byte) -> {range, 0, 255};
+expand_predef_alias(char) -> {range, 0, 1114111};
+expand_predef_alias(nil) -> {empty_list};
+expand_predef_alias(number) -> {union, [{predef, float}, {predef, integer}]};
+expand_predef_alias(list) -> {list, {predef, any}};
+% also see code in ast_transform for expanding predefined aliases applied to arguments
+expand_predef_alias(nonempty_list) -> {nonempty_list, {predef, any}};
+expand_predef_alias(maybe_improper_list) -> {improper_list, {predef, any}, {predef, any}};
+expand_predef_alias(nonempty_maybe_improper_list) -> {nonempty_list, {predef, any}};
+expand_predef_alias(string) -> {list, expand_predef_alias(char)};
+expand_predef_alias(nonempty_string) -> {nonempty_list, expand_predef_alias(char)};
+expand_predef_alias(iodata) -> {union, [expand_predef_alias(iolist), expand_predef_alias(binary)]};
+expand_predef_alias(iolist) ->
+    % TODO fix variable IDs
+    RecVarID = erlang:unique_integer(),
+    Var = {var, erlang:list_to_atom("mu" ++ integer_to_list(RecVarID))},
+    RecType = {improper_list, {union, [expand_predef_alias(byte), expand_predef_alias(binary), Var]}, {union, [expand_predef_alias(binary), {empty_list}]}},
+    {mu, Var, RecType};
+expand_predef_alias(map) -> {map, [{map_field_opt, {predef, any}, {predef, any}}]};
+expand_predef_alias(function) -> {fun_simple};
+expand_predef_alias(module) -> {predef, atom};
+expand_predef_alias(mfa) -> {tuple, [{predef, atom}, {predef, atom}, {predef, integer}]};
+expand_predef_alias(arity) -> {predef, integer};
+expand_predef_alias(identifier) -> {union, [{predef, pid}, {predef, port}, {predef, reference}]};
+expand_predef_alias(node) -> {predef, atom};
+expand_predef_alias(timeout) -> {union, [{singleton, infinity}, expand_predef_alias(non_neg_integer)]};
+expand_predef_alias(no_return) -> {predef, none};
+expand_predef_alias(non_neg_integer) -> {range, 0, '*'};
+expand_predef_alias(pos_integer) -> {range, 1, '*'};
+expand_predef_alias(neg_integer) -> {range, '*', -1};
+
+expand_predef_alias(Name) ->
+    logger:error("Not expanding: ~p", [Name]),
+    errors:not_implemented(utils:sformat("expand_predef_alias for ~w", Name)).
