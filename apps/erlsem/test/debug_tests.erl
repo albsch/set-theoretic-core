@@ -46,9 +46,7 @@ tuple_test() ->
 slow_test() ->
   {ok, [System]} = file:consult("system"),
 
-
   global_state:with_new_state(fun() -> 
-    ty_parser:set_symtab(System),
     maps:foreach(fun(VarName, AstTy) ->
       % io:format(user,"~p~n", [AstTy]),
       ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy})
@@ -94,6 +92,30 @@ slow_test() ->
     %   || {_,_,{_,_,TTN,_},_} = TT <- [Ty1, Ty2, Ty3, Ty4, Ty5, Ty6, Ty7, Ty8, Ty9, Ty10]
     % ],
 
+
+    ok
+  end).
+
+
+ast_test() ->
+  {ok, [System]} = file:consult("system_ast"),
+
+  global_state:with_new_state(fun() -> 
+    maps:foreach(fun({ty_key,ast,VarName,_Arity}, AstTyScheme) ->
+      ty_parser:extend_symtab(VarName, AstTyScheme)
+    end, System),
+
+    Ty = {named, noloc, {ty_ref, 'ast', ty, 0}, []},
+
+    {Time, Ty} = timer:tc(fun() -> 
+      % fprof:trace(start),
+      Z = ty_parser:parse(Ty),
+      % fprof:trace(stop),
+      % fprof:profile(),
+      % fprof:analyse(),
+      Z
+    end),
+    io:format(user,"parse> ~p ms~n", [Time/1000]),
 
     ok
   end).

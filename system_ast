@@ -1,0 +1,27 @@
+#{
+{ty_key,ast,ty,0} =>
+    {ty_scheme,[],
+     {union,
+      [
+       {named,{loc,"src/ast.erl",414,65},{ty_ref,ast,ty_predef,0},[]}
+      ]}},
+
+{ty_key,ast,ty_predef,0} =>
+    {ty_scheme,[],
+     {tuple,
+      [{singleton,predef},
+       {named,{loc,"src/ast.erl",373,31},{ty_ref,ast,predef_name,0},[]}]}},
+
+{ty_key,ast,predef_name,0} =>
+    {ty_scheme,[],
+     {union,
+      [{singleton,any},
+       {singleton,none},
+       {singleton,pid},
+       {singleton,port},
+       {singleton,reference},
+       {singleton,float},
+       {singleton,integer},
+       {singleton,atom}]}}
+
+}.
