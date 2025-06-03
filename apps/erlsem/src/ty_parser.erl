@@ -33,6 +33,7 @@ clean() ->
 -type temporary_ref() :: 
     {local_ref, integer()}. % fresh type references created for the queue
 
+% create an unique type reference
 -spec new_local_ref() -> temporary_ref().
 new_local_ref() -> {local_ref, erlang:unique_integer()}.
 
@@ -286,6 +287,7 @@ unify(Ref, {IdToTy, TyToIds}) ->
 
   % replace equivalent refs with representative
   {UnifiedRef, {UnifiedIdToTy, _UnifiedTyToIds}} = unify(Ref, {IdToTy, TyToIds}, ToUnify),
+
   {UnifiedRef, UnifiedIdToTy}.
 
 % -spec choose_representative([temporary_ref()]) -> {temporary_ref(), [temporary_ref()]}.
@@ -293,17 +295,21 @@ unify(Ref, {IdToTy, TyToIds}) ->
 % now, we pick the first element
 choose_representative([H | T]) -> {H, T}.
 
-unify(Ref, Db, All) ->
+unify(Ref, {Db, Old}, All) ->
   ToReplace = maps:from_list(lists:flatten([[{Single, Represent} || Single <- Dupl ] || {_, {Represent, Dupl}}<- All])),
 
-  utils:everywhere(fun
+  T0 = os:system_time(microsecond),
+  {NewRef, NewDb} = utils:everywhere(fun
     (RRef = {X, _}) when X == local_ref; X == mu_ref -> 
       case ToReplace of 
         #{RRef := Representative} -> {ok, Representative};
         _ -> error
       end;
     (_) -> error
-  end, {Ref, Db}).
+  end, {Ref, Db}),
+  T1 = os:system_time(microsecond),
+
+  {NewRef, {NewDb, Old}}.
 
 -spec expand_predef_alias(ast:predef_alias_name()) -> ast:ty().
 expand_predef_alias(term) -> {predef, any};

@@ -29,8 +29,7 @@ everywhere(F, T) ->
                 X when is_map(X) -> #{everywhere(F, K) => everywhere(F, V) || K := V <- X};
                 X -> X
             end;
-        {ok, X} -> X;
-        {rec, X} -> everywhere(F, X)
+        {ok, X} -> X
     end.
 
 

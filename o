@@ -1,0 +1,1049 @@
+[0;32m===> Verifying dependencies...
+[0m[0;32m===> Analyzing applications...
+[0m[0;32m===> Compiling recsys
+[0m[0;32m===> Compiling erlsem
+[0m[0;32m===> Compiling musem
+[0m[0;32m===> Performing EUnit tests...
+[0m======================== EUnit ========================
+debug_tests: ast_test...CONV{union,[{named,{loc,"src/ast.erl",413,15},{ty_ref,ast,ty_singleton,0},[]},
+            {named,{loc,"src/ast.erl",413,32},{ty_ref,ast,ty_bitstring,0},[]},
+            {named,{loc,"src/ast.erl",413,49},{ty_ref,ast,ty_some_list,0},[]},
+            {named,{loc,"src/ast.erl",414,7},{ty_ref,ast,ty_fun,0},[]},
+            {named,{loc,"src/ast.erl",414,18},
+                   {ty_ref,ast,ty_integer_range,0},
+                   []},
+            {named,{loc,"src/ast.erl",414,39},{ty_ref,ast,ty_map_any,0},[]},
+            {named,{loc,"src/ast.erl",414,54},{ty_ref,ast,ty_map,0},[]},
+            {named,{loc,"src/ast.erl",414,65},{ty_ref,ast,ty_predef,0},[]},
+            {named,{loc,"src/ast.erl",414,79},
+                   {ty_ref,ast,ty_predef_alias,0},
+                   []},
+            {named,{loc,"src/ast.erl",415,7},{ty_ref,ast,ty_named,0},[]},
+            {named,{loc,"src/ast.erl",415,20},{ty_ref,ast,ty_tuple_any,0},[]},
+            {named,{loc,"src/ast.erl",415,37},{ty_ref,ast,ty_tuple,0},[]},
+            {named,{loc,"src/ast.erl",415,50},{ty_ref,ast,ty_var,0},[]},
+            {named,{loc,"src/ast.erl",415,61},{ty_ref,ast,ty_mu,0},[]},
+            {named,{loc,"src/ast.erl",416,7},{ty_ref,ast,ty_union,0},[]},
+            {named,{loc,"src/ast.erl",416,20},
+                   {ty_ref,ast,ty_intersection,0},
+                   []},
+            {named,{loc,"src/ast.erl",416,40},{ty_ref,ast,ty_negation,0},[]}]}
+CONV{tuple,[{singleton,singleton},
+            {union,[{predef,atom},{predef,integer},{predef_alias,char}]}]}
+<19887> {ty_ref,ast,ty_singleton,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{2 =>
+                 {node,{ty_tuple,2,
+                                 [{local_ref,-576460752303422108},
+                                  {local_ref,-576460752303422076}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,binary},{predef,integer},{predef,integer}]}
+<19> {ty_ref,ast,ty_bitstring,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{3 =>
+                 {node,{ty_tuple,3,
+                                 [{local_ref,-576460752303422012},
+                                  {local_ref,-576460752303421980},
+                                  {local_ref,-576460752303421980}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{union,[{named,{loc,"src/ast.erl",351,25},{ty_ref,ast,ty_empty_list,0},[]},
+            {named,{loc,"src/ast.erl",351,43},{ty_ref,ast,ty_list,0},[]},
+            {named,{loc,"src/ast.erl",351,55},
+                   {ty_ref,ast,ty_nonempty_list,0},
+                   []},
+            {named,{loc,"src/ast.erl",351,76},
+                   {ty_ref,ast,ty_improper_list,0},
+                   []},
+            {named,{loc,"src/ast.erl",352,25},
+                   {ty_ref,ast,ty_nonempty_improper_list,0},
+                   []}]}
+CONV{tuple,[{singleton,empty_list}]}
+<6> {ty_ref,ast,ty_empty_list,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{1 =>
+                 {node,{ty_tuple,1,[{local_ref,-576460752303421884}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,list},
+            {named,{loc,"src/ast.erl",347,27},{ty_ref,ast,ty,0},[]}]}
+<7> {ty_ref,ast,ty_list,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{2 =>
+                 {node,{ty_tuple,2,
+                                 [{local_ref,-576460752303421820},
+                                  {local_ref,-576460752303421788}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,nonempty_list},
+            {named,{loc,"src/ast.erl",348,45},{ty_ref,ast,ty,0},[]}]}
+<7> {ty_ref,ast,ty_nonempty_list,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{2 =>
+                 {node,{ty_tuple,2,
+                                 [{local_ref,-576460752303421724},
+                                  {local_ref,-576460752303421692}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,improper_list},
+            {named,{loc,"src/ast.erl",349,45},{ty_ref,ast,ty,0},[]},
+            {named,{loc,"src/ast.erl",349,51},{ty_ref,ast,ty,0},[]}]}
+<10> {ty_ref,ast,ty_improper_list,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{3 =>
+                 {node,{ty_tuple,3,
+                                 [{local_ref,-576460752303421628},
+                                  {local_ref,-576460752303421596},
+                                  {local_ref,-576460752303421564}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,nonempty_improper_list},
+            {named,{loc,"src/ast.erl",350,63},{ty_ref,ast,ty,0},[]},
+            {named,{loc,"src/ast.erl",350,69},{ty_ref,ast,ty,0},[]}]}
+<10> {ty_ref,ast,ty_nonempty_improper_list,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{3 =>
+                 {node,{ty_tuple,3,
+                                 [{local_ref,-576460752303421500},
+                                  {local_ref,-576460752303421468},
+                                  {local_ref,-576460752303421436}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+<922> {ty_ref,ast,ty_some_list,0} ->
+{leaf,
+    {ty,<<0:5>>,
+        {{0,nil},finite},
+        [],
+        {leaf,0},
+        {{leaf,0},
+         #{1 =>
+               {node,
+                   {ty_tuple,1,[{local_ref,-576460752303421884}]},
+                   {leaf,1},
+                   {leaf,0}},
+           2 =>
+               {node,
+                   {ty_tuple,2,
+                       [{local_ref,-576460752303421820},
+                        {local_ref,-576460752303421788}]},
+                   {leaf,1},
+                   {node,
+                       {ty_tuple,2,
+                           [{local_ref,-576460752303421724},
+                            {local_ref,-576460752303421692}]},
+                       {leaf,1},
+                       {leaf,0}}},
+           3 =>
+               {node,
+                   {ty_tuple,3,
+                       [{local_ref,-576460752303421628},
+                        {local_ref,-576460752303421596},
+                        {local_ref,-576460752303421564}]},
+                   {leaf,1},
+                   {node,
+                       {ty_tuple,3,
+                           [{local_ref,-576460752303421500},
+                            {local_ref,-576460752303421468},
+                            {local_ref,-576460752303421436}]},
+                       {leaf,1},
+                       {leaf,0}}}}},
+        {{leaf,0},#{}}}}
+CONV{union,[{named,{loc,"src/ast.erl",357,19},{ty_ref,ast,ty_simple_fun,0},[]},
+            {named,{loc,"src/ast.erl",357,37},
+                   {ty_ref,ast,ty_any_arg_fun,0},
+                   []},
+            {named,{loc,"src/ast.erl",357,56},{ty_ref,ast,ty_full_fun,0},[]}]}
+CONV{tuple,[{singleton,fun_simple}]}
+<7> {ty_ref,ast,ty_simple_fun,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{1 =>
+                 {node,{ty_tuple,1,[{local_ref,-576460752303421340}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,fun_any_arg},
+            {named,{loc,"src/ast.erl",355,41},{ty_ref,ast,ty,0},[]}]}
+<7> {ty_ref,ast,ty_any_arg_fun,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{2 =>
+                 {node,{ty_tuple,2,
+                                 [{local_ref,-576460752303421276},
+                                  {local_ref,-576460752303421244}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,fun_full},
+            {list,{named,{loc,"src/ast.erl",356,36},{ty_ref,ast,ty,0},[]}},
+            {named,{loc,"src/ast.erl",356,43},{ty_ref,ast,ty,0},[]}]}
+<9> {ty_ref,ast,ty_full_fun,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{3 =>
+                 {node,{ty_tuple,3,
+                                 [{local_ref,-576460752303421180},
+                                  {local_ref,-576460752303421148},
+                                  {local_ref,-576460752303421116}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+<444> {ty_ref,ast,ty_fun,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{1 =>
+                 {node,{ty_tuple,1,[{local_ref,-576460752303421340}]},
+                       {leaf,1},
+                       {leaf,0}},
+             2 =>
+                 {node,{ty_tuple,2,
+                                 [{local_ref,-576460752303421276},
+                                  {local_ref,-576460752303421244}]},
+                       {leaf,1},
+                       {leaf,0}},
+             3 =>
+                 {node,{ty_tuple,3,
+                                 [{local_ref,-576460752303421180},
+                                  {local_ref,-576460752303421148},
+                                  {local_ref,-576460752303421116}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,range},
+            {union,[{predef,integer},{singleton,'*'}]},
+            {union,[{predef,integer},{singleton,'*'}]}]}
+<9> {ty_ref,ast,ty_integer_range,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{3 =>
+                 {node,{ty_tuple,3,
+                                 [{local_ref,-576460752303421052},
+                                  {local_ref,-576460752303421020},
+                                  {local_ref,-576460752303421020}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,map_any}]}
+<6> {ty_ref,ast,ty_map_any,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{1 =>
+                 {node,{ty_tuple,1,[{local_ref,-576460752303420956}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,map},
+            {list,{named,{loc,"src/ast.erl",364,26},
+                         {ty_ref,ast,ty_map_assoc,0},
+                         []}}]}
+<8> {ty_ref,ast,ty_map,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{2 =>
+                 {node,{ty_tuple,2,
+                                 [{local_ref,-576460752303420892},
+                                  {local_ref,-576460752303420860}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,predef},
+            {named,{loc,"src/ast.erl",373,31},{ty_ref,ast,predef_name,0},[]}]}
+<7> {ty_ref,ast,ty_predef,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{2 =>
+                 {node,{ty_tuple,2,
+                                 [{local_ref,-576460752303420796},
+                                  {local_ref,-576460752303420764}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,predef_alias},
+            {named,{loc,"src/ast.erl",386,43},
+                   {ty_ref,ast,predef_alias_name,0},
+                   []}]}
+<8> {ty_ref,ast,ty_predef_alias,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{2 =>
+                 {node,{ty_tuple,2,
+                                 [{local_ref,-576460752303420700},
+                                  {local_ref,-576460752303420668}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,named},
+            {named,{loc,"src/ast.erl",399,29},{ty_ref,ast,loc,0},[]},
+            {named,{loc,"src/ast.erl",399,42},{ty_ref,ast,ty_ref,0},[]},
+            {list,{named,{loc,"src/ast.erl",399,59},{ty_ref,ast,ty,0},[]}}]}
+<12> {ty_ref,ast,ty_named,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{4 =>
+                 {node,{ty_tuple,4,
+                                 [{local_ref,-576460752303420604},
+                                  {local_ref,-576460752303420572},
+                                  {local_ref,-576460752303420540},
+                                  {local_ref,-576460752303420508}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,tuple_any}]}
+<7> {ty_ref,ast,ty_tuple_any,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{1 =>
+                 {node,{ty_tuple,1,[{local_ref,-576460752303420444}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,tuple},
+            {list,{named,{loc,"src/ast.erl",405,30},{ty_ref,ast,ty,0},[]}}]}
+<8> {ty_ref,ast,ty_tuple,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{2 =>
+                 {node,{ty_tuple,2,
+                                 [{local_ref,-576460752303420380},
+                                  {local_ref,-576460752303420348}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,var},
+            {named,{loc,"src/ast.erl",407,25},{ty_ref,ast,ty_varname,0},[]}]}
+<9> {ty_ref,ast,ty_var,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{2 =>
+                 {node,{ty_tuple,2,
+                                 [{local_ref,-576460752303420284},
+                                  {local_ref,-576460752303420252}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,mu},
+            {named,{loc,"src/ast.erl",402,42},{ty_ref,ast,ty_var,0},[]},
+            {named,{loc,"src/ast.erl",402,72},{ty_ref,ast,ty,0},[]}]}
+<10> {ty_ref,ast,ty_mu,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{3 =>
+                 {node,{ty_tuple,3,
+                                 [{local_ref,-576460752303420188},
+                                  {local_ref,-576460752303420156},
+                                  {local_ref,-576460752303420124}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,union},
+            {list,{named,{loc,"src/ast.erl",408,30},{ty_ref,ast,ty,0},[]}}]}
+<9> {ty_ref,ast,ty_union,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{2 =>
+                 {node,{ty_tuple,2,
+                                 [{local_ref,-576460752303420060},
+                                  {local_ref,-576460752303420028}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,intersection},
+            {list,{named,{loc,"src/ast.erl",409,44},{ty_ref,ast,ty,0},[]}}]}
+<8> {ty_ref,ast,ty_intersection,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{2 =>
+                 {node,{ty_tuple,2,
+                                 [{local_ref,-576460752303419964},
+                                  {local_ref,-576460752303419932}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,negation},
+            {named,{loc,"src/ast.erl",410,35},{ty_ref,ast,ty,0},[]}]}
+<8> {ty_ref,ast,ty_negation,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{2 =>
+                 {node,{ty_tuple,2,
+                                 [{local_ref,-576460752303419868},
+                                  {local_ref,-576460752303419836}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+<24440> {ty_ref,ast,ty,0} ->
+{leaf,
+ {ty,
+  <<0:5>>,
+  {{0,nil},finite},
+  [],
+  {leaf,0},
+  {{leaf,0},
+   #{1 =>
+      {node,
+       {ty_tuple,1,[{local_ref,-576460752303421884}]},
+       {leaf,1},
+       {node,
+        {ty_tuple,1,[{local_ref,-576460752303421340}]},
+        {leaf,1},
+        {node,
+         {ty_tuple,1,[{local_ref,-576460752303420956}]},
+         {leaf,1},
+         {node,
+          {ty_tuple,1,[{local_ref,-576460752303420444}]},
+          {leaf,1},
+          {leaf,0}}}}},
+     2 =>
+      {node,
+       {ty_tuple,2,
+        [{local_ref,-576460752303422108},{local_ref,-576460752303422076}]},
+       {leaf,1},
+       {node,
+        {ty_tuple,2,
+         [{local_ref,-576460752303421820},{local_ref,-576460752303421788}]},
+        {leaf,1},
+        {node,
+         {ty_tuple,2,
+          [{local_ref,-576460752303421724},{local_ref,-576460752303421692}]},
+         {leaf,1},
+         {node,
+          {ty_tuple,2,
+           [{local_ref,-576460752303421276},{local_ref,-576460752303421244}]},
+          {leaf,1},
+          {node,
+           {ty_tuple,2,
+            [{local_ref,-576460752303420892},{local_ref,-576460752303420860}]},
+           {leaf,1},
+           {node,
+            {ty_tuple,2,
+             [{local_ref,-576460752303420796},
+              {local_ref,-576460752303420764}]},
+            {leaf,1},
+            {node,
+             {ty_tuple,2,
+              [{local_ref,-576460752303420700},
+               {local_ref,-576460752303420668}]},
+             {leaf,1},
+             {node,
+              {ty_tuple,2,
+               [{local_ref,-576460752303420380},
+                {local_ref,-576460752303420348}]},
+              {leaf,1},
+              {node,
+               {ty_tuple,2,
+                [{local_ref,-576460752303420284},
+                 {local_ref,-576460752303420252}]},
+               {leaf,1},
+               {node,
+                {ty_tuple,2,
+                 [{local_ref,-576460752303420060},
+                  {local_ref,-576460752303420028}]},
+                {leaf,1},
+                {node,
+                 {ty_tuple,2,
+                  [{local_ref,-576460752303419964},
+                   {local_ref,-576460752303419932}]},
+                 {leaf,1},
+                 {node,
+                  {ty_tuple,2,
+                   [{local_ref,-576460752303419868},
+                    {local_ref,-576460752303419836}]},
+                  {leaf,1},
+                  {leaf,0}}}}}}}}}}}}},
+     3 =>
+      {node,
+       {ty_tuple,3,
+        [{local_ref,-576460752303422012},
+         {local_ref,-576460752303421980},
+         {local_ref,-576460752303421980}]},
+       {leaf,1},
+       {node,
+        {ty_tuple,3,
+         [{local_ref,-576460752303421628},
+          {local_ref,-576460752303421596},
+          {local_ref,-576460752303421564}]},
+        {leaf,1},
+        {node,
+         {ty_tuple,3,
+          [{local_ref,-576460752303421500},
+           {local_ref,-576460752303421468},
+           {local_ref,-576460752303421436}]},
+         {leaf,1},
+         {node,
+          {ty_tuple,3,
+           [{local_ref,-576460752303421180},
+            {local_ref,-576460752303421148},
+            {local_ref,-576460752303421116}]},
+          {leaf,1},
+          {node,
+           {ty_tuple,3,
+            [{local_ref,-576460752303421052},
+             {local_ref,-576460752303421020},
+             {local_ref,-576460752303421020}]},
+           {leaf,1},
+           {node,
+            {ty_tuple,3,
+             [{local_ref,-576460752303420188},
+              {local_ref,-576460752303420156},
+              {local_ref,-576460752303420124}]},
+            {leaf,1},
+            {leaf,0}}}}}}},
+     4 =>
+      {node,
+       {ty_tuple,4,
+        [{local_ref,-576460752303420604},
+         {local_ref,-576460752303420572},
+         {local_ref,-576460752303420540},
+         {local_ref,-576460752303420508}]},
+       {leaf,1},
+       {leaf,0}}}},
+  {{leaf,0},#{}}}}
+
+{named,noloc,{ty_ref,ast,ty,0},[]}
+25437 us
+
+{singleton,singleton}
+10 us
+
+{union,[{predef,atom},{predef,integer},{predef_alias,char}]}
+14 us
+
+{singleton,binary}
+2 us
+
+{predef,integer}
+2 us
+
+{predef,integer}
+2 us
+
+{singleton,empty_list}
+2 us
+
+{singleton,list}
+2 us
+X
+{named,{loc,"src/ast.erl",347,27},{ty_ref,ast,ty,0},[]}
+25 us
+
+{singleton,nonempty_list}
+2 us
+X
+{named,{loc,"src/ast.erl",348,45},{ty_ref,ast,ty,0},[]}
+25 us
+
+{singleton,improper_list}
+2 us
+X
+{named,{loc,"src/ast.erl",349,45},{ty_ref,ast,ty,0},[]}
+35 us
+X
+{named,{loc,"src/ast.erl",349,51},{ty_ref,ast,ty,0},[]}
+71 us
+
+{singleton,nonempty_improper_list}
+3 us
+X
+{named,{loc,"src/ast.erl",350,63},{ty_ref,ast,ty,0},[]}
+34 us
+X
+{named,{loc,"src/ast.erl",350,69},{ty_ref,ast,ty,0},[]}
+27 us
+
+{singleton,fun_simple}
+2 us
+
+{singleton,fun_any_arg}
+1 us
+X
+{named,{loc,"src/ast.erl",355,41},{ty_ref,ast,ty,0},[]}
+30 us
+
+{singleton,fun_full}
+3 us
+
+{list,{named,{loc,"src/ast.erl",356,36},{ty_ref,ast,ty,0},[]}}
+17 us
+X
+{named,{loc,"src/ast.erl",356,43},{ty_ref,ast,ty,0},[]}
+26 us
+
+{singleton,range}
+2 us
+
+{union,[{predef,integer},{singleton,'*'}]}
+7 us
+
+{union,[{predef,integer},{singleton,'*'}]}
+5 us
+
+{singleton,map_any}
+3 us
+
+{singleton,map}
+2 us
+
+{list,{named,{loc,"src/ast.erl",364,26},{ty_ref,ast,ty_map_assoc,0},[]}}
+12 us
+
+{singleton,predef}
+2 us
+CONV{union,[{singleton,any},
+            {singleton,none},
+            {singleton,pid},
+            {singleton,port},
+            {singleton,reference},
+            {singleton,float},
+            {singleton,integer},
+            {singleton,atom}]}
+<59> {ty_ref,ast,predef_name,0} ->
+{leaf,{ty,<<0:5>>,
+          {{8,
+            {integer,{atom,{any,nil,nil},{float,nil,nil}},
+                     {pid,{none,nil,nil},{port,nil,{reference,nil,nil}}}}},
+           finite},
+          [],
+          {leaf,0},
+          {{leaf,0},#{}},
+          {{leaf,0},#{}}}}
+
+{named,{loc,"src/ast.erl",373,31},{ty_ref,ast,predef_name,0},[]}
+204 us
+
+{singleton,predef_alias}
+3 us
+CONV{union,[{singleton,term},
+            {singleton,binary},
+            {singleton,nonempty_binary},
+            {singleton,bitstring},
+            {singleton,nonempty_bitstring},
+            {singleton,boolean},
+            {singleton,byte},
+            {singleton,char},
+            {singleton,nil},
+            {singleton,number},
+            {singleton,list},
+            {singleton,nonempty_list},
+            {singleton,maybe_improper_list},
+            {singleton,nonempty_improper_list},
+            {singleton,nonempty_maybe_improper_list},
+            {singleton,string},
+            {singleton,nonempty_string},
+            {singleton,iodata},
+            {singleton,iolist},
+            {singleton,map},
+            {singleton,function},
+            {singleton,module},
+            {singleton,mfa},
+            {singleton,arity},
+            {singleton,identifier},
+            {singleton,node},
+            {singleton,timeout},
+            {singleton,no_return},
+            {singleton,non_neg_integer},
+            {singleton,pos_integer},
+            {singleton,neg_integer}]}
+<194> {ty_ref,ast,predef_alias_name,0} ->
+{leaf,
+    {ty,<<0:5>>,
+        {{31,
+          {neg_integer,
+              {identifier,
+                  {arity,nil,
+                      {function,
+                          {char,
+                              {byte,
+                                  {boolean,
+                                      {bitstring,{binary,nil,nil},nil},
+                                      nil},
+                                  nil},
+                              nil},
+                          nil}},
+                  {mfa,
+                      {map,
+                          {iolist,{iodata,nil,nil},{list,nil,nil}},
+                          {maybe_improper_list,nil,nil}},
+                      {module,nil,nil}}},
+              {non_neg_integer,
+                  {no_return,{nil,nil,nil},{node,nil,nil}},
+                  {pos_integer,
+                      {nonempty_string,
+                          {nonempty_maybe_improper_list,
+                              {nonempty_improper_list,
+                                  {nonempty_bitstring,
+                                      {nonempty_binary,nil,nil},
+                                      nil},
+                                  {nonempty_list,nil,nil}},
+                              nil},
+                          {number,nil,nil}},
+                      {timeout,{string,nil,{term,nil,nil}},nil}}}}},
+         finite},
+        [],
+        {leaf,0},
+        {{leaf,0},#{}},
+        {{leaf,0},#{}}}}
+
+{named,{loc,"src/ast.erl",386,43},{ty_ref,ast,predef_alias_name,0},[]}
+579 us
+
+{singleton,named}
+4 us
+CONV{tuple,[{singleton,loc},
+            {predef_alias,string},
+            {predef,integer},
+            {predef,integer}]}
+<11> {ty_ref,ast,loc,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{4 =>
+                 {node,{ty_tuple,4,
+                                 [{local_ref,-576460752303419708},
+                                  {local_ref,-576460752303419676},
+                                  {local_ref,-576460752303421980},
+                                  {local_ref,-576460752303421980}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+
+{named,{loc,"src/ast.erl",399,29},{ty_ref,ast,loc,0},[]}
+159 us
+CONV{union,[{tuple,[{singleton,ty_ref},
+                    {predef,atom},
+                    {predef,atom},
+                    {predef_alias,arity}]},
+            {tuple,[{singleton,ty_qref},
+                    {predef,atom},
+                    {predef,atom},
+                    {predef_alias,arity}]}]}
+<23> {ty_ref,ast,ty_ref,0} ->
+{leaf,
+    {ty,<<0:5>>,
+        {{0,nil},finite},
+        [],
+        {leaf,0},
+        {{leaf,0},
+         #{4 =>
+               {node,
+                   {ty_tuple,4,
+                       [{local_ref,-576460752303419644},
+                        {local_ref,-576460752303419612},
+                        {local_ref,-576460752303419612},
+                        {local_ref,-576460752303419580}]},
+                   {leaf,1},
+                   {node,
+                       {ty_tuple,4,
+                           [{local_ref,-576460752303419548},
+                            {local_ref,-576460752303419612},
+                            {local_ref,-576460752303419612},
+                            {local_ref,-576460752303419580}]},
+                       {leaf,1},
+                       {leaf,0}}}}},
+        {{leaf,0},#{}}}}
+
+{named,{loc,"src/ast.erl",399,42},{ty_ref,ast,ty_ref,0},[]}
+210 us
+
+{list,{named,{loc,"src/ast.erl",399,59},{ty_ref,ast,ty,0},[]}}
+12 us
+
+{singleton,tuple_any}
+2 us
+
+{singleton,tuple}
+2 us
+
+{list,{named,{loc,"src/ast.erl",405,30},{ty_ref,ast,ty,0},[]}}
+11 us
+
+{singleton,var}
+2 us
+CONV{predef,atom}
+<5> {ty_ref,ast,ty_varname,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},cofinite},
+          [],
+          {leaf,0},
+          {{leaf,0},#{}},
+          {{leaf,0},#{}}}}
+
+{named,{loc,"src/ast.erl",407,25},{ty_ref,ast,ty_varname,0},[]}
+99 us
+
+{singleton,mu}
+2 us
+X
+{named,{loc,"src/ast.erl",402,42},{ty_ref,ast,ty_var,0},[]}
+29 us
+X
+{named,{loc,"src/ast.erl",402,72},{ty_ref,ast,ty,0},[]}
+24 us
+
+{singleton,union}
+3 us
+
+{list,{named,{loc,"src/ast.erl",408,30},{ty_ref,ast,ty,0},[]}}
+13 us
+
+{singleton,intersection}
+2 us
+
+{list,{named,{loc,"src/ast.erl",409,44},{ty_ref,ast,ty,0},[]}}
+9 us
+
+{singleton,negation}
+2 us
+X
+{named,{loc,"src/ast.erl",410,35},{ty_ref,ast,ty,0},[]}
+23 us
+X
+{named,{loc,"src/ast.erl",356,36},{ty_ref,ast,ty,0},[]}
+25 us
+
+{empty_list}
+2 us
+CONV{union,[{named,{loc,"src/ast.erl",367,25},
+                   {ty_ref,ast,ty_map_assoc_opt,0},
+                   []},
+            {named,{loc,"src/ast.erl",367,46},
+                   {ty_ref,ast,ty_map_assoc_req,0},
+                   []}]}
+CONV{tuple,[{singleton,map_field_opt},
+            {named,{loc,"src/ast.erl",365,45},{ty_ref,ast,ty,0},[]},
+            {named,{loc,"src/ast.erl",365,51},{ty_ref,ast,ty,0},[]}]}
+<19> {ty_ref,ast,ty_map_assoc_opt,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{3 =>
+                 {node,{ty_tuple,3,
+                                 [{local_ref,-576460752303419356},
+                                  {local_ref,-576460752303419324},
+                                  {local_ref,-576460752303419292}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+CONV{tuple,[{singleton,map_field_req},
+            {named,{loc,"src/ast.erl",366,45},{ty_ref,ast,ty,0},[]},
+            {named,{loc,"src/ast.erl",366,51},{ty_ref,ast,ty,0},[]}]}
+<9> {ty_ref,ast,ty_map_assoc_req,0} ->
+{leaf,{ty,<<0:5>>,
+          {{0,nil},finite},
+          [],
+          {leaf,0},
+          {{leaf,0},
+           #{3 =>
+                 {node,{ty_tuple,3,
+                                 [{local_ref,-576460752303419228},
+                                  {local_ref,-576460752303419196},
+                                  {local_ref,-576460752303419164}]},
+                       {leaf,1},
+                       {leaf,0}}}},
+          {{leaf,0},#{}}}}
+<404> {ty_ref,ast,ty_map_assoc,0} ->
+{leaf,
+    {ty,<<0:5>>,
+        {{0,nil},finite},
+        [],
+        {leaf,0},
+        {{leaf,0},
+         #{3 =>
+               {node,
+                   {ty_tuple,3,
+                       [{local_ref,-576460752303419356},
+                        {local_ref,-576460752303419324},
+                        {local_ref,-576460752303419292}]},
+                   {leaf,1},
+                   {node,
+                       {ty_tuple,3,
+                           [{local_ref,-576460752303419228},
+                            {local_ref,-576460752303419196},
+                            {local_ref,-576460752303419164}]},
+                       {leaf,1},
+                       {leaf,0}}}}},
+        {{leaf,0},#{}}}}
+
+{named,{loc,"src/ast.erl",364,26},{ty_ref,ast,ty_map_assoc,0},[]}
+605 us
+
+{empty_list}
+5 us
+
+{singleton,loc}
+3 us
+
+{predef_alias,string}
+12 us
+
+{predef,integer}
+2 us
+
+{predef,integer}
+1 us
+
+{singleton,ty_ref}
+2 us
+
+{predef,atom}
+1 us
+
+{predef,atom}
+1 us
+
+{predef_alias,arity}
+1 us
+
+{singleton,ty_qref}
+2 us
+
+{predef,atom}
+1 us
+
+{predef,atom}
+1 us
+
+{predef_alias,arity}
+1 us
+X
+{named,{loc,"src/ast.erl",399,59},{ty_ref,ast,ty,0},[]}
+35 us
+
+{empty_list}
+2 us
+X
+{named,{loc,"src/ast.erl",405,30},{ty_ref,ast,ty,0},[]}
+29 us
+
+{empty_list}
+1 us
+X
+{named,{loc,"src/ast.erl",408,30},{ty_ref,ast,ty,0},[]}
+27 us
+
+{empty_list}
+2 us
+X
+{named,{loc,"src/ast.erl",409,44},{ty_ref,ast,ty,0},[]}
+21 us
+
+{empty_list}
+2 us
+
+{singleton,map_field_opt}
+3 us
+X
+{named,{loc,"src/ast.erl",365,45},{ty_ref,ast,ty,0},[]}
+25 us
+X
+{named,{loc,"src/ast.erl",365,51},{ty_ref,ast,ty,0},[]}
+26 us
+
+{singleton,map_field_req}
+2 us
+X
+{named,{loc,"src/ast.erl",366,45},{ty_ref,ast,ty,0},[]}
+29 us
+X
+{named,{loc,"src/ast.erl",366,51},{ty_ref,ast,ty,0},[]}
+33 us
+
+{range,0,1114111}
+2 us
+
+{empty_list}
+2 us
+parse> 37.232 ms
+[0.052 s] ok
+=======================================================
+  Test passed.

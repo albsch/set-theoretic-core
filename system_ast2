@@ -1,0 +1,5 @@
+#{
+   {ty_key,ast,ty_singleton,0} =>
+    {ty_scheme,[],
+     {predef,any}}
+}.

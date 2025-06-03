@@ -68,7 +68,7 @@ union(I1, I2) ->
 intersect(I1, I2) ->
     negate(union(negate(I1), negate(I2))).
 
-diff(I1, I2) ->
+difference(I1, I2) ->
     intersect(I1, negate(I2)).
 
 interval_add({range, A, B}, Xs) -> add_range(Xs, A, B);

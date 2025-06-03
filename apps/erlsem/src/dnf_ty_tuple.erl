@@ -42,7 +42,7 @@ phi(BigS, [Ty | N], ST) ->
       % remove pi_Index(NegativeComponents) from pi_Index(PComponents) and continue searching
         DoDiff = fun({IIndex, PComp}) ->
           case IIndex of
-            Index -> ?NODE:diff(PComp, NComponent);
+            Index -> ?NODE:difference(PComp, NComponent);
             _ -> PComp
           end
                  end,

@@ -45,6 +45,7 @@ tuple_test() ->
 
 slow_test() ->
   {ok, [System]} = file:consult("system"),
+  dnf_ty_variable:any(),
 
   global_state:with_new_state(fun() -> 
     maps:foreach(fun(VarName, AstTy) ->
@@ -99,6 +100,7 @@ slow_test() ->
 
 ast_test() ->
   {ok, [System]} = file:consult("system_ast"),
+  dnf_ty_variable:any(),
   % io:format(user,"~p~n", [System]),
 
   global_state:with_new_state(fun() -> 
@@ -106,7 +108,7 @@ ast_test() ->
       ty_parser:extend_symtab(VarName, AstTyScheme)
     end, System),
 
-    Ty = {named, noloc, {ty_ref, 'ast', ty, 0}, []},
+    Ty = {named, noloc, {ty_ref, 'ast', ty_singleton, 0}, []},
 
     {Time, _} = timer:tc(fun() -> 
       % fprof:trace(start),

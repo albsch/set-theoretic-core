@@ -1,0 +1,908 @@
+%% Analysis results:
+{  analysis_options,
+ [{callers, true},
+  {sort, acc},
+  {totals, false},
+  {details, true}]}.
+
+%                                               CNT       ACC       OWN        
+[{ totals,                                     2466,   16.750,   13.482}].  %%%
+
+
+%                                               CNT       ACC       OWN        
+[{ "<0.405.0>",                                2466,undefined,   13.482}].   %%
+
+{[{{debug_tests,'-ast_test/0-fun-1-',0},          0,   16.673,    0.008},      
+  {undefined,                                     0,    0.038,    0.028},      
+  {{fprof,call,1},                                1,    0.020,    0.015}],     
+ { {fprof,just_call,2},                           1,   16.731,    0.051},     %
+ [{{ty_parser,parse,1},                           1,   16.665,    0.080},      
+  {{erlang,demonitor,1},                          1,    0.010,    0.010},      
+  {{erlang,monitor,2},                            1,    0.005,    0.005},      
+  {suspend,                                       1,    0.000,    0.000}]}.    
+
+{[{undefined,                                     0,   16.712,    0.004}],     
+ { {debug_tests,'-ast_test/0-fun-1-',0},          0,   16.712,    0.004},     %
+ [{{fprof,just_call,2},                           0,   16.673,    0.008},      
+  {{fprof,trace,1},                               1,    0.035,    0.003}]}.    
+
+{[{{fprof,just_call,2},                           1,   16.665,    0.080}],     
+ { {ty_parser,parse,1},                           1,   16.665,    0.080},     %
+ [{{ty_parser,unify,2},                           1,    5.956,    0.018},      
+  {{ty_parser,convert,3},                         1,    5.003,    0.016},      
+  {{ty_parser,replace_all,2},                     1,    2.696,    0.003},      
+  {{error_handler,undefined_function,3},          1,    2.358,    0.012},      
+  {{utils,update_ets_from_map,2},                 2,    0.160,    0.016},      
+  {{ty_parser,'-parse/1-lc$^2/1-2-',1},           1,    0.115,    0.006},      
+  {{ets,tab2list,1},                              3,    0.094,    0.019},      
+  {{ty_parser,'-parse/1-lc$^1/1-1-',1},           1,    0.077,    0.016},      
+  {{ty_parser,new_local_ref,1},                   1,    0.040,    0.013},      
+  {{ty_parser,'-parse/1-lc$^0/1-0-',1},           1,    0.039,    0.015},      
+  {{maps,from_list,1},                            5,    0.017,    0.017},      
+  {{erts_internal,mc_iterator,1},                 2,    0.015,    0.011},      
+  {{ets,insert,2},                                1,    0.005,    0.005},      
+  {{ets,lookup,2},                                1,    0.004,    0.004},      
+  {{queue,from_list,1},                           1,    0.003,    0.003},      
+  {{maps,keys,1},                                 1,    0.003,    0.003}]}.    
+
+{[{{ty_parser,unify,3},                           1,    5.840,    0.070},      
+  {{ty_parser,replace_all,2},                     1,    2.693,    0.037},      
+  {{utils,'-everywhere/2-lc$^2/1-0-',2},         24,    0.000,    0.285},      
+  {{utils,'-everywhere/2-fun-0-',2},            284,    0.000,    2.396}],     
+ { {utils,everywhere,2},                        310,    8.533,    2.788},     %
+ [{{utils,'-everywhere/2-lc$^2/1-0-',2},         21,    7.567,    0.134},      
+  {{utils,'-everywhere/2-fun-1-',2},            122,    7.300,    0.412},      
+  {{lists,map_1,2},                               0,    1.905,    0.160},      
+  {{lists,map,2},                                 0,    0.739,    0.004},      
+  {{ty_parser,'-unify/3-fun-2-',2},             213,    0.504,    0.504},      
+  {{erlang,tuple_to_list,1},                    107,    0.255,    0.255},      
+  {{erlang,list_to_tuple,1},                    107,    0.255,    0.255},      
+  {{ty_parser,'-replace_all/2-fun-0-',2},        97,    0.248,    0.248},      
+  {{erts_internal,mc_iterator,1},                21,    0.180,    0.131},      
+  {{maps,from_list,1},                           21,    0.094,    0.068},      
+  {garbage_collect,                               2,    0.056,    0.056}]}.    
+
+{[{{lists,map,2},                               116,    5.713,    0.984},      
+  {{utils,everywhere,2},                          0,    1.905,    0.160},      
+  {{lists,map_1,2},                             168,    0.000,    0.488}],     
+ { {lists,map_1,2},                             284,    7.618,    1.632},     %
+ [{{utils,'-everywhere/2-fun-0-',2},            168,    7.126,    0.546},      
+  {{lists,map,2},                                 0,    0.033,    0.033},      
+  {suspend,                                       1,    0.027,    0.000},      
+  {{lists,map_1,2},                             168,    0.000,    0.488}]}.    
+
+{[{{utils,everywhere,2},                         21,    7.567,    0.134},      
+  {{utils,'-everywhere/2-lc$^2/1-0-',2},         12,    0.000,    0.042}],     
+ { {utils,'-everywhere/2-lc$^2/1-0-',2},         33,    7.567,    0.176},     %
+ [{{utils,everywhere,2},                         24,    0.000,    0.285},      
+  {{utils,'-everywhere/2-lc$^2/1-0-',2},         12,    0.000,    0.042}]}.    
+
+{[{{lists,map_1,2},                             168,    7.126,    0.546},      
+  {{lists,map,2},                               116,    0.263,    0.412}],     
+ { {utils,'-everywhere/2-fun-0-',2},            284,    7.389,    0.958},     %
+ [{{utils,everywhere,2},                        284,    0.000,    2.396}]}.    
+
+{[{{utils,everywhere,2},                        122,    7.300,    0.412}],     
+ { {utils,'-everywhere/2-fun-1-',2},            122,    7.300,    0.412},     %
+ [{{lists,map,2},                               122,    6.523,    0.911}]}.    
+
+{[{{utils,'-everywhere/2-fun-1-',2},            122,    6.523,    0.911},      
+  {{utils,everywhere,2},                          0,    0.739,    0.004},      
+  {{lists,map_1,2},                               0,    0.033,    0.033}],     
+ { {lists,map,2},                               122,    7.295,    0.948},     %
+ [{{lists,map_1,2},                             116,    5.713,    0.984},      
+  {{utils,'-everywhere/2-fun-0-',2},            116,    0.263,    0.412}]}.    
+
+{[{{ty_parser,parse,1},                           1,    5.956,    0.018}],     
+ { {ty_parser,unify,2},                           1,    5.956,    0.018},     %
+ [{{ty_parser,unify,3},                           1,    5.893,    0.012},      
+  {{ty_parser,'-unify/2-lc$^0/1-0-',1},           1,    0.020,    0.004},      
+  {{maps,to_list,1},                              1,    0.012,    0.007},      
+  {{erts_internal,mc_iterator,1},                 1,    0.008,    0.006},      
+  {{maps,from_list,1},                            1,    0.005,    0.005}]}.    
+
+{[{{ty_parser,unify,2},                           1,    5.893,    0.012}],     
+ { {ty_parser,unify,3},                           1,    5.893,    0.012},     %
+ [{{utils,everywhere,2},                          1,    5.840,    0.070},      
+  {{lists,flatten,1},                             1,    0.021,    0.004},      
+  {{ty_parser,'-unify/3-lc$^0/1-0-',1},           1,    0.018,    0.009},      
+  {{maps,from_list,1},                            1,    0.002,    0.002}]}.    
+
+{[{{ty_parser,parse,1},                           1,    5.003,    0.016},      
+  {{ty_parser,convert,3},                         3,    0.000,    0.038}],     
+ { {ty_parser,convert,3},                         4,    5.003,    0.054},     %
+ [{{ty_parser,do_convert,3},                      3,    4.900,    0.070},      
+  {{ty_parser,group,3},                           3,    0.031,    0.013},      
+  {{queue,is_empty,1},                            4,    0.011,    0.011},      
+  {{queue,out,1},                                 3,    0.007,    0.007},      
+  {{ty_parser,convert,3},                         3,    0.000,    0.038}]}.    
+
+{[{{ty_parser,convert,3},                         3,    4.900,    0.070},      
+  {{ty_parser,do_convert,3},                      7,    0.000,    0.038}],     
+ { {ty_parser,do_convert,3},                     10,    4.900,    0.108},     %
+ [{{error_handler,undefined_function,3},          1,    2.248,    0.013},      
+  {{dnf_ty_variable,union,2},                     2,    0.884,    0.010},      
+  {{dnf_ty_variable,interval,1},                  2,    0.508,    0.012},      
+  {{dnf_ty_variable,atom,1},                      2,    0.504,    0.013},      
+  {{dnf_ty_variable,tuples,1},                    1,    0.302,    0.007},      
+  {{dnf_ty_atom,finite,1},                        1,    0.143,    0.010},      
+  {{lists,foldl,3},                               1,    0.088,    0.008},      
+  {{ty_tuples,singleton,2},                       1,    0.050,    0.008},      
+  {{dnf_ty_tuple,singleton,1},                    1,    0.026,    0.011},      
+  {{ty_parser,lookup_ty,1},                       1,    0.010,    0.004},      
+  {{ty_parser,new_local_ref,1},                   1,    0.009,    0.006},      
+  {{ty_parser,group,3},                           1,    0.008,    0.005},      
+  {{lists,reverse,1},                             1,    0.003,    0.003},      
+  {{dnf_ty_atom,any,0},                           1,    0.003,    0.003},      
+  {{ty_parser,expand_predef_alias,1},             1,    0.002,    0.002},      
+  {{dnf_ty_interval,interval,2},                  1,    0.002,    0.002},      
+  {{dnf_ty_interval,any,0},                       1,    0.002,    0.002},      
+  {{ty_parser,do_convert,3},                      7,    0.000,    0.038}]}.    
+
+{[{{ty_parser,parse,1},                           1,    2.358,    0.012},      
+  {{ty_parser,do_convert,3},                      1,    2.248,    0.013}],     
+ { {error_handler,undefined_function,3},          2,    4.606,    0.025},     %
+ [{{error_handler,ensure_loaded,1},               2,    4.454,    0.019},      
+  {{utils,update_ets_from_map,2},                 1,    0.118,    0.010},      
+  {{erlang,function_exported,3},                  2,    0.007,    0.007},      
+  {{ty_tuple,tuple,1},                            1,    0.002,    0.002}]}.    
+
+{[{{error_handler,undefined_function,3},          2,    4.454,    0.019}],     
+ { {error_handler,ensure_loaded,1},               2,    4.454,    0.019},     %
+ [{{code,ensure_loaded,1},                        2,    4.427,    0.042},      
+  {{erlang,whereis,1},                            2,    0.008,    0.008}]}.    
+
+{[{{error_handler,ensure_loaded,1},               2,    4.427,    0.042}],     
+ { {code,ensure_loaded,1},                        2,    4.427,    0.042},     %
+ [{{code,call,1},                                 4,    3.443,    0.086},      
+  {{code,ensure_prepare_loading,3},               2,    0.903,    0.010},      
+  {{code,get_mode,0},                             2,    0.033,    0.010},      
+  {{erlang,module_loaded,1},                      2,    0.006,    0.006}]}.    
+
+{[{{code,ensure_loaded,1},                        4,    3.443,    0.086}],     
+ { {code,call,1},                                 4,    3.443,    0.086},     %
+ [{{code_server,call,1},                          4,    3.357,    0.078}]}.    
+
+{[{{code,call,1},                                 4,    3.357,    0.078}],     
+ { {code_server,call,1},                          4,    3.357,    0.078},     %
+ [{suspend,                                       4,    3.241,    0.000},      
+  {{erlang,monitor,2},                            4,    0.021,    0.021},      
+  {{erlang,demonitor,2},                          4,    0.017,    0.017}]}.    
+
+{[{{code_server,call,1},                          4,    3.241,    0.000},      
+  {{lists,map_1,2},                               1,    0.027,    0.000},      
+  {{fprof,just_call,2},                           1,    0.000,    0.000}],     
+ { suspend,                                       6,    3.268,    0.000},     %
+ [ ]}.
+
+{[{{ty_parser,parse,1},                           1,    2.696,    0.003}],     
+ { {ty_parser,replace_all,2},                     1,    2.696,    0.003},     %
+ [{{utils,everywhere,2},                          1,    2.693,    0.037}]}.    
+
+{[{{ty_rec,map,2},                                5,    0.918,    0.031},      
+  {{ty_rec,binary_map,3},                         2,    0.723,    0.013},      
+  {{ty_parser,do_convert,3},                      1,    0.088,    0.008},      
+  {{dnf_ty_interval,union,2},                     2,    0.000,    0.019}],     
+ { {lists,foldl,3},                              10,    1.729,    0.071},     %
+ [{{lists,foldl_1,3},                            10,    1.512,    0.057},      
+  {{ty_rec,'-map/2-fun-0-',4},                    5,    0.094,    0.040},      
+  {{ty_parser,'-do_convert/3-fun-1-',2},          1,    0.036,    0.010},      
+  {{ty_rec,'-binary_map/3-fun-0-',5},             2,    0.035,    0.017},      
+  {{dnf_ty_interval,'-union/2-fun-0-',2},         2,    0.022,    0.007}]}.    
+
+{[{{lists,foldl,3},                              10,    1.512,    0.057},      
+  {{lists,foldl_1,3},                            36,    0.000,    0.219}],     
+ { {lists,foldl_1,3},                            46,    1.512,    0.276},     %
+ [{{ty_rec,'-binary_map/3-fun-0-',5},            10,    0.606,    0.087},      
+  {{ty_rec,'-map/2-fun-0-',4},                   25,    0.599,    0.208},      
+  {{ty_parser,'-do_convert/3-fun-1-',2},          1,    0.035,    0.008},      
+  {{lists,foldl_1,3},                            36,    0.000,    0.219}]}.    
+
+{[{{ty_rec,interval,1},                           2,    0.480,    0.006},      
+  {{ty_rec,atom,1},                               2,    0.476,    0.006},      
+  {{ty_rec,tuples,1},                             1,    0.287,    0.004}],     
+ { {ty_rec,empty,0},                              5,    1.243,    0.016},     %
+ [{{ty_rec,map,2},                                5,    1.227,    0.054}]}.    
+
+{[{{ty_rec,empty,0},                              5,    1.227,    0.054}],     
+ { {ty_rec,map,2},                                5,    1.227,    0.054},     %
+ [{{lists,foldl,3},                               5,    0.918,    0.031},      
+  {{lists,zip,2},                                 5,    0.186,    0.022},      
+  {{lists,seq,2},                                 5,    0.069,    0.016}]}.    
+
+{[{{code,ensure_loaded,1},                        2,    0.903,    0.010}],     
+ { {code,ensure_prepare_loading,3},               2,    0.903,    0.010},     %
+ [{{erlang,prepare_loading,2},                    2,    0.893,    0.010}]}.    
+
+{[{{code,ensure_prepare_loading,3},               2,    0.893,    0.010}],     
+ { {erlang,prepare_loading,2},                    2,    0.893,    0.010},     %
+ [{{erlang,prepare_loading_1,2},                  2,    0.883,    0.019}]}.    
+
+{[{{ty_parser,do_convert,3},                      2,    0.884,    0.010}],     
+ { {dnf_ty_variable,union,2},                     2,    0.884,    0.010},     %
+ [{{dnf_ty_variable,op,3},                        2,    0.874,    0.007}]}.    
+
+{[{{erlang,prepare_loading,2},                    2,    0.883,    0.019}],     
+ { {erlang,prepare_loading_1,2},                  2,    0.883,    0.019},     %
+ [{{erts_internal,prepare_loading,2},             2,    0.864,    0.864}]}.    
+
+{[{{dnf_ty_variable,union,2},                     2,    0.874,    0.007}],     
+ { {dnf_ty_variable,op,3},                        2,    0.874,    0.007},     %
+ [{{dnf_ty_variable,'-op/3-ROp/2-0-',3},          2,    0.867,    0.017}]}.    
+
+{[{{dnf_ty_variable,op,3},                        2,    0.867,    0.017}],     
+ { {dnf_ty_variable,'-op/3-ROp/2-0-',3},          2,    0.867,    0.017},     %
+ [{{ty_rec,union,2},                              2,    0.846,    0.007},      
+  {{dnf_ty_variable,normalize,1},                 2,    0.004,    0.004}]}.    
+
+{[{{erlang,prepare_loading_1,2},                  2,    0.864,    0.864}],     
+ { {erts_internal,prepare_loading,2},             2,    0.864,    0.864},     %
+ [ ]}.
+
+{[{{dnf_ty_variable,'-op/3-ROp/2-0-',3},          2,    0.846,    0.007}],     
+ { {ty_rec,union,2},                              2,    0.846,    0.007},     %
+ [{{ty_rec,binary_map,3},                         2,    0.839,    0.019}]}.    
+
+{[{{ty_rec,union,2},                              2,    0.839,    0.019}],     
+ { {ty_rec,binary_map,3},                         2,    0.839,    0.019},     %
+ [{{lists,foldl,3},                               2,    0.723,    0.013},      
+  {{lists,zip,2},                                 2,    0.073,    0.006},      
+  {{lists,seq,2},                                 2,    0.024,    0.006}]}.    
+
+{[{{lists,foldl_1,3},                            25,    0.599,    0.208},      
+  {{lists,foldl,3},                               5,    0.094,    0.040}],     
+ { {ty_rec,'-map/2-fun-0-',4},                   30,    0.693,    0.248},     %
+ [{{ty_rec,'-empty/0-fun-0-',2},                 30,    0.362,    0.113},      
+  {{erlang,setelement,3},                        30,    0.083,    0.083}]}.    
+
+{[{{lists,foldl_1,3},                            10,    0.606,    0.087},      
+  {{lists,foldl,3},                               2,    0.035,    0.017}],     
+ { {ty_rec,'-binary_map/3-fun-0-',5},            12,    0.641,    0.104},     %
+ [{{ty_rec,'-union/2-fun-0-',3},                 12,    0.507,    0.044},      
+  {{erlang,setelement,3},                        12,    0.030,    0.030}]}.    
+
+{[{{ty_parser,do_convert,3},                      2,    0.508,    0.012}],     
+ { {dnf_ty_variable,interval,1},                  2,    0.508,    0.012},     %
+ [{{ty_rec,interval,1},                           2,    0.492,    0.012},      
+  {{dnf_ty_variable,leaf,1},                      2,    0.004,    0.004}]}.    
+
+{[{{ty_rec,'-binary_map/3-fun-0-',5},            12,    0.507,    0.044}],     
+ { {ty_rec,'-union/2-fun-0-',3},                 12,    0.507,    0.044},     %
+ [{{ty_functions,union,2},                        2,    0.164,    0.038},      
+  {{ty_tuples,union,2},                           2,    0.158,    0.044},      
+  {{dnf_ty_interval,union,2},                     2,    0.053,    0.008},      
+  {{dnf_ty_atom,union,2},                         2,    0.046,    0.026},      
+  {{dnf_ty_list,union,2},                         2,    0.036,    0.006},      
+  {{dnf_ty_predefined,union,2},                   2,    0.006,    0.006}]}.    
+
+{[{{utils,everywhere,2},                        213,    0.504,    0.504}],     
+ { {ty_parser,'-unify/3-fun-2-',2},             213,    0.504,    0.504},     %
+ [ ]}.
+
+{[{{ty_parser,do_convert,3},                      2,    0.504,    0.013}],     
+ { {dnf_ty_variable,atom,1},                      2,    0.504,    0.013},     %
+ [{{ty_rec,atom,1},                               2,    0.487,    0.011},      
+  {{dnf_ty_variable,leaf,1},                      2,    0.004,    0.004}]}.    
+
+{[{{dnf_ty_variable,interval,1},                  2,    0.492,    0.012}],     
+ { {ty_rec,interval,1},                           2,    0.492,    0.012},     %
+ [{{ty_rec,empty,0},                              2,    0.480,    0.006}]}.    
+
+{[{{dnf_ty_variable,atom,1},                      2,    0.487,    0.011}],     
+ { {ty_rec,atom,1},                               2,    0.487,    0.011},     %
+ [{{ty_rec,empty,0},                              2,    0.476,    0.006}]}.    
+
+{[{{ty_rec,'-map/2-fun-0-',4},                   30,    0.362,    0.113}],     
+ { {ty_rec,'-empty/0-fun-0-',2},                 30,    0.362,    0.113},     %
+ [{{dnf_ty_list,empty,0},                         5,    0.080,    0.029},      
+  {{ty_functions,empty,0},                        5,    0.064,    0.026},      
+  {{ty_tuples,empty,0},                           5,    0.063,    0.028},      
+  {{dnf_ty_predefined,empty,0},                   5,    0.017,    0.017},      
+  {{dnf_ty_atom,empty,0},                         5,    0.013,    0.013},      
+  {{dnf_ty_interval,empty,0},                     5,    0.012,    0.012}]}.    
+
+{[{{ty_parser,do_convert,3},                      1,    0.302,    0.007}],     
+ { {dnf_ty_variable,tuples,1},                    1,    0.302,    0.007},     %
+ [{{ty_rec,tuples,1},                             1,    0.292,    0.005},      
+  {{dnf_ty_variable,leaf,1},                      1,    0.003,    0.003}]}.    
+
+{[{{dnf_ty_variable,tuples,1},                    1,    0.292,    0.005}],     
+ { {ty_rec,tuples,1},                             1,    0.292,    0.005},     %
+ [{{ty_rec,empty,0},                              1,    0.287,    0.004}]}.    
+
+{[{{ty_parser,parse,1},                           2,    0.160,    0.016},      
+  {{error_handler,undefined_function,3},          1,    0.118,    0.010}],     
+ { {utils,update_ets_from_map,2},                 3,    0.278,    0.026},     %
+ [{{maps,fold,3},                                 3,    0.222,    0.031},      
+  {{ets,insert,2},                                3,    0.030,    0.030}]}.    
+
+{[{{ty_rec,map,2},                                5,    0.186,    0.022},      
+  {{ty_rec,binary_map,3},                         2,    0.073,    0.006}],     
+ { {lists,zip,2},                                 7,    0.259,    0.028},     %
+ [{{lists,zip,3},                                 7,    0.231,    0.062}]}.    
+
+{[{{utils,everywhere,2},                        107,    0.255,    0.255}],     
+ { {erlang,tuple_to_list,1},                    107,    0.255,    0.255},     %
+ [ ]}.
+
+{[{{utils,everywhere,2},                        107,    0.255,    0.255}],     
+ { {erlang,list_to_tuple,1},                    107,    0.255,    0.255},     %
+ [ ]}.
+
+{[{{utils,everywhere,2},                         97,    0.248,    0.248}],     
+ { {ty_parser,'-replace_all/2-fun-0-',2},        97,    0.248,    0.248},     %
+ [ ]}.
+
+{[{{utils,everywhere,2},                         21,    0.180,    0.131},      
+  {{ty_tuples,remove_redundant,1},                3,    0.028,    0.020},      
+  {{ty_parser,parse,1},                           2,    0.015,    0.011},      
+  {{ty_functions,remove_redundant,1},             2,    0.015,    0.011},      
+  {{ty_parser,unify,2},                           1,    0.008,    0.006}],     
+ { {erts_internal,mc_iterator,1},                29,    0.246,    0.179},     %
+ [{{erts_internal,map_next,3},                   29,    0.067,    0.067}]}.    
+
+{[{{lists,zip,2},                                 7,    0.231,    0.062},      
+  {{lists,zip,3},                                42,    0.000,    0.169}],     
+ { {lists,zip,3},                                49,    0.231,    0.231},     %
+ [{{lists,zip,3},                                42,    0.000,    0.169}]}.    
+
+{[{{utils,update_ets_from_map,2},                 3,    0.222,    0.031}],     
+ { {maps,fold,3},                                 3,    0.222,    0.031},     %
+ [{{maps,fold_1,4},                               3,    0.148,    0.028},      
+  {{maps,next,1},                                 3,    0.025,    0.015},      
+  {{maps,iterator,1},                             3,    0.018,    0.011}]}.    
+
+{[{{ty_rec,'-union/2-fun-0-',3},                  2,    0.164,    0.038}],     
+ { {ty_functions,union,2},                        2,    0.164,    0.038},     %
+ [{{ty_functions,remove_redundant,1},             2,    0.047,    0.024},      
+  {{dnf_ty_function,union,2},                     2,    0.037,    0.007},      
+  {{erlang,'++',2},                               2,    0.022,    0.022},      
+  {{maps,keys,1},                                 4,    0.008,    0.008},      
+  {{maps,from_list,1},                            2,    0.008,    0.008},      
+  {{ty_functions,'-union/2-lc$^1/1-0-',2},        2,    0.004,    0.004}]}.    
+
+{[{{ty_rec,'-union/2-fun-0-',3},                  2,    0.158,    0.044}],     
+ { {ty_tuples,union,2},                           2,    0.158,    0.044},     %
+ [{{ty_tuples,remove_redundant,1},                2,    0.049,    0.021},      
+  {{dnf_ty_tuple,union,2},                        2,    0.035,    0.007},      
+  {{maps,keys,1},                                 4,    0.012,    0.012},      
+  {{maps,from_list,1},                            2,    0.008,    0.008},      
+  {{erlang,'++',2},                               2,    0.006,    0.006},      
+  {{ty_tuples,'-union/2-lc$^1/1-0-',2},           2,    0.004,    0.004}]}.    
+
+{[{{utils,everywhere,2},                         21,    0.094,    0.068},      
+  {{ty_parser,parse,1},                           5,    0.017,    0.017},      
+  {{ty_tuples,remove_redundant,1},                3,    0.010,    0.010},      
+  {{ty_tuples,union,2},                           2,    0.008,    0.008},      
+  {{ty_functions,union,2},                        2,    0.008,    0.008},      
+  {{ty_parser,unify,2},                           1,    0.005,    0.005},      
+  {{ty_functions,remove_redundant,1},             2,    0.004,    0.004},      
+  {{ty_parser,unify,3},                           1,    0.002,    0.002}],     
+ { {maps,from_list,1},                           37,    0.148,    0.122},     %
+ [{garbage_collect,                               1,    0.026,    0.026}]}.    
+
+{[{{maps,fold,3},                                 3,    0.148,    0.028},      
+  {{maps,fold_1,4},                               7,    0.000,    0.041}],     
+ { {maps,fold_1,4},                              10,    0.148,    0.069},     %
+ [{{utils,'-update_ets_from_map/2-fun-0-',4},     7,    0.062,    0.037},      
+  {{maps,try_next,2},                             7,    0.017,    0.017},      
+  {{maps,fold_1,4},                               7,    0.000,    0.041}]}.    
+
+{[{{ty_parser,do_convert,3},                      1,    0.143,    0.010},      
+  {{dnf_ty_atom,finite,1},                        1,    0.000,    0.003}],     
+ { {dnf_ty_atom,finite,1},                        2,    0.143,    0.013},     %
+ [{{gb_sets,from_list,1},                         1,    0.125,    0.009},      
+  {{dnf_ty_atom,intersect,2},                     1,    0.003,    0.003},      
+  {{dnf_ty_atom,any,0},                           1,    0.002,    0.002},      
+  {{dnf_ty_atom,finite,1},                        1,    0.000,    0.003}]}.    
+
+{[{{dnf_ty_atom,finite,1},                        1,    0.125,    0.009}],     
+ { {gb_sets,from_list,1},                         1,    0.125,    0.009},     %
+ [{{gb_sets,from_ordset,1},                       1,    0.106,    0.097},      
+  {{ordsets,from_list,1},                         1,    0.010,    0.008}]}.    
+
+{[{{ty_parser,parse,1},                           1,    0.115,    0.006},      
+  {{ty_parser,'-parse/1-lc$^2/1-2-',1},           3,    0.000,    0.020}],     
+ { {ty_parser,'-parse/1-lc$^2/1-2-',1},           4,    0.115,    0.026},     %
+ [{{ty_node,define,2},                            3,    0.089,    0.025},      
+  {{ty_parser,'-parse/1-lc$^2/1-2-',1},           3,    0.000,    0.020}]}.    
+
+{[{{ty_rec,'-map/2-fun-0-',4},                   30,    0.083,    0.083},      
+  {{ty_rec,'-binary_map/3-fun-0-',5},            12,    0.030,    0.030}],     
+ { {erlang,setelement,3},                        42,    0.113,    0.113},     %
+ [ ]}.
+
+{[{{gb_sets,from_list,1},                         1,    0.106,    0.097}],     
+ { {gb_sets,from_ordset,1},                       1,    0.106,    0.097},     %
+ [{{gb_sets,balance_list,2},                      1,    0.009,    0.007}]}.    
+
+{[{{utils,everywhere,2},                          2,    0.056,    0.056},      
+  {{maps,from_list,1},                            1,    0.026,    0.026},      
+  {{ty_bool,empty,0},                             1,    0.023,    0.023}],     
+ { garbage_collect,                               4,    0.105,    0.105},     %
+ [ ]}.
+
+{[{{ty_node,define,2},                            3,    0.049,    0.049},      
+  {{utils,'-update_ets_from_map/2-fun-0-',4},     7,    0.025,    0.025},      
+  {{ty_parser,new_local_ref,1},                   4,    0.015,    0.015},      
+  {{ty_parser,lookup_ty,1},                       1,    0.006,    0.006},      
+  {{ty_parser,parse,1},                           1,    0.004,    0.004}],     
+ { {ets,lookup,2},                               16,    0.099,    0.099},     %
+ [ ]}.
+
+{[{{ty_parser,'-do_convert/3-fun-1-',2},          2,    0.048,    0.020},      
+  {{ty_parser,parse,1},                           1,    0.040,    0.013},      
+  {{ty_parser,do_convert,3},                      1,    0.009,    0.006}],     
+ { {ty_parser,new_local_ref,1},                   4,    0.097,    0.039},     %
+ [{{ty_parser,new_local_ref,0},                   3,    0.024,    0.016},      
+  {{ets,insert,2},                                3,    0.019,    0.019},      
+  {{ets,lookup,2},                                4,    0.015,    0.015}]}.    
+
+{[{{ty_parser,parse,1},                           3,    0.094,    0.019}],     
+ { {ets,tab2list,1},                              3,    0.094,    0.019},     %
+ [{{ets,match_object,2},                          3,    0.075,    0.075}]}.    
+
+{[{{ty_rec,map,2},                                5,    0.069,    0.016},      
+  {{ty_rec,binary_map,3},                         2,    0.024,    0.006}],     
+ { {lists,seq,2},                                 7,    0.093,    0.022},     %
+ [{{lists,seq_loop,3},                            7,    0.071,    0.027}]}.    
+
+{[{{ty_parser,'-parse/1-lc$^2/1-2-',1},           3,    0.089,    0.025}],     
+ { {ty_node,define,2},                            3,    0.089,    0.025},     %
+ [{{ets,lookup,2},                                3,    0.049,    0.049},      
+  {{ets,insert,2},                                3,    0.015,    0.015}]}.    
+
+{[{{ty_tuples,union,2},                           2,    0.049,    0.021},      
+  {{ty_tuples,singleton,2},                       1,    0.035,    0.011}],     
+ { {ty_tuples,remove_redundant,1},                3,    0.084,    0.032},     %
+ [{{erts_internal,mc_iterator,1},                 3,    0.028,    0.020},      
+  {{ty_tuples,'-remove_redundant/1-lc$^0/1-0-',2},   3,    0.014,    0.012},      
+  {{maps,from_list,1},                            3,    0.010,    0.010}]}.    
+
+{[{{dnf_ty_list,empty,0},                         5,    0.051,    0.028},      
+  {{dnf_ty_tuple,empty,0},                        7,    0.018,    0.018},      
+  {{dnf_ty_function,empty,0},                     5,    0.011,    0.011}],     
+ { {ty_bool,empty,0},                            17,    0.080,    0.057},     %
+ [{garbage_collect,                               1,    0.023,    0.023}]}.    
+
+{[{{ty_rec,'-empty/0-fun-0-',2},                  5,    0.080,    0.029}],     
+ { {dnf_ty_list,empty,0},                         5,    0.080,    0.029},     %
+ [{{ty_bool,empty,0},                             5,    0.051,    0.028}]}.    
+
+{[{{erts_internal,mc_iterator,1},                29,    0.067,    0.067},      
+  {{maps,next,1},                                 3,    0.010,    0.010},      
+  {{maps,to_list,1},                              1,    0.002,    0.002}],     
+ { {erts_internal,map_next,3},                   33,    0.079,    0.079},     %
+ [ ]}.
+
+{[{{ty_parser,parse,1},                           1,    0.077,    0.016},      
+  {{ty_parser,'-parse/1-lc$^1/1-1-',1},           3,    0.000,    0.014}],     
+ { {ty_parser,'-parse/1-lc$^1/1-1-',1},           4,    0.077,    0.030},     %
+ [{{ty_node,new_ty_node,0},                       3,    0.047,    0.016},      
+  {{ty_parser,'-parse/1-lc$^1/1-1-',1},           3,    0.000,    0.014}]}.    
+
+{[{{ets,tab2list,1},                              3,    0.075,    0.075}],     
+ { {ets,match_object,2},                          3,    0.075,    0.075},     %
+ [ ]}.
+
+{[{{lists,foldl,3},                               1,    0.036,    0.010},      
+  {{lists,foldl_1,3},                             1,    0.035,    0.008}],     
+ { {ty_parser,'-do_convert/3-fun-1-',2},          2,    0.071,    0.018},     %
+ [{{ty_parser,new_local_ref,1},                   2,    0.048,    0.020},      
+  {{queue,in,2},                                  2,    0.005,    0.005}]}.    
+
+{[{{lists,seq,2},                                 7,    0.071,    0.027},      
+  {{lists,seq_loop,3},                           14,    0.000,    0.044}],     
+ { {lists,seq_loop,3},                           21,    0.071,    0.071},     %
+ [{{lists,seq_loop,3},                           14,    0.000,    0.044}]}.    
+
+{[{{utils,update_ets_from_map,2},                 3,    0.030,    0.030},      
+  {{ty_parser,new_local_ref,1},                   3,    0.019,    0.019},      
+  {{ty_node,define,2},                            3,    0.015,    0.015},      
+  {{ty_parser,parse,1},                           1,    0.005,    0.005}],     
+ { {ets,insert,2},                               10,    0.069,    0.069},     %
+ [ ]}.
+
+{[{{ty_rec,'-empty/0-fun-0-',2},                  5,    0.064,    0.026}],     
+ { {ty_functions,empty,0},                        5,    0.064,    0.026},     %
+ [{{dnf_ty_function,empty,0},                     5,    0.038,    0.027}]}.    
+
+{[{{ty_rec,'-empty/0-fun-0-',2},                  5,    0.063,    0.028}],     
+ { {ty_tuples,empty,0},                           5,    0.063,    0.028},     %
+ [{{dnf_ty_tuple,empty,0},                        5,    0.035,    0.023}]}.    
+
+{[{{maps,fold_1,4},                               7,    0.062,    0.037}],     
+ { {utils,'-update_ets_from_map/2-fun-0-',4},     7,    0.062,    0.037},     %
+ [{{ets,lookup,2},                                7,    0.025,    0.025}]}.    
+
+{[{{ty_rec,'-union/2-fun-0-',3},                  2,    0.053,    0.008}],     
+ { {dnf_ty_interval,union,2},                     2,    0.053,    0.008},     %
+ [{{lists,foldl,3},                               2,    0.000,    0.019}]}.    
+
+{[{{ty_parser,do_convert,3},                      1,    0.050,    0.008}],     
+ { {ty_tuples,singleton,2},                       1,    0.050,    0.008},     %
+ [{{ty_tuples,remove_redundant,1},                1,    0.035,    0.011},      
+  {{dnf_ty_tuple,empty,0},                        1,    0.007,    0.004}]}.    
+
+{[{{ty_tuples,empty,0},                           5,    0.035,    0.023},      
+  {{ty_tuples,singleton,2},                       1,    0.007,    0.004},      
+  {{dnf_ty_tuple,singleton,1},                    1,    0.007,    0.004}],     
+ { {dnf_ty_tuple,empty,0},                        7,    0.049,    0.031},     %
+ [{{ty_bool,empty,0},                             7,    0.018,    0.018}]}.    
+
+{[{{ty_parser,'-parse/1-lc$^1/1-1-',1},           3,    0.047,    0.016}],     
+ { {ty_node,new_ty_node,0},                       3,    0.047,    0.016},     %
+ [{{ty_node,next_id,0},                           3,    0.031,    0.017}]}.    
+
+{[{{ty_functions,union,2},                        2,    0.047,    0.024}],     
+ { {ty_functions,remove_redundant,1},             2,    0.047,    0.024},     %
+ [{{erts_internal,mc_iterator,1},                 2,    0.015,    0.011},      
+  {{ty_functions,'-remove_redundant/1-lc$^0/1-0-',2},   2,    0.004,    0.004},      
+  {{maps,from_list,1},                            2,    0.004,    0.004}]}.    
+
+{[{{ty_rec,'-union/2-fun-0-',3},                  2,    0.046,    0.026}],     
+ { {dnf_ty_atom,union,2},                         2,    0.046,    0.026},     %
+ [{{dnf_ty_atom,negate,1},                        6,    0.013,    0.013},      
+  {{dnf_ty_atom,intersect,2},                     2,    0.007,    0.007}]}.    
+
+{[{{ty_parser,convert,3},                         3,    0.031,    0.013},      
+  {{ty_parser,do_convert,3},                      1,    0.008,    0.005}],     
+ { {ty_parser,group,3},                           4,    0.039,    0.018},     %
+ [{{maps,update_with,4},                          4,    0.021,    0.018}]}.    
+
+{[{{ty_parser,parse,1},                           1,    0.039,    0.015},      
+  {{ty_parser,'-parse/1-lc$^0/1-0-',1},           3,    0.000,    0.013}],     
+ { {ty_parser,'-parse/1-lc$^0/1-0-',1},           4,    0.039,    0.028},     %
+ [{{lists,usort,1},                               3,    0.011,    0.008},      
+  {{ty_parser,'-parse/1-lc$^0/1-0-',1},           3,    0.000,    0.013}]}.    
+
+{[{{ty_functions,empty,0},                        5,    0.038,    0.027}],     
+ { {dnf_ty_function,empty,0},                     5,    0.038,    0.027},     %
+ [{{ty_bool,empty,0},                             5,    0.011,    0.011}]}.    
+
+{[{{ty_functions,union,2},                        2,    0.037,    0.007}],     
+ { {dnf_ty_function,union,2},                     2,    0.037,    0.007},     %
+ [{{dnf_ty_function,op,3},                        2,    0.030,    0.007}]}.    
+
+{[{{ty_rec,'-union/2-fun-0-',3},                  2,    0.036,    0.006}],     
+ { {dnf_ty_list,union,2},                         2,    0.036,    0.006},     %
+ [{{dnf_ty_list,op,3},                            2,    0.030,    0.008}]}.    
+
+{[{{debug_tests,'-ast_test/0-fun-1-',0},          1,    0.035,    0.003}],     
+ { {fprof,trace,1},                               1,    0.035,    0.003},     %
+ [{{fprof,call,1},                                1,    0.032,    0.008}]}.    
+
+{[{{ty_tuples,union,2},                           2,    0.035,    0.007}],     
+ { {dnf_ty_tuple,union,2},                        2,    0.035,    0.007},     %
+ [{{dnf_ty_tuple,op,3},                           2,    0.028,    0.007}]}.    
+
+{[{{code,ensure_loaded,1},                        2,    0.033,    0.010}],     
+ { {code,get_mode,0},                             2,    0.033,    0.010},     %
+ [{{code_server,get_mode,0},                      2,    0.023,    0.013}]}.    
+
+{[{{fprof,trace,1},                               1,    0.032,    0.008}],     
+ { {fprof,call,1},                                1,    0.032,    0.008},     %
+ [{{fprof,just_call,2},                           1,    0.020,    0.015},      
+  {{erlang,whereis,1},                            1,    0.004,    0.004}]}.    
+
+{[{{ty_node,new_ty_node,0},                       3,    0.031,    0.017}],     
+ { {ty_node,next_id,0},                           3,    0.031,    0.017},     %
+ [{{ets,update_counter,3},                        3,    0.014,    0.014}]}.    
+
+{[{{dnf_ty_list,union,2},                         2,    0.030,    0.008}],     
+ { {dnf_ty_list,op,3},                            2,    0.030,    0.008},     %
+ [{{dnf_ty_list,'-op/3-ROp/2-0-',3},              2,    0.022,    0.012}]}.    
+
+{[{{dnf_ty_function,union,2},                     2,    0.030,    0.007}],     
+ { {dnf_ty_function,op,3},                        2,    0.030,    0.007},     %
+ [{{dnf_ty_function,'-op/3-ROp/2-0-',3},          2,    0.023,    0.012}]}.    
+
+{[{{ty_functions,union,2},                        2,    0.022,    0.022},      
+  {{ty_tuples,union,2},                           2,    0.006,    0.006}],     
+ { {erlang,'++',2},                               4,    0.028,    0.028},     %
+ [ ]}.
+
+{[{{dnf_ty_tuple,union,2},                        2,    0.028,    0.007}],     
+ { {dnf_ty_tuple,op,3},                           2,    0.028,    0.007},     %
+ [{{dnf_ty_tuple,'-op/3-ROp/2-0-',3},             2,    0.021,    0.013}]}.    
+
+{[{{code_server,call,1},                          4,    0.021,    0.021},      
+  {{fprof,just_call,2},                           1,    0.005,    0.005}],     
+ { {erlang,monitor,2},                            5,    0.026,    0.026},     %
+ [ ]}.
+
+{[{{ty_parser,do_convert,3},                      1,    0.026,    0.011}],     
+ { {dnf_ty_tuple,singleton,1},                    1,    0.026,    0.011},     %
+ [{{dnf_ty_tuple,any,0},                          1,    0.008,    0.006},      
+  {{dnf_ty_tuple,empty,0},                        1,    0.007,    0.004}]}.    
+
+{[{{maps,fold,3},                                 3,    0.025,    0.015}],     
+ { {maps,next,1},                                 3,    0.025,    0.015},     %
+ [{{erts_internal,map_next,3},                    3,    0.010,    0.010}]}.    
+
+{[{{ty_parser,new_local_ref,1},                   3,    0.024,    0.016}],     
+ { {ty_parser,new_local_ref,0},                   3,    0.024,    0.016},     %
+ [{{erlang,unique_integer,0},                     3,    0.008,    0.008}]}.    
+
+{[{{ty_tuples,union,2},                           4,    0.012,    0.012},      
+  {{ty_functions,union,2},                        4,    0.008,    0.008},      
+  {{ty_parser,parse,1},                           1,    0.003,    0.003}],     
+ { {maps,keys,1},                                 9,    0.023,    0.023},     %
+ [ ]}.
+
+{[{{dnf_ty_function,op,3},                        2,    0.023,    0.012}],     
+ { {dnf_ty_function,'-op/3-ROp/2-0-',3},          2,    0.023,    0.012},     %
+ [{{ty_bool,union,2},                             2,    0.007,    0.007},      
+  {{dnf_ty_function,normalize,1},                 2,    0.004,    0.004}]}.    
+
+{[{{code,get_mode,0},                             2,    0.023,    0.013}],     
+ { {code_server,get_mode,0},                      2,    0.023,    0.013},     %
+ [{{persistent_term,get,1},                       2,    0.010,    0.010}]}.    
+
+{[{{dnf_ty_list,op,3},                            2,    0.022,    0.012}],     
+ { {dnf_ty_list,'-op/3-ROp/2-0-',3},              2,    0.022,    0.012},     %
+ [{{ty_bool,union,2},                             2,    0.005,    0.005},      
+  {{dnf_ty_list,normalize,1},                     2,    0.005,    0.005}]}.    
+
+{[{{lists,foldl,3},                               2,    0.022,    0.007}],     
+ { {dnf_ty_interval,'-union/2-fun-0-',2},         2,    0.022,    0.007},     %
+ [{{dnf_ty_interval,interval_add,2},              2,    0.015,    0.007}]}.    
+
+{[{{ty_parser,group,3},                           4,    0.021,    0.018}],     
+ { {maps,update_with,4},                          4,    0.021,    0.018},     %
+ [{{ty_parser,'-group/3-fun-0-',2},               1,    0.003,    0.003}]}.    
+
+{[{{ty_parser,unify,3},                           1,    0.021,    0.004}],     
+ { {lists,flatten,1},                             1,    0.021,    0.004},     %
+ [{{lists,do_flatten,2},                          1,    0.017,    0.008}]}.    
+
+{[{{dnf_ty_tuple,op,3},                           2,    0.021,    0.013}],     
+ { {dnf_ty_tuple,'-op/3-ROp/2-0-',3},             2,    0.021,    0.013},     %
+ [{{ty_bool,union,2},                             2,    0.004,    0.004},      
+  {{dnf_ty_tuple,normalize,1},                    2,    0.004,    0.004}]}.    
+
+{[{{ty_parser,unify,2},                           1,    0.020,    0.004},      
+  {{ty_parser,'-unify/2-lc$^0/1-0-',1},           3,    0.000,    0.014}],     
+ { {ty_parser,'-unify/2-lc$^0/1-0-',1},           4,    0.020,    0.018},     %
+ [{{ty_parser,choose_representative,1},           1,    0.002,    0.002},      
+  {{ty_parser,'-unify/2-lc$^0/1-0-',1},           3,    0.000,    0.014}]}.    
+
+{[{{ty_parser,unify,3},                           1,    0.018,    0.009},      
+  {{ty_parser,'-unify/3-lc$^0/1-0-',1},           1,    0.000,    0.002}],     
+ { {ty_parser,'-unify/3-lc$^0/1-0-',1},           2,    0.018,    0.011},     %
+ [{{ty_parser,'-unify/3-lc$^1/1-1-',2},           1,    0.007,    0.005},      
+  {{ty_parser,'-unify/3-lc$^0/1-0-',1},           1,    0.000,    0.002}]}.    
+
+{[{{maps,fold,3},                                 3,    0.018,    0.011}],     
+ { {maps,iterator,1},                             3,    0.018,    0.011},     %
+ [{{maps,iterator,2},                             3,    0.007,    0.007}]}.    
+
+{[{{maps,fold_1,4},                               7,    0.017,    0.017}],     
+ { {maps,try_next,2},                             7,    0.017,    0.017},     %
+ [ ]}.
+
+{[{{lists,flatten,1},                             1,    0.017,    0.008},      
+  {{lists,do_flatten,2},                          3,    0.000,    0.009}],     
+ { {lists,do_flatten,2},                          4,    0.017,    0.017},     %
+ [{{lists,do_flatten,2},                          3,    0.000,    0.009}]}.    
+
+{[{{code_server,call,1},                          4,    0.017,    0.017}],     
+ { {erlang,demonitor,2},                          4,    0.017,    0.017},     %
+ [ ]}.
+
+{[{{ty_rec,'-empty/0-fun-0-',2},                  5,    0.017,    0.017}],     
+ { {dnf_ty_predefined,empty,0},                   5,    0.017,    0.017},     %
+ [ ]}.
+
+{[{{dnf_ty_function,'-op/3-ROp/2-0-',3},          2,    0.007,    0.007},      
+  {{dnf_ty_list,'-op/3-ROp/2-0-',3},              2,    0.005,    0.005},      
+  {{dnf_ty_tuple,'-op/3-ROp/2-0-',3},             2,    0.004,    0.004}],     
+ { {ty_bool,union,2},                             6,    0.016,    0.016},     %
+ [ ]}.
+
+{[{{dnf_ty_interval,'-union/2-fun-0-',2},         2,    0.015,    0.007}],     
+ { {dnf_ty_interval,interval_add,2},              2,    0.015,    0.007},     %
+ [{{dnf_ty_interval,add_range,3},                 1,    0.005,    0.003},      
+  {{dnf_ty_interval,any,0},                       1,    0.003,    0.003}]}.    
+
+{[{{ty_tuples,remove_redundant,1},                3,    0.014,    0.012},      
+  {{ty_tuples,'-remove_redundant/1-lc$^0/1-0-',2},   1,    0.000,    0.002}],     
+ { {ty_tuples,'-remove_redundant/1-lc$^0/1-0-',2},   4,    0.014,    0.014},     %
+ [{{ty_tuples,'-remove_redundant/1-lc$^0/1-0-',2},   1,    0.000,    0.002}]}.    
+
+{[{{ty_node,next_id,0},                           3,    0.014,    0.014}],     
+ { {ets,update_counter,3},                        3,    0.014,    0.014},     %
+ [ ]}.
+
+{[{{ty_parser,'-parse/1-lc$^0/1-0-',1},           3,    0.011,    0.008},      
+  {{ordsets,from_list,1},                         1,    0.002,    0.002}],     
+ { {lists,usort,1},                               4,    0.013,    0.010},     %
+ [{{lists,usort_1,2},                             1,    0.003,    0.003}]}.    
+
+{[{{dnf_ty_atom,union,2},                         6,    0.013,    0.013}],     
+ { {dnf_ty_atom,negate,1},                        6,    0.013,    0.013},     %
+ [ ]}.
+
+{[{{ty_rec,'-empty/0-fun-0-',2},                  5,    0.013,    0.013}],     
+ { {dnf_ty_atom,empty,0},                         5,    0.013,    0.013},     %
+ [ ]}.
+
+{[{{ty_parser,unify,2},                           1,    0.012,    0.007}],     
+ { {maps,to_list,1},                              1,    0.012,    0.007},     %
+ [{{maps,to_list_internal,1},                     1,    0.003,    0.003},      
+  {{erts_internal,map_next,3},                    1,    0.002,    0.002}]}.    
+
+{[{{error_handler,ensure_loaded,1},               2,    0.008,    0.008},      
+  {{fprof,call,1},                                1,    0.004,    0.004}],     
+ { {erlang,whereis,1},                            3,    0.012,    0.012},     %
+ [ ]}.
+
+{[{{ty_rec,'-empty/0-fun-0-',2},                  5,    0.012,    0.012}],     
+ { {dnf_ty_interval,empty,0},                     5,    0.012,    0.012},     %
+ [ ]}.
+
+{[{{ty_parser,convert,3},                         4,    0.011,    0.011}],     
+ { {queue,is_empty,1},                            4,    0.011,    0.011},     %
+ [ ]}.
+
+{[{{dnf_ty_variable,interval,1},                  2,    0.004,    0.004},      
+  {{dnf_ty_variable,atom,1},                      2,    0.004,    0.004},      
+  {{dnf_ty_variable,tuples,1},                    1,    0.003,    0.003}],     
+ { {dnf_ty_variable,leaf,1},                      5,    0.011,    0.011},     %
+ [ ]}.
+
+{[{{ty_parser,do_convert,3},                      1,    0.010,    0.004}],     
+ { {ty_parser,lookup_ty,1},                       1,    0.010,    0.004},     %
+ [{{ets,lookup,2},                                1,    0.006,    0.006}]}.    
+
+{[{{code_server,get_mode,0},                      2,    0.010,    0.010}],     
+ { {persistent_term,get,1},                       2,    0.010,    0.010},     %
+ [ ]}.
+
+{[{{gb_sets,from_list,1},                         1,    0.010,    0.008}],     
+ { {ordsets,from_list,1},                         1,    0.010,    0.008},     %
+ [{{lists,usort,1},                               1,    0.002,    0.002}]}.    
+
+{[{{fprof,just_call,2},                           1,    0.010,    0.010}],     
+ { {erlang,demonitor,1},                          1,    0.010,    0.010},     %
+ [ ]}.
+
+{[{{dnf_ty_atom,union,2},                         2,    0.007,    0.007},      
+  {{dnf_ty_atom,finite,1},                        1,    0.003,    0.003}],     
+ { {dnf_ty_atom,intersect,2},                     3,    0.010,    0.010},     %
+ [ ]}.
+
+{[{{gb_sets,from_ordset,1},                       1,    0.009,    0.007}],     
+ { {gb_sets,balance_list,2},                      1,    0.009,    0.007},     %
+ [{{gb_sets,balance_list_1,2},                    1,    0.002,    0.002}]}.    
+
+{[{{ty_parser,new_local_ref,0},                   3,    0.008,    0.008}],     
+ { {erlang,unique_integer,0},                     3,    0.008,    0.008},     %
+ [ ]}.
+
+{[{{dnf_ty_tuple,singleton,1},                    1,    0.008,    0.006}],     
+ { {dnf_ty_tuple,any,0},                          1,    0.008,    0.006},     %
+ [{{ty_bool,any,0},                               1,    0.002,    0.002}]}.    
+
+{[{{ty_parser,'-unify/3-lc$^0/1-0-',1},           1,    0.007,    0.005},      
+  {{ty_parser,'-unify/3-lc$^1/1-1-',2},           1,    0.000,    0.002}],     
+ { {ty_parser,'-unify/3-lc$^1/1-1-',2},           2,    0.007,    0.007},     %
+ [{{ty_parser,'-unify/3-lc$^1/1-1-',2},           1,    0.000,    0.002}]}.    
+
+{[{{ty_parser,convert,3},                         3,    0.007,    0.007}],     
+ { {queue,out,1},                                 3,    0.007,    0.007},     %
+ [ ]}.
+
+{[{{maps,iterator,1},                             3,    0.007,    0.007}],     
+ { {maps,iterator,2},                             3,    0.007,    0.007},     %
+ [ ]}.
+
+{[{{error_handler,undefined_function,3},          2,    0.007,    0.007}],     
+ { {erlang,function_exported,3},                  2,    0.007,    0.007},     %
+ [ ]}.
+
+{[{{dnf_ty_interval,interval_add,2},              1,    0.003,    0.003},      
+  {{ty_parser,do_convert,3},                      1,    0.002,    0.002},      
+  {{dnf_ty_interval,add_range,3},                 1,    0.002,    0.002}],     
+ { {dnf_ty_interval,any,0},                       3,    0.007,    0.007},     %
+ [ ]}.
+
+{[{{code,ensure_loaded,1},                        2,    0.006,    0.006}],     
+ { {erlang,module_loaded,1},                      2,    0.006,    0.006},     %
+ [ ]}.
+
+{[{{ty_rec,'-union/2-fun-0-',3},                  2,    0.006,    0.006}],     
+ { {dnf_ty_predefined,union,2},                   2,    0.006,    0.006},     %
+ [ ]}.
+
+{[{{ty_parser,'-do_convert/3-fun-1-',2},          2,    0.005,    0.005}],     
+ { {queue,in,2},                                  2,    0.005,    0.005},     %
+ [ ]}.
+
+{[{{dnf_ty_list,'-op/3-ROp/2-0-',3},              2,    0.005,    0.005}],     
+ { {dnf_ty_list,normalize,1},                     2,    0.005,    0.005},     %
+ [ ]}.
+
+{[{{dnf_ty_interval,interval_add,2},              1,    0.005,    0.003}],     
+ { {dnf_ty_interval,add_range,3},                 1,    0.005,    0.003},     %
+ [{{dnf_ty_interval,any,0},                       1,    0.002,    0.002}]}.    
+
+{[{{ty_parser,do_convert,3},                      1,    0.003,    0.003},      
+  {{dnf_ty_atom,finite,1},                        1,    0.002,    0.002}],     
+ { {dnf_ty_atom,any,0},                           2,    0.005,    0.005},     %
+ [ ]}.
+
+{[{{ty_tuples,union,2},                           2,    0.004,    0.004}],     
+ { {ty_tuples,'-union/2-lc$^1/1-0-',2},           2,    0.004,    0.004},     %
+ [ ]}.
+
+{[{{ty_functions,union,2},                        2,    0.004,    0.004}],     
+ { {ty_functions,'-union/2-lc$^1/1-0-',2},        2,    0.004,    0.004},     %
+ [ ]}.
+
+{[{{ty_functions,remove_redundant,1},             2,    0.004,    0.004}],     
+ { {ty_functions,'-remove_redundant/1-lc$^0/1-0-',2},   2,    0.004,    0.004},     %
+ [ ]}.
+
+{[{{dnf_ty_variable,'-op/3-ROp/2-0-',3},          2,    0.004,    0.004}],     
+ { {dnf_ty_variable,normalize,1},                 2,    0.004,    0.004},     %
+ [ ]}.
+
+{[{{dnf_ty_tuple,'-op/3-ROp/2-0-',3},             2,    0.004,    0.004}],     
+ { {dnf_ty_tuple,normalize,1},                    2,    0.004,    0.004},     %
+ [ ]}.
+
+{[{{dnf_ty_function,'-op/3-ROp/2-0-',3},          2,    0.004,    0.004}],     
+ { {dnf_ty_function,normalize,1},                 2,    0.004,    0.004},     %
+ [ ]}.
+
+{[{{maps,update_with,4},                          1,    0.003,    0.003}],     
+ { {ty_parser,'-group/3-fun-0-',2},               1,    0.003,    0.003},     %
+ [ ]}.
+
+{[{{ty_parser,parse,1},                           1,    0.003,    0.003}],     
+ { {queue,from_list,1},                           1,    0.003,    0.003},     %
+ [ ]}.
+
+{[{{maps,to_list,1},                              1,    0.003,    0.003}],     
+ { {maps,to_list_internal,1},                     1,    0.003,    0.003},     %
+ [ ]}.
+
+{[{{lists,usort,1},                               1,    0.003,    0.003}],     
+ { {lists,usort_1,2},                             1,    0.003,    0.003},     %
+ [ ]}.
+
+{[{{ty_parser,do_convert,3},                      1,    0.003,    0.003}],     
+ { {lists,reverse,1},                             1,    0.003,    0.003},     %
+ [ ]}.
+
+{[{{error_handler,undefined_function,3},          1,    0.002,    0.002}],     
+ { {ty_tuple,tuple,1},                            1,    0.002,    0.002},     %
+ [ ]}.
+
+{[{{ty_parser,do_convert,3},                      1,    0.002,    0.002}],     
+ { {ty_parser,expand_predef_alias,1},             1,    0.002,    0.002},     %
+ [ ]}.
+
+{[{{ty_parser,'-unify/2-lc$^0/1-0-',1},           1,    0.002,    0.002}],     
+ { {ty_parser,choose_representative,1},           1,    0.002,    0.002},     %
+ [ ]}.
+
+{[{{dnf_ty_tuple,any,0},                          1,    0.002,    0.002}],     
+ { {ty_bool,any,0},                               1,    0.002,    0.002},     %
+ [ ]}.
+
+{[{{gb_sets,balance_list,2},                      1,    0.002,    0.002}],     
+ { {gb_sets,balance_list_1,2},                    1,    0.002,    0.002},     %
+ [ ]}.
+
+{[{{ty_parser,do_convert,3},                      1,    0.002,    0.002}],     
+ { {dnf_ty_interval,interval,2},                  1,    0.002,    0.002},     %
+ [ ]}.
+
+{[ ],
+ { undefined,                                     0,    0.000,    0.000},     %
+ [{{debug_tests,'-ast_test/0-fun-1-',0},          0,   16.712,    0.004},      
+  {{fprof,just_call,2},                           0,    0.038,    0.028}]}.    
+
+

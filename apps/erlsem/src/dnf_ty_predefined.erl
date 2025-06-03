@@ -35,4 +35,4 @@ union(<<P1:?ELEMENTS>>, <<P2:?ELEMENTS>>) -> <<(P1 bor P2):?ELEMENTS>>.
 
 intersect(<<P1:?ELEMENTS>>, <<P2:?ELEMENTS>>) -> <<(P1 band P2):?ELEMENTS>>.
 
-diff(I1, I2) -> intersect(I1, negate(I2)).
+difference(I1, I2) -> intersect(I1, negate(I2)).

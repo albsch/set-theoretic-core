@@ -31,7 +31,7 @@ intersect({S, cofinite}, {T, cofinite}) ->
 
 union(S,T) -> negate(intersect(negate(S), negate(T))).
 
-diff(S,T) -> intersect(S, negate(T)).
+difference(S,T) -> intersect(S, negate(T)).
 
 is_empty(Rep, ST) ->
   case Rep of

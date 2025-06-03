@@ -1,0 +1,1507 @@
+events: Time
+summary: 16750
+fl=fprof
+fn={fprof,just_call,2}
+1 51
+cfl=ty_parser
+cfn={ty_parser,parse,1}
+calls=1 1
+1 16665
+cfl=erlang
+cfn={erlang,demonitor,1}
+calls=1 1
+1 10
+cfl=erlang
+cfn={erlang,monitor,2}
+calls=1 1
+1 5
+cfl=pseudo
+cfn=suspend
+calls=1 1
+1 0
+fl=debug_tests
+fn={debug_tests,'-ast_test/0-fun-1-',0}
+1 4
+cfl=fprof
+cfn={fprof,just_call,2}
+calls=0 1
+1 16673
+cfl=fprof
+cfn={fprof,trace,1}
+calls=1 1
+1 35
+fl=ty_parser
+fn={ty_parser,parse,1}
+1 80
+cfl=ty_parser
+cfn={ty_parser,unify,2}
+calls=1 1
+1 5956
+cfl=ty_parser
+cfn={ty_parser,convert,3}
+calls=1 1
+1 5003
+cfl=ty_parser
+cfn={ty_parser,replace_all,2}
+calls=1 1
+1 2696
+cfl=error_handler
+cfn={error_handler,undefined_function,3}
+calls=1 1
+1 2358
+cfl=utils
+cfn={utils,update_ets_from_map,2}
+calls=2 1
+1 160
+cfl=ty_parser
+cfn={ty_parser,'-parse/1-lc$^2/1-2-',1}
+calls=1 1
+1 115
+cfl=ets
+cfn={ets,tab2list,1}
+calls=3 1
+1 94
+cfl=ty_parser
+cfn={ty_parser,'-parse/1-lc$^1/1-1-',1}
+calls=1 1
+1 77
+cfl=ty_parser
+cfn={ty_parser,new_local_ref,1}
+calls=1 1
+1 40
+cfl=ty_parser
+cfn={ty_parser,'-parse/1-lc$^0/1-0-',1}
+calls=1 1
+1 39
+cfl=maps
+cfn={maps,from_list,1}
+calls=5 1
+1 17
+cfl=erts_internal
+cfn={erts_internal,mc_iterator,1}
+calls=2 1
+1 15
+cfl=ets
+cfn={ets,insert,2}
+calls=1 1
+1 5
+cfl=ets
+cfn={ets,lookup,2}
+calls=1 1
+1 4
+cfl=queue
+cfn={queue,from_list,1}
+calls=1 1
+1 3
+cfl=maps
+cfn={maps,keys,1}
+calls=1 1
+1 3
+fl=utils
+fn={utils,everywhere,2}
+1 2788
+cfl=utils
+cfn={utils,'-everywhere/2-lc$^2/1-0-',2}
+calls=21 1
+1 7567
+cfl=utils
+cfn={utils,'-everywhere/2-fun-1-',2}
+calls=122 1
+1 7300
+cfl=lists
+cfn={lists,map_1,2}
+calls=0 1
+1 1905
+cfl=lists
+cfn={lists,map,2}
+calls=0 1
+1 739
+cfl=ty_parser
+cfn={ty_parser,'-unify/3-fun-2-',2}
+calls=213 1
+1 504
+cfl=erlang
+cfn={erlang,tuple_to_list,1}
+calls=107 1
+1 255
+cfl=erlang
+cfn={erlang,list_to_tuple,1}
+calls=107 1
+1 255
+cfl=ty_parser
+cfn={ty_parser,'-replace_all/2-fun-0-',2}
+calls=97 1
+1 248
+cfl=erts_internal
+cfn={erts_internal,mc_iterator,1}
+calls=21 1
+1 180
+cfl=maps
+cfn={maps,from_list,1}
+calls=21 1
+1 94
+cfl=pseudo
+cfn=garbage_collect
+calls=2 1
+1 56
+fl=lists
+fn={lists,map_1,2}
+1 1632
+cfl=utils
+cfn={utils,'-everywhere/2-fun-0-',2}
+calls=168 1
+1 7126
+cfl=lists
+cfn={lists,map,2}
+calls=0 1
+1 33
+cfl=pseudo
+cfn=suspend
+calls=1 1
+1 27
+cfl=lists
+cfn={lists,map_1,2}
+calls=168 1
+1 0
+fl=utils
+fn={utils,'-everywhere/2-lc$^2/1-0-',2}
+1 176
+cfl=utils
+cfn={utils,everywhere,2}
+calls=24 1
+1 0
+cfl=utils
+cfn={utils,'-everywhere/2-lc$^2/1-0-',2}
+calls=12 1
+1 0
+fl=utils
+fn={utils,'-everywhere/2-fun-0-',2}
+1 958
+cfl=utils
+cfn={utils,everywhere,2}
+calls=284 1
+1 0
+fl=utils
+fn={utils,'-everywhere/2-fun-1-',2}
+1 412
+cfl=lists
+cfn={lists,map,2}
+calls=122 1
+1 6523
+fl=lists
+fn={lists,map,2}
+1 948
+cfl=lists
+cfn={lists,map_1,2}
+calls=116 1
+1 5713
+cfl=utils
+cfn={utils,'-everywhere/2-fun-0-',2}
+calls=116 1
+1 263
+fl=ty_parser
+fn={ty_parser,unify,2}
+1 18
+cfl=ty_parser
+cfn={ty_parser,unify,3}
+calls=1 1
+1 5893
+cfl=ty_parser
+cfn={ty_parser,'-unify/2-lc$^0/1-0-',1}
+calls=1 1
+1 20
+cfl=maps
+cfn={maps,to_list,1}
+calls=1 1
+1 12
+cfl=erts_internal
+cfn={erts_internal,mc_iterator,1}
+calls=1 1
+1 8
+cfl=maps
+cfn={maps,from_list,1}
+calls=1 1
+1 5
+fl=ty_parser
+fn={ty_parser,unify,3}
+1 12
+cfl=utils
+cfn={utils,everywhere,2}
+calls=1 1
+1 5840
+cfl=lists
+cfn={lists,flatten,1}
+calls=1 1
+1 21
+cfl=ty_parser
+cfn={ty_parser,'-unify/3-lc$^0/1-0-',1}
+calls=1 1
+1 18
+cfl=maps
+cfn={maps,from_list,1}
+calls=1 1
+1 2
+fl=ty_parser
+fn={ty_parser,convert,3}
+1 54
+cfl=ty_parser
+cfn={ty_parser,do_convert,3}
+calls=3 1
+1 4900
+cfl=ty_parser
+cfn={ty_parser,group,3}
+calls=3 1
+1 31
+cfl=queue
+cfn={queue,is_empty,1}
+calls=4 1
+1 11
+cfl=queue
+cfn={queue,out,1}
+calls=3 1
+1 7
+cfl=ty_parser
+cfn={ty_parser,convert,3}
+calls=3 1
+1 0
+fl=ty_parser
+fn={ty_parser,do_convert,3}
+1 108
+cfl=error_handler
+cfn={error_handler,undefined_function,3}
+calls=1 1
+1 2248
+cfl=dnf_ty_variable
+cfn={dnf_ty_variable,union,2}
+calls=2 1
+1 884
+cfl=dnf_ty_variable
+cfn={dnf_ty_variable,interval,1}
+calls=2 1
+1 508
+cfl=dnf_ty_variable
+cfn={dnf_ty_variable,atom,1}
+calls=2 1
+1 504
+cfl=dnf_ty_variable
+cfn={dnf_ty_variable,tuples,1}
+calls=1 1
+1 302
+cfl=dnf_ty_atom
+cfn={dnf_ty_atom,finite,1}
+calls=1 1
+1 143
+cfl=lists
+cfn={lists,foldl,3}
+calls=1 1
+1 88
+cfl=ty_tuples
+cfn={ty_tuples,singleton,2}
+calls=1 1
+1 50
+cfl=dnf_ty_tuple
+cfn={dnf_ty_tuple,singleton,1}
+calls=1 1
+1 26
+cfl=ty_parser
+cfn={ty_parser,lookup_ty,1}
+calls=1 1
+1 10
+cfl=ty_parser
+cfn={ty_parser,new_local_ref,1}
+calls=1 1
+1 9
+cfl=ty_parser
+cfn={ty_parser,group,3}
+calls=1 1
+1 8
+cfl=lists
+cfn={lists,reverse,1}
+calls=1 1
+1 3
+cfl=dnf_ty_atom
+cfn={dnf_ty_atom,any,0}
+calls=1 1
+1 3
+cfl=ty_parser
+cfn={ty_parser,expand_predef_alias,1}
+calls=1 1
+1 2
+cfl=dnf_ty_interval
+cfn={dnf_ty_interval,interval,2}
+calls=1 1
+1 2
+cfl=dnf_ty_interval
+cfn={dnf_ty_interval,any,0}
+calls=1 1
+1 2
+cfl=ty_parser
+cfn={ty_parser,do_convert,3}
+calls=7 1
+1 0
+fl=error_handler
+fn={error_handler,undefined_function,3}
+1 25
+cfl=error_handler
+cfn={error_handler,ensure_loaded,1}
+calls=2 1
+1 4454
+cfl=utils
+cfn={utils,update_ets_from_map,2}
+calls=1 1
+1 118
+cfl=erlang
+cfn={erlang,function_exported,3}
+calls=2 1
+1 7
+cfl=ty_tuple
+cfn={ty_tuple,tuple,1}
+calls=1 1
+1 2
+fl=error_handler
+fn={error_handler,ensure_loaded,1}
+1 19
+cfl=code
+cfn={code,ensure_loaded,1}
+calls=2 1
+1 4427
+cfl=erlang
+cfn={erlang,whereis,1}
+calls=2 1
+1 8
+fl=code
+fn={code,ensure_loaded,1}
+1 42
+cfl=code
+cfn={code,call,1}
+calls=4 1
+1 3443
+cfl=code
+cfn={code,ensure_prepare_loading,3}
+calls=2 1
+1 903
+cfl=code
+cfn={code,get_mode,0}
+calls=2 1
+1 33
+cfl=erlang
+cfn={erlang,module_loaded,1}
+calls=2 1
+1 6
+fl=code
+fn={code,call,1}
+1 86
+cfl=code_server
+cfn={code_server,call,1}
+calls=4 1
+1 3357
+fl=code_server
+fn={code_server,call,1}
+1 78
+cfl=pseudo
+cfn=suspend
+calls=4 1
+1 3241
+cfl=erlang
+cfn={erlang,monitor,2}
+calls=4 1
+1 21
+cfl=erlang
+cfn={erlang,demonitor,2}
+calls=4 1
+1 17
+fl=pseudo
+fn=suspend
+1 3268
+fl=ty_parser
+fn={ty_parser,replace_all,2}
+1 3
+cfl=utils
+cfn={utils,everywhere,2}
+calls=1 1
+1 2693
+fl=lists
+fn={lists,foldl,3}
+1 71
+cfl=lists
+cfn={lists,foldl_1,3}
+calls=10 1
+1 1512
+cfl=ty_rec
+cfn={ty_rec,'-map/2-fun-0-',4}
+calls=5 1
+1 94
+cfl=ty_parser
+cfn={ty_parser,'-do_convert/3-fun-1-',2}
+calls=1 1
+1 36
+cfl=ty_rec
+cfn={ty_rec,'-binary_map/3-fun-0-',5}
+calls=2 1
+1 35
+cfl=dnf_ty_interval
+cfn={dnf_ty_interval,'-union/2-fun-0-',2}
+calls=2 1
+1 22
+fl=lists
+fn={lists,foldl_1,3}
+1 276
+cfl=ty_rec
+cfn={ty_rec,'-binary_map/3-fun-0-',5}
+calls=10 1
+1 606
+cfl=ty_rec
+cfn={ty_rec,'-map/2-fun-0-',4}
+calls=25 1
+1 599
+cfl=ty_parser
+cfn={ty_parser,'-do_convert/3-fun-1-',2}
+calls=1 1
+1 35
+cfl=lists
+cfn={lists,foldl_1,3}
+calls=36 1
+1 0
+fl=ty_rec
+fn={ty_rec,empty,0}
+1 16
+cfl=ty_rec
+cfn={ty_rec,map,2}
+calls=5 1
+1 1227
+fl=ty_rec
+fn={ty_rec,map,2}
+1 54
+cfl=lists
+cfn={lists,foldl,3}
+calls=5 1
+1 918
+cfl=lists
+cfn={lists,zip,2}
+calls=5 1
+1 186
+cfl=lists
+cfn={lists,seq,2}
+calls=5 1
+1 69
+fl=code
+fn={code,ensure_prepare_loading,3}
+1 10
+cfl=erlang
+cfn={erlang,prepare_loading,2}
+calls=2 1
+1 893
+fl=erlang
+fn={erlang,prepare_loading,2}
+1 10
+cfl=erlang
+cfn={erlang,prepare_loading_1,2}
+calls=2 1
+1 883
+fl=dnf_ty_variable
+fn={dnf_ty_variable,union,2}
+1 10
+cfl=dnf_ty_variable
+cfn={dnf_ty_variable,op,3}
+calls=2 1
+1 874
+fl=erlang
+fn={erlang,prepare_loading_1,2}
+1 19
+cfl=erts_internal
+cfn={erts_internal,prepare_loading,2}
+calls=2 1
+1 864
+fl=dnf_ty_variable
+fn={dnf_ty_variable,op,3}
+1 7
+cfl=dnf_ty_variable
+cfn={dnf_ty_variable,'-op/3-ROp/2-0-',3}
+calls=2 1
+1 867
+fl=dnf_ty_variable
+fn={dnf_ty_variable,'-op/3-ROp/2-0-',3}
+1 17
+cfl=ty_rec
+cfn={ty_rec,union,2}
+calls=2 1
+1 846
+cfl=dnf_ty_variable
+cfn={dnf_ty_variable,normalize,1}
+calls=2 1
+1 4
+fl=erts_internal
+fn={erts_internal,prepare_loading,2}
+1 864
+fl=ty_rec
+fn={ty_rec,union,2}
+1 7
+cfl=ty_rec
+cfn={ty_rec,binary_map,3}
+calls=2 1
+1 839
+fl=ty_rec
+fn={ty_rec,binary_map,3}
+1 19
+cfl=lists
+cfn={lists,foldl,3}
+calls=2 1
+1 723
+cfl=lists
+cfn={lists,zip,2}
+calls=2 1
+1 73
+cfl=lists
+cfn={lists,seq,2}
+calls=2 1
+1 24
+fl=ty_rec
+fn={ty_rec,'-map/2-fun-0-',4}
+1 248
+cfl=ty_rec
+cfn={ty_rec,'-empty/0-fun-0-',2}
+calls=30 1
+1 362
+cfl=erlang
+cfn={erlang,setelement,3}
+calls=30 1
+1 83
+fl=ty_rec
+fn={ty_rec,'-binary_map/3-fun-0-',5}
+1 104
+cfl=ty_rec
+cfn={ty_rec,'-union/2-fun-0-',3}
+calls=12 1
+1 507
+cfl=erlang
+cfn={erlang,setelement,3}
+calls=12 1
+1 30
+fl=dnf_ty_variable
+fn={dnf_ty_variable,interval,1}
+1 12
+cfl=ty_rec
+cfn={ty_rec,interval,1}
+calls=2 1
+1 492
+cfl=dnf_ty_variable
+cfn={dnf_ty_variable,leaf,1}
+calls=2 1
+1 4
+fl=ty_rec
+fn={ty_rec,'-union/2-fun-0-',3}
+1 44
+cfl=ty_functions
+cfn={ty_functions,union,2}
+calls=2 1
+1 164
+cfl=ty_tuples
+cfn={ty_tuples,union,2}
+calls=2 1
+1 158
+cfl=dnf_ty_interval
+cfn={dnf_ty_interval,union,2}
+calls=2 1
+1 53
+cfl=dnf_ty_atom
+cfn={dnf_ty_atom,union,2}
+calls=2 1
+1 46
+cfl=dnf_ty_list
+cfn={dnf_ty_list,union,2}
+calls=2 1
+1 36
+cfl=dnf_ty_predefined
+cfn={dnf_ty_predefined,union,2}
+calls=2 1
+1 6
+fl=ty_parser
+fn={ty_parser,'-unify/3-fun-2-',2}
+1 504
+fl=dnf_ty_variable
+fn={dnf_ty_variable,atom,1}
+1 13
+cfl=ty_rec
+cfn={ty_rec,atom,1}
+calls=2 1
+1 487
+cfl=dnf_ty_variable
+cfn={dnf_ty_variable,leaf,1}
+calls=2 1
+1 4
+fl=ty_rec
+fn={ty_rec,interval,1}
+1 12
+cfl=ty_rec
+cfn={ty_rec,empty,0}
+calls=2 1
+1 480
+fl=ty_rec
+fn={ty_rec,atom,1}
+1 11
+cfl=ty_rec
+cfn={ty_rec,empty,0}
+calls=2 1
+1 476
+fl=ty_rec
+fn={ty_rec,'-empty/0-fun-0-',2}
+1 113
+cfl=dnf_ty_list
+cfn={dnf_ty_list,empty,0}
+calls=5 1
+1 80
+cfl=ty_functions
+cfn={ty_functions,empty,0}
+calls=5 1
+1 64
+cfl=ty_tuples
+cfn={ty_tuples,empty,0}
+calls=5 1
+1 63
+cfl=dnf_ty_predefined
+cfn={dnf_ty_predefined,empty,0}
+calls=5 1
+1 17
+cfl=dnf_ty_atom
+cfn={dnf_ty_atom,empty,0}
+calls=5 1
+1 13
+cfl=dnf_ty_interval
+cfn={dnf_ty_interval,empty,0}
+calls=5 1
+1 12
+fl=dnf_ty_variable
+fn={dnf_ty_variable,tuples,1}
+1 7
+cfl=ty_rec
+cfn={ty_rec,tuples,1}
+calls=1 1
+1 292
+cfl=dnf_ty_variable
+cfn={dnf_ty_variable,leaf,1}
+calls=1 1
+1 3
+fl=ty_rec
+fn={ty_rec,tuples,1}
+1 5
+cfl=ty_rec
+cfn={ty_rec,empty,0}
+calls=1 1
+1 287
+fl=utils
+fn={utils,update_ets_from_map,2}
+1 26
+cfl=maps
+cfn={maps,fold,3}
+calls=3 1
+1 222
+cfl=ets
+cfn={ets,insert,2}
+calls=3 1
+1 30
+fl=lists
+fn={lists,zip,2}
+1 28
+cfl=lists
+cfn={lists,zip,3}
+calls=7 1
+1 231
+fl=erlang
+fn={erlang,tuple_to_list,1}
+1 255
+fl=erlang
+fn={erlang,list_to_tuple,1}
+1 255
+fl=ty_parser
+fn={ty_parser,'-replace_all/2-fun-0-',2}
+1 248
+fl=erts_internal
+fn={erts_internal,mc_iterator,1}
+1 179
+cfl=erts_internal
+cfn={erts_internal,map_next,3}
+calls=29 1
+1 67
+fl=lists
+fn={lists,zip,3}
+1 231
+cfl=lists
+cfn={lists,zip,3}
+calls=42 1
+1 0
+fl=maps
+fn={maps,fold,3}
+1 31
+cfl=maps
+cfn={maps,fold_1,4}
+calls=3 1
+1 148
+cfl=maps
+cfn={maps,next,1}
+calls=3 1
+1 25
+cfl=maps
+cfn={maps,iterator,1}
+calls=3 1
+1 18
+fl=ty_functions
+fn={ty_functions,union,2}
+1 38
+cfl=ty_functions
+cfn={ty_functions,remove_redundant,1}
+calls=2 1
+1 47
+cfl=dnf_ty_function
+cfn={dnf_ty_function,union,2}
+calls=2 1
+1 37
+cfl=erlang
+cfn={erlang,'++',2}
+calls=2 1
+1 22
+cfl=maps
+cfn={maps,keys,1}
+calls=4 1
+1 8
+cfl=maps
+cfn={maps,from_list,1}
+calls=2 1
+1 8
+cfl=ty_functions
+cfn={ty_functions,'-union/2-lc$^1/1-0-',2}
+calls=2 1
+1 4
+fl=ty_tuples
+fn={ty_tuples,union,2}
+1 44
+cfl=ty_tuples
+cfn={ty_tuples,remove_redundant,1}
+calls=2 1
+1 49
+cfl=dnf_ty_tuple
+cfn={dnf_ty_tuple,union,2}
+calls=2 1
+1 35
+cfl=maps
+cfn={maps,keys,1}
+calls=4 1
+1 12
+cfl=maps
+cfn={maps,from_list,1}
+calls=2 1
+1 8
+cfl=erlang
+cfn={erlang,'++',2}
+calls=2 1
+1 6
+cfl=ty_tuples
+cfn={ty_tuples,'-union/2-lc$^1/1-0-',2}
+calls=2 1
+1 4
+fl=maps
+fn={maps,from_list,1}
+1 122
+cfl=pseudo
+cfn=garbage_collect
+calls=1 1
+1 26
+fl=maps
+fn={maps,fold_1,4}
+1 69
+cfl=utils
+cfn={utils,'-update_ets_from_map/2-fun-0-',4}
+calls=7 1
+1 62
+cfl=maps
+cfn={maps,try_next,2}
+calls=7 1
+1 17
+cfl=maps
+cfn={maps,fold_1,4}
+calls=7 1
+1 0
+fl=dnf_ty_atom
+fn={dnf_ty_atom,finite,1}
+1 13
+cfl=gb_sets
+cfn={gb_sets,from_list,1}
+calls=1 1
+1 125
+cfl=dnf_ty_atom
+cfn={dnf_ty_atom,intersect,2}
+calls=1 1
+1 3
+cfl=dnf_ty_atom
+cfn={dnf_ty_atom,any,0}
+calls=1 1
+1 2
+cfl=dnf_ty_atom
+cfn={dnf_ty_atom,finite,1}
+calls=1 1
+1 0
+fl=gb_sets
+fn={gb_sets,from_list,1}
+1 9
+cfl=gb_sets
+cfn={gb_sets,from_ordset,1}
+calls=1 1
+1 106
+cfl=ordsets
+cfn={ordsets,from_list,1}
+calls=1 1
+1 10
+fl=ty_parser
+fn={ty_parser,'-parse/1-lc$^2/1-2-',1}
+1 26
+cfl=ty_node
+cfn={ty_node,define,2}
+calls=3 1
+1 89
+cfl=ty_parser
+cfn={ty_parser,'-parse/1-lc$^2/1-2-',1}
+calls=3 1
+1 0
+fl=erlang
+fn={erlang,setelement,3}
+1 113
+fl=gb_sets
+fn={gb_sets,from_ordset,1}
+1 97
+cfl=gb_sets
+cfn={gb_sets,balance_list,2}
+calls=1 1
+1 9
+fl=pseudo
+fn=garbage_collect
+1 105
+fl=ets
+fn={ets,lookup,2}
+1 99
+fl=ty_parser
+fn={ty_parser,new_local_ref,1}
+1 39
+cfl=ty_parser
+cfn={ty_parser,new_local_ref,0}
+calls=3 1
+1 24
+cfl=ets
+cfn={ets,insert,2}
+calls=3 1
+1 19
+cfl=ets
+cfn={ets,lookup,2}
+calls=4 1
+1 15
+fl=ets
+fn={ets,tab2list,1}
+1 19
+cfl=ets
+cfn={ets,match_object,2}
+calls=3 1
+1 75
+fl=lists
+fn={lists,seq,2}
+1 22
+cfl=lists
+cfn={lists,seq_loop,3}
+calls=7 1
+1 71
+fl=ty_node
+fn={ty_node,define,2}
+1 25
+cfl=ets
+cfn={ets,lookup,2}
+calls=3 1
+1 49
+cfl=ets
+cfn={ets,insert,2}
+calls=3 1
+1 15
+fl=ty_tuples
+fn={ty_tuples,remove_redundant,1}
+1 32
+cfl=erts_internal
+cfn={erts_internal,mc_iterator,1}
+calls=3 1
+1 28
+cfl=ty_tuples
+cfn={ty_tuples,'-remove_redundant/1-lc$^0/1-0-',2}
+calls=3 1
+1 14
+cfl=maps
+cfn={maps,from_list,1}
+calls=3 1
+1 10
+fl=ty_bool
+fn={ty_bool,empty,0}
+1 57
+cfl=pseudo
+cfn=garbage_collect
+calls=1 1
+1 23
+fl=dnf_ty_list
+fn={dnf_ty_list,empty,0}
+1 29
+cfl=ty_bool
+cfn={ty_bool,empty,0}
+calls=5 1
+1 51
+fl=erts_internal
+fn={erts_internal,map_next,3}
+1 79
+fl=ty_parser
+fn={ty_parser,'-parse/1-lc$^1/1-1-',1}
+1 30
+cfl=ty_node
+cfn={ty_node,new_ty_node,0}
+calls=3 1
+1 47
+cfl=ty_parser
+cfn={ty_parser,'-parse/1-lc$^1/1-1-',1}
+calls=3 1
+1 0
+fl=ets
+fn={ets,match_object,2}
+1 75
+fl=ty_parser
+fn={ty_parser,'-do_convert/3-fun-1-',2}
+1 18
+cfl=ty_parser
+cfn={ty_parser,new_local_ref,1}
+calls=2 1
+1 48
+cfl=queue
+cfn={queue,in,2}
+calls=2 1
+1 5
+fl=lists
+fn={lists,seq_loop,3}
+1 71
+cfl=lists
+cfn={lists,seq_loop,3}
+calls=14 1
+1 0
+fl=ets
+fn={ets,insert,2}
+1 69
+fl=ty_functions
+fn={ty_functions,empty,0}
+1 26
+cfl=dnf_ty_function
+cfn={dnf_ty_function,empty,0}
+calls=5 1
+1 38
+fl=ty_tuples
+fn={ty_tuples,empty,0}
+1 28
+cfl=dnf_ty_tuple
+cfn={dnf_ty_tuple,empty,0}
+calls=5 1
+1 35
+fl=utils
+fn={utils,'-update_ets_from_map/2-fun-0-',4}
+1 37
+cfl=ets
+cfn={ets,lookup,2}
+calls=7 1
+1 25
+fl=dnf_ty_interval
+fn={dnf_ty_interval,union,2}
+1 8
+cfl=lists
+cfn={lists,foldl,3}
+calls=2 1
+1 0
+fl=ty_tuples
+fn={ty_tuples,singleton,2}
+1 8
+cfl=ty_tuples
+cfn={ty_tuples,remove_redundant,1}
+calls=1 1
+1 35
+cfl=dnf_ty_tuple
+cfn={dnf_ty_tuple,empty,0}
+calls=1 1
+1 7
+fl=dnf_ty_tuple
+fn={dnf_ty_tuple,empty,0}
+1 31
+cfl=ty_bool
+cfn={ty_bool,empty,0}
+calls=7 1
+1 18
+fl=ty_node
+fn={ty_node,new_ty_node,0}
+1 16
+cfl=ty_node
+cfn={ty_node,next_id,0}
+calls=3 1
+1 31
+fl=ty_functions
+fn={ty_functions,remove_redundant,1}
+1 24
+cfl=erts_internal
+cfn={erts_internal,mc_iterator,1}
+calls=2 1
+1 15
+cfl=ty_functions
+cfn={ty_functions,'-remove_redundant/1-lc$^0/1-0-',2}
+calls=2 1
+1 4
+cfl=maps
+cfn={maps,from_list,1}
+calls=2 1
+1 4
+fl=dnf_ty_atom
+fn={dnf_ty_atom,union,2}
+1 26
+cfl=dnf_ty_atom
+cfn={dnf_ty_atom,negate,1}
+calls=6 1
+1 13
+cfl=dnf_ty_atom
+cfn={dnf_ty_atom,intersect,2}
+calls=2 1
+1 7
+fl=ty_parser
+fn={ty_parser,group,3}
+1 18
+cfl=maps
+cfn={maps,update_with,4}
+calls=4 1
+1 21
+fl=ty_parser
+fn={ty_parser,'-parse/1-lc$^0/1-0-',1}
+1 28
+cfl=lists
+cfn={lists,usort,1}
+calls=3 1
+1 11
+cfl=ty_parser
+cfn={ty_parser,'-parse/1-lc$^0/1-0-',1}
+calls=3 1
+1 0
+fl=dnf_ty_function
+fn={dnf_ty_function,empty,0}
+1 27
+cfl=ty_bool
+cfn={ty_bool,empty,0}
+calls=5 1
+1 11
+fl=dnf_ty_function
+fn={dnf_ty_function,union,2}
+1 7
+cfl=dnf_ty_function
+cfn={dnf_ty_function,op,3}
+calls=2 1
+1 30
+fl=dnf_ty_list
+fn={dnf_ty_list,union,2}
+1 6
+cfl=dnf_ty_list
+cfn={dnf_ty_list,op,3}
+calls=2 1
+1 30
+fl=fprof
+fn={fprof,trace,1}
+1 3
+cfl=fprof
+cfn={fprof,call,1}
+calls=1 1
+1 32
+fl=dnf_ty_tuple
+fn={dnf_ty_tuple,union,2}
+1 7
+cfl=dnf_ty_tuple
+cfn={dnf_ty_tuple,op,3}
+calls=2 1
+1 28
+fl=code
+fn={code,get_mode,0}
+1 10
+cfl=code_server
+cfn={code_server,get_mode,0}
+calls=2 1
+1 23
+fl=fprof
+fn={fprof,call,1}
+1 8
+cfl=fprof
+cfn={fprof,just_call,2}
+calls=1 1
+1 20
+cfl=erlang
+cfn={erlang,whereis,1}
+calls=1 1
+1 4
+fl=ty_node
+fn={ty_node,next_id,0}
+1 17
+cfl=ets
+cfn={ets,update_counter,3}
+calls=3 1
+1 14
+fl=dnf_ty_list
+fn={dnf_ty_list,op,3}
+1 8
+cfl=dnf_ty_list
+cfn={dnf_ty_list,'-op/3-ROp/2-0-',3}
+calls=2 1
+1 22
+fl=dnf_ty_function
+fn={dnf_ty_function,op,3}
+1 7
+cfl=dnf_ty_function
+cfn={dnf_ty_function,'-op/3-ROp/2-0-',3}
+calls=2 1
+1 23
+fl=erlang
+fn={erlang,'++',2}
+1 28
+fl=dnf_ty_tuple
+fn={dnf_ty_tuple,op,3}
+1 7
+cfl=dnf_ty_tuple
+cfn={dnf_ty_tuple,'-op/3-ROp/2-0-',3}
+calls=2 1
+1 21
+fl=erlang
+fn={erlang,monitor,2}
+1 26
+fl=dnf_ty_tuple
+fn={dnf_ty_tuple,singleton,1}
+1 11
+cfl=dnf_ty_tuple
+cfn={dnf_ty_tuple,any,0}
+calls=1 1
+1 8
+cfl=dnf_ty_tuple
+cfn={dnf_ty_tuple,empty,0}
+calls=1 1
+1 7
+fl=maps
+fn={maps,next,1}
+1 15
+cfl=erts_internal
+cfn={erts_internal,map_next,3}
+calls=3 1
+1 10
+fl=ty_parser
+fn={ty_parser,new_local_ref,0}
+1 16
+cfl=erlang
+cfn={erlang,unique_integer,0}
+calls=3 1
+1 8
+fl=maps
+fn={maps,keys,1}
+1 23
+fl=dnf_ty_function
+fn={dnf_ty_function,'-op/3-ROp/2-0-',3}
+1 12
+cfl=ty_bool
+cfn={ty_bool,union,2}
+calls=2 1
+1 7
+cfl=dnf_ty_function
+cfn={dnf_ty_function,normalize,1}
+calls=2 1
+1 4
+fl=code_server
+fn={code_server,get_mode,0}
+1 13
+cfl=persistent_term
+cfn={persistent_term,get,1}
+calls=2 1
+1 10
+fl=dnf_ty_list
+fn={dnf_ty_list,'-op/3-ROp/2-0-',3}
+1 12
+cfl=ty_bool
+cfn={ty_bool,union,2}
+calls=2 1
+1 5
+cfl=dnf_ty_list
+cfn={dnf_ty_list,normalize,1}
+calls=2 1
+1 5
+fl=dnf_ty_interval
+fn={dnf_ty_interval,'-union/2-fun-0-',2}
+1 7
+cfl=dnf_ty_interval
+cfn={dnf_ty_interval,interval_add,2}
+calls=2 1
+1 15
+fl=maps
+fn={maps,update_with,4}
+1 18
+cfl=ty_parser
+cfn={ty_parser,'-group/3-fun-0-',2}
+calls=1 1
+1 3
+fl=lists
+fn={lists,flatten,1}
+1 4
+cfl=lists
+cfn={lists,do_flatten,2}
+calls=1 1
+1 17
+fl=dnf_ty_tuple
+fn={dnf_ty_tuple,'-op/3-ROp/2-0-',3}
+1 13
+cfl=ty_bool
+cfn={ty_bool,union,2}
+calls=2 1
+1 4
+cfl=dnf_ty_tuple
+cfn={dnf_ty_tuple,normalize,1}
+calls=2 1
+1 4
+fl=ty_parser
+fn={ty_parser,'-unify/2-lc$^0/1-0-',1}
+1 18
+cfl=ty_parser
+cfn={ty_parser,choose_representative,1}
+calls=1 1
+1 2
+cfl=ty_parser
+cfn={ty_parser,'-unify/2-lc$^0/1-0-',1}
+calls=3 1
+1 0
+fl=ty_parser
+fn={ty_parser,'-unify/3-lc$^0/1-0-',1}
+1 11
+cfl=ty_parser
+cfn={ty_parser,'-unify/3-lc$^1/1-1-',2}
+calls=1 1
+1 7
+cfl=ty_parser
+cfn={ty_parser,'-unify/3-lc$^0/1-0-',1}
+calls=1 1
+1 0
+fl=maps
+fn={maps,iterator,1}
+1 11
+cfl=maps
+cfn={maps,iterator,2}
+calls=3 1
+1 7
+fl=maps
+fn={maps,try_next,2}
+1 17
+fl=lists
+fn={lists,do_flatten,2}
+1 17
+cfl=lists
+cfn={lists,do_flatten,2}
+calls=3 1
+1 0
+fl=erlang
+fn={erlang,demonitor,2}
+1 17
+fl=dnf_ty_predefined
+fn={dnf_ty_predefined,empty,0}
+1 17
+fl=ty_bool
+fn={ty_bool,union,2}
+1 16
+fl=dnf_ty_interval
+fn={dnf_ty_interval,interval_add,2}
+1 7
+cfl=dnf_ty_interval
+cfn={dnf_ty_interval,add_range,3}
+calls=1 1
+1 5
+cfl=dnf_ty_interval
+cfn={dnf_ty_interval,any,0}
+calls=1 1
+1 3
+fl=ty_tuples
+fn={ty_tuples,'-remove_redundant/1-lc$^0/1-0-',2}
+1 14
+cfl=ty_tuples
+cfn={ty_tuples,'-remove_redundant/1-lc$^0/1-0-',2}
+calls=1 1
+1 0
+fl=ets
+fn={ets,update_counter,3}
+1 14
+fl=lists
+fn={lists,usort,1}
+1 10
+cfl=lists
+cfn={lists,usort_1,2}
+calls=1 1
+1 3
+fl=dnf_ty_atom
+fn={dnf_ty_atom,negate,1}
+1 13
+fl=dnf_ty_atom
+fn={dnf_ty_atom,empty,0}
+1 13
+fl=maps
+fn={maps,to_list,1}
+1 7
+cfl=maps
+cfn={maps,to_list_internal,1}
+calls=1 1
+1 3
+cfl=erts_internal
+cfn={erts_internal,map_next,3}
+calls=1 1
+1 2
+fl=erlang
+fn={erlang,whereis,1}
+1 12
+fl=dnf_ty_interval
+fn={dnf_ty_interval,empty,0}
+1 12
+fl=queue
+fn={queue,is_empty,1}
+1 11
+fl=dnf_ty_variable
+fn={dnf_ty_variable,leaf,1}
+1 11
+fl=ty_parser
+fn={ty_parser,lookup_ty,1}
+1 4
+cfl=ets
+cfn={ets,lookup,2}
+calls=1 1
+1 6
+fl=persistent_term
+fn={persistent_term,get,1}
+1 10
+fl=ordsets
+fn={ordsets,from_list,1}
+1 8
+cfl=lists
+cfn={lists,usort,1}
+calls=1 1
+1 2
+fl=erlang
+fn={erlang,demonitor,1}
+1 10
+fl=dnf_ty_atom
+fn={dnf_ty_atom,intersect,2}
+1 10
+fl=gb_sets
+fn={gb_sets,balance_list,2}
+1 7
+cfl=gb_sets
+cfn={gb_sets,balance_list_1,2}
+calls=1 1
+1 2
+fl=erlang
+fn={erlang,unique_integer,0}
+1 8
+fl=dnf_ty_tuple
+fn={dnf_ty_tuple,any,0}
+1 6
+cfl=ty_bool
+cfn={ty_bool,any,0}
+calls=1 1
+1 2
+fl=ty_parser
+fn={ty_parser,'-unify/3-lc$^1/1-1-',2}
+1 7
+cfl=ty_parser
+cfn={ty_parser,'-unify/3-lc$^1/1-1-',2}
+calls=1 1
+1 0
+fl=queue
+fn={queue,out,1}
+1 7
+fl=maps
+fn={maps,iterator,2}
+1 7
+fl=erlang
+fn={erlang,function_exported,3}
+1 7
+fl=dnf_ty_interval
+fn={dnf_ty_interval,any,0}
+1 7
+fl=erlang
+fn={erlang,module_loaded,1}
+1 6
+fl=dnf_ty_predefined
+fn={dnf_ty_predefined,union,2}
+1 6
+fl=queue
+fn={queue,in,2}
+1 5
+fl=dnf_ty_list
+fn={dnf_ty_list,normalize,1}
+1 5
+fl=dnf_ty_interval
+fn={dnf_ty_interval,add_range,3}
+1 3
+cfl=dnf_ty_interval
+cfn={dnf_ty_interval,any,0}
+calls=1 1
+1 2
+fl=dnf_ty_atom
+fn={dnf_ty_atom,any,0}
+1 5
+fl=ty_tuples
+fn={ty_tuples,'-union/2-lc$^1/1-0-',2}
+1 4
+fl=ty_functions
+fn={ty_functions,'-union/2-lc$^1/1-0-',2}
+1 4
+fl=ty_functions
+fn={ty_functions,'-remove_redundant/1-lc$^0/1-0-',2}
+1 4
+fl=dnf_ty_variable
+fn={dnf_ty_variable,normalize,1}
+1 4
+fl=dnf_ty_tuple
+fn={dnf_ty_tuple,normalize,1}
+1 4
+fl=dnf_ty_function
+fn={dnf_ty_function,normalize,1}
+1 4
+fl=ty_parser
+fn={ty_parser,'-group/3-fun-0-',2}
+1 3
+fl=queue
+fn={queue,from_list,1}
+1 3
+fl=maps
+fn={maps,to_list_internal,1}
+1 3
+fl=lists
+fn={lists,usort_1,2}
+1 3
+fl=lists
+fn={lists,reverse,1}
+1 3
+fl=ty_tuple
+fn={ty_tuple,tuple,1}
+1 2
+fl=ty_parser
+fn={ty_parser,expand_predef_alias,1}
+1 2
+fl=ty_parser
+fn={ty_parser,choose_representative,1}
+1 2
+fl=ty_bool
+fn={ty_bool,any,0}
+1 2
+fl=gb_sets
+fn={gb_sets,balance_list_1,2}
+1 2
+fl=dnf_ty_interval
+fn={dnf_ty_interval,interval,2}
+1 2
+fl=pseudo
+fn=undefined
+1 0
+cfl=debug_tests
+cfn={debug_tests,'-ast_test/0-fun-1-',0}
+calls=0 1
+1 16712
+cfl=fprof
+cfn={fprof,just_call,2}
+calls=0 1
+1 38
