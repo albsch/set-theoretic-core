@@ -10,7 +10,7 @@
 -define(TYTOREF, ty_parser_ty_to_ref).
 -define(ALL_ETS, [?TERMREFS, ?UNIFY, ?CACHE, ?REFTOTY, ?TYTOREF, ?SYMTAB]).
 
--define(TY, ty_rec).
+-define(TY, dnf_ty_variable).
 -define(NODE, ty_node).
 
 % global state
@@ -246,9 +246,9 @@ do_convert({{improper_list, A, B}, R}, Q, Cache) ->
     
   {?TY:list(dnf_ty_list:singleton(ty_tuple:tuple([T1, T2]))), Q1, R, Cache};
 do_convert({{empty_list}, R}, Q, Cache) ->
-  {?TY:predef(dnf_ty_predef:predef('[]')), Q, R, Cache};
+  {?TY:predefined(dnf_ty_predefined:predefined('[]')), Q, R, Cache};
 do_convert({{predef, T}, R}, Q, Cache) when T == pid; T == port; T == reference; T == float ->
-  {?TY:predef(dnf_ty_predef:predef(T)), Q, R, Cache};
+  {?TY:predefined(dnf_ty_predefined:predefined(T)), Q, R, Cache};
 
 % % var
 % do_convert({V = {var, A}, R = {IdTy, _}}, Q) ->

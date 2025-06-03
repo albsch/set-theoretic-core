@@ -1,7 +1,7 @@
--module(dnf_ty_predef).
+-module(dnf_ty_predefined).
 
 % TODO benchmark how much faster the bit representation is (O(n) vs O(1))
-% predef(Predef) -> [Predef].
+% predefined(Predef) -> [Predef].
 % empty() -> [].
 % any() -> [ '[]', float, pid, port, reference ].
 % is_empty([], ST) -> {true, ST};
@@ -13,11 +13,11 @@
 
 -define(ELEMENTS, 5).
 % Map each element to a unique bit position
-predef('[]') -> <<1:?ELEMENTS>>; 
-predef(float) -> <<2:?ELEMENTS>>;
-predef(pid) -> <<4:?ELEMENTS>>;
-predef(port) -> <<8:?ELEMENTS>>;
-predef(reference) -> <<16:?ELEMENTS>>.
+predefined('[]') -> <<1:?ELEMENTS>>; 
+predefined(float) -> <<2:?ELEMENTS>>;
+predefined(pid) -> <<4:?ELEMENTS>>;
+predefined(port) -> <<8:?ELEMENTS>>;
+predefined(reference) -> <<16:?ELEMENTS>>.
 
 % The empty set (no bits set)
 empty() -> <<0:?ELEMENTS>>.

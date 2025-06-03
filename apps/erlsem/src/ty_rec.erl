@@ -4,7 +4,7 @@
 
 -record(ty, 
   {
-    dnf_ty_predef,
+    dnf_ty_predefined,
     dnf_ty_atom,
     dnf_ty_interval,
     dnf_ty_list,
@@ -38,10 +38,11 @@ empty() ->
 -spec is_empty(type(), local_cache()) -> {boolean(), local_cache()}.
 is_empty(Ty, Cache) ->
   fold(fun
-        (_, _, {true, LC0}) -> {true, LC0};
-        (Module, Value, {false, LC0}) -> Module:is_empty(Value, LC0)
+        (_, _, {false, LC0}) -> {false, LC0};
+        (Module, Value, {true, LC0}) -> 
+          Module:is_empty(Value, LC0)
       end, 
-      {false, Cache},
+      {true, Cache},
       Ty).
 
 -spec negate(type()) -> type().
@@ -74,5 +75,5 @@ interval(A) ->
 list(A) ->
   (empty())#ty{dnf_ty_list = A}.
 
-predef(A) ->
-  (empty())#ty{dnf_ty_predef = A}.
+predefined(A) ->
+  (empty())#ty{dnf_ty_predefined = A}.

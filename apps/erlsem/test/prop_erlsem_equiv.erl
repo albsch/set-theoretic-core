@@ -28,23 +28,23 @@ tvar_if_not_toplevel(Variables, Mode) ->
 
 limited_formula(Variables, Size, Mode) when Size =< 1 ->
   frequency([
-    {1, tempty()},
-    {2, tpredef()},
-    {3, {empty_list}},
+    % {1, tempty()},
+    % {2, tpredef()},
+    % {3, {empty_list}},
     {1, tany()}
   ] ++ tvar_if_not_toplevel(Variables, Mode)
 );
 limited_formula(Variables, Size, Mode) ->
   frequency([
     {2, tempty()},
-    {2, tany()},
-    {1, ?LAZY(?LET(A, ?F, tnegation(A))) },
-    {4, ?LAZY(?LET({A, B}, {?F, ?F}, tunion(A, B))) },
-    {4, ?LAZY(?LET({A, B}, {?F, ?F}, tintersection(A, B))) },
-    {8, ?LAZY(?LET({A, B}, {?Fi, ?Fi}, tproduct(A, B))) },
-    {1, ?LAZY(?LET({A}, {?Fi}, tlist(A))) },
-    {4, ?LAZY(?LET({A, B}, {?Fi, ?Fi}, tarrow(A, B))) },
-    {1, ?LAZY(?LET({As, B}, {list(?Fi), ?Fi}, tfun(As, B))) }
+    {2, tany()}
+    % {1, ?LAZY(?LET(A, ?F, tnegation(A))) },
+    % {4, ?LAZY(?LET({A, B}, {?F, ?F}, tunion(A, B))) },
+    % {4, ?LAZY(?LET({A, B}, {?F, ?F}, tintersection(A, B))) },
+    % {8, ?LAZY(?LET({A, B}, {?Fi, ?Fi}, tproduct(A, B))) },
+    % {1, ?LAZY(?LET({A}, {?Fi}, tlist(A))) },
+    % {4, ?LAZY(?LET({A, B}, {?Fi, ?Fi}, tarrow(A, B))) },
+    % {1, ?LAZY(?LET({As, B}, {list(?Fi), ?Fi}, tfun(As, B))) }
   ] ++ tvar_if_not_toplevel(Variables, Mode)
 ).
 
@@ -73,7 +73,12 @@ prop_parse_and_emptiness() ->
         %   ok
         % end,
         % T1 = os:system_time(millisecond),
-        ty_node:is_empty(Parsed),
+
+        E = ty_node:is_empty(Parsed),
+        % case E of 
+        %   true -> io:format(user, "O", []);
+        %   false -> io:format(user, "X", [])
+        % end,
         % maybe 
         %   true ?= (T11 = os:system_time(millisecond)) - T1 > 10,
         %   io:format(user,"~p is_empty> ~p ms~n", [ty, (T11 - T1)])

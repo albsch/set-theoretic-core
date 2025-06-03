@@ -11,6 +11,7 @@
 -define(P, ty_node_p).
 -define(N, ty_node_n).
 -define(ALL_ETS, [?ID, ?SYSTEM, ?P, ?N]).
+-define(TY, dnf_ty_variable).
 
 -spec init() -> _.
 init() ->
@@ -46,6 +47,7 @@ new_ty_node() ->
   {node, next_id()}.
 
 define(Reference, Node) ->
+  [] = ets:lookup(?SYSTEM, Node),
   ets:insert(?SYSTEM, {Reference, Node}),
   Reference.
 
@@ -101,7 +103,7 @@ is_empty(TyNode, LocalCache) ->
     _ -> 
       % assume type is empty and add to state
       % N U {t}
-      {Result, LC_0} = ty_rec:is_empty(Ty, LocalCache#{Ty => true}),
+      {Result, LC_0} = ?TY:is_empty(Ty, LocalCache#{Ty => true}),
 
       case Result of 
         % empty; 
@@ -122,24 +124,24 @@ is_empty(TyNode, LocalCache) ->
   end.
 
 negate(T) ->
-  make(ty_rec:negate(load(T))).
+  make(?TY:negate(load(T))).
 
 intersect(T1, T2) ->
   % io:format(user, "~p~n", [load(T1)]),
   % io:format(user, "~p~n", [load(T2)]),
-  make(ty_rec:intersect(load(T1), load(T2))).
+  make(?TY:intersect(load(T1), load(T2))).
 
 union(T1, T2) ->
-  make(ty_rec:union(load(T1), load(T2))).
+  make(?TY:union(load(T1), load(T2))).
 
 difference(T1, T2) ->
-  make(ty_rec:difference(load(T1), load(T2))).
+  make(?TY:difference(load(T1), load(T2))).
 
 any() ->
-  make(ty_rec:any()).
+  make(?TY:any()).
 
 empty() ->
-  make(ty_rec:empty()).
+  make(?TY:empty()).
 
 disjunction(Nodes) ->
   lists:foldl(fun(E, Acc) -> union(E, Acc) end, empty(), Nodes).
