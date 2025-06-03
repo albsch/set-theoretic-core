@@ -10,6 +10,9 @@
 -define(TYTOREF, ty_parser_ty_to_ref).
 -define(ALL_ETS, [?TERMREFS, ?UNIFY, ?CACHE, ?REFTOTY, ?TYTOREF, ?SYMTAB]).
 
+-define(TY, ty_rec).
+-define(NODE, ty_node).
+
 % global state
 -spec init() -> _.
 init() ->
@@ -94,11 +97,11 @@ parse(Ty) ->
 
       % 2.2 create new type references and replace temporary ones
       %     return result reference
-      ReplaceRefs = maps:from_list([{Ref, ty_node:new_ty_node()} || Ref <- maps:keys(UnifiedResult)]),
+      ReplaceRefs = maps:from_list([{Ref, ?NODE:new_ty_node()} || Ref <- maps:keys(UnifiedResult)]),
       {ReplacedRef, ReplacedResults} = replace_all({UnifiedRef, UnifiedResult}, ReplaceRefs),
 
       % 2.3 define types
-      [ty_node:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
+      [?NODE:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
 
       % 2.4 save unify result
       ets:insert(?UNIFY, {LocalRef, ReplacedRef}),
@@ -161,46 +164,46 @@ do_convert({X = {named, _, Ref, Args}, R = {IdTy, _}}, Q, Cache) ->
   end;
  
 % built-ins
-do_convert({{predef, any}, R}, Q, Cache) -> {ty_rec:any(), Q, R, Cache};
-do_convert({{predef, none}, R}, Q, Cache) -> {ty_rec:empty(), Q, R, Cache};
-do_convert({{predef, atom}, R}, Q, Cache) -> {ty_rec:atom(dnf_ty_atom:any()), Q, R, Cache};
-do_convert({{predef, integer}, R}, Q, Cache) -> {ty_rec:interval(dnf_ty_interval:any()), Q, R, Cache};
+do_convert({{predef, any}, R}, Q, Cache) -> {?TY:any(), Q, R, Cache};
+do_convert({{predef, none}, R}, Q, Cache) -> {?TY:empty(), Q, R, Cache};
+do_convert({{predef, atom}, R}, Q, Cache) -> {?TY:atom(dnf_ty_atom:any()), Q, R, Cache};
+do_convert({{predef, integer}, R}, Q, Cache) -> {?TY:interval(dnf_ty_interval:any()), Q, R, Cache};
 
 % boolean operators
-do_convert({{union, []}, R}, Q, Cache) -> {ty_rec:empty(), Q, R, Cache};
+do_convert({{union, []}, R}, Q, Cache) -> {?TY:empty(), Q, R, Cache};
 do_convert({{union, [A]}, R}, Q, Cache) -> do_convert({A, R}, Q, Cache);
 do_convert({{union, [A|T]}, R}, Q, Cache) -> 
   {R1, Q1, RR1, C1} = do_convert({A, R}, Q, Cache),
   {R2, Q2, RR2, C2} = do_convert({{union, T}, RR1}, Q1, C1),
-  {ty_rec:union(R1, R2), Q2, RR2, C2};
+  {?TY:union(R1, R2), Q2, RR2, C2};
 
-do_convert({{intersection, []}, R}, Q, Cache) -> {ty_rec:any(), Q, R, Cache};
+do_convert({{intersection, []}, R}, Q, Cache) -> {?TY:any(), Q, R, Cache};
 do_convert({{intersection, [A]}, R}, Q, Cache) -> do_convert({A, R}, Q, Cache);
 do_convert({{intersection, [A|T]}, R}, Q, Cache) -> 
   {R1, Q1, RR0, C0} = do_convert({A, R}, Q, Cache),
   {R2, Q2, RR1, C1} = do_convert({{intersection, T}, RR0}, Q1, C0),
-  {ty_rec:intersect(R1, R2), Q2, RR1, C1};
+  {?TY:intersect(R1, R2), Q2, RR1, C1};
 
 do_convert({{negation, Ty}, R}, Q, Cache) -> 
   {NewR, Q0, RR0, C0} = do_convert({Ty, R}, Q, Cache),
-  {ty_rec:negate(NewR), Q0, RR0, C0};
+  {?TY:negate(NewR), Q0, RR0, C0};
 
 % functions
 do_convert({{fun_full, Comps, Result}, R}, Q, Cache) ->
-    {RevETy, Q0} = lists:foldl(
-        fun(Element, {Components, OldQ}) ->
-            % to be converted later, add to queue
-            Id = new_local_ref(Element),
-            {[Id | Components], queue:in({Id, Element}, OldQ)}
-        end, {[], Q}, Comps),
-    ETy = lists:reverse(RevETy),
+  {RevETy, Q0} = lists:foldl(
+    fun(Element, {Components, OldQ}) ->
+      % to be converted later, add to queue
+      Id = new_local_ref(Element),
+      {[Id | Components], queue:in({Id, Element}, OldQ)}
+   end, {[], Q}, Comps),
+  ETy = lists:reverse(RevETy),
 
-    % add fun result to queue
-    Id = new_local_ref(Result),
-    Q1 = queue:in({Id, Result}, Q0),
+  % add fun result to queue
+  Id = new_local_ref(Result),
+  Q1 = queue:in({Id, Result}, Q0),
     
-    T = ty_functions:singleton(length(Comps), dnf_ty_function:singleton(ty_function:function(ETy, Id))),
-    {ty_rec:functions(T), Q1, R, Cache};
+  T = ty_functions:singleton(length(Comps), dnf_ty_function:singleton(ty_function:function(ETy, Id))),
+  {?TY:functions(T), Q1, R, Cache};
 
 do_convert({{tuple, Comps}, R}, Q, Cache) ->
   {RevETy, Q0} = lists:foldl(
@@ -212,15 +215,15 @@ do_convert({{tuple, Comps}, R}, Q, Cache) ->
   ETy = lists:reverse(RevETy),
     
   T = ty_tuples:singleton(length(Comps), dnf_ty_tuple:singleton(ty_tuple:tuple(ETy))),
-  {ty_rec:tuples(T), Q0, R, Cache};
+  {?TY:tuples(T), Q0, R, Cache};
 
 do_convert({{singleton, Atom}, R}, Q, Cache) when is_atom(Atom) ->
   TAtom = dnf_ty_atom:finite([Atom]),
-  {ty_rec:atom(TAtom), Q, R, Cache};
+  {?TY:atom(TAtom), Q, R, Cache};
 
 do_convert({{range, From, To}, R}, Q, Cache) ->
   Int = dnf_ty_interval:interval(From, To),
-  {ty_rec:interval(Int), Q, R, Cache};
+  {?TY:interval(Int), Q, R, Cache};
 
 do_convert({{predef_alias, Alias}, R}, Q, Cache) ->
   do_convert({expand_predef_alias(Alias), R}, Q, Cache);
@@ -241,11 +244,11 @@ do_convert({{improper_list, A, B}, R}, Q, Cache) ->
   Q0 = queue:in({T1, A}, Q),
   Q1 = queue:in({T2, B}, Q0),
     
-  {ty_rec:list(dnf_ty_list:singleton(ty_tuple:tuple([T1, T2]))), Q1, R, Cache};
+  {?TY:list(dnf_ty_list:singleton(ty_tuple:tuple([T1, T2]))), Q1, R, Cache};
 do_convert({{empty_list}, R}, Q, Cache) ->
-  {ty_rec:predef(dnf_ty_predef:predef('[]')), Q, R, Cache};
+  {?TY:predef(dnf_ty_predef:predef('[]')), Q, R, Cache};
 do_convert({{predef, T}, R}, Q, Cache) when T == pid; T == port; T == reference; T == float ->
-  {ty_rec:predef(dnf_ty_predef:predef(T)), Q, R, Cache};
+  {?TY:predef(dnf_ty_predef:predef(T)), Q, R, Cache};
 
 % % var
 % do_convert({V = {var, A}, R = {IdTy, _}}, Q) ->
