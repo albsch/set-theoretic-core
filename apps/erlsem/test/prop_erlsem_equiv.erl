@@ -89,6 +89,31 @@ prop_parse_and_emptiness() ->
     end)
   end).
 
+prop_parse_and_emptiness_cache() -> 
+  ?SETUP(
+      fun() ->
+          global_state:clean(),
+          global_state:init(),
+          T0 = os:system_time(millisecond),
+          fun() -> 
+              io:format("Running cleanup after all tests~n"),
+              T1 = os:system_time(millisecond),
+              io:format(user,"~p ms (~p)~n", [T1-T0, length(ets:tab2list(ty_parser_cache))]),
+              ok
+          end
+      end,
+    ?FORALL(X, ?LET(Types, nonempty_list(atom()), system(Types)), begin 
+      maps:foreach(fun(VarName, AstTy) -> ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy}) end, X),
+
+      maps:map(fun(Name, _) -> 
+        Ty = {named, noloc, {ty_ref, '.', Name, 0}, []},
+        Parsed = ty_parser:parse(Ty),
+        true
+      end, X),
+      true 
+    end)
+    ).
+
 prop_subtype_instances() -> 
   ?FORALL(X, ?LET(Types, nonempty_list(atom()), system(Types)), begin 
     global_state:with_new_state(fun() ->

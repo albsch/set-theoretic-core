@@ -37,7 +37,9 @@ compare({node, _Id1}, {node, _Id2}) -> eq;
 % ty_node has to support comparing these local temporary references
 compare({local_ref, Id1}, {local_ref, Id2}) when Id1 < Id2 -> lt;
 compare({local_ref, Id1}, {local_ref, Id2}) when Id1 > Id2 -> gt;
-compare({local_ref, _Id1}, {local_ref, _Id2}) -> eq.
+compare({local_ref, _Id1}, {local_ref, _Id2}) -> eq;
+compare({local_ref, _}, {node, _}) -> lt;
+compare({node, _}, {local_ref, _}) -> gt.
 
 
 make(Ty) ->

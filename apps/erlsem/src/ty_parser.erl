@@ -8,7 +8,7 @@
 -define(CACHE, ty_parser_cache).
 -define(REFTOTY, ty_parser_ref_to_ty).
 -define(TYTOREF, ty_parser_ty_to_ref).
--define(ALL_ETS, [?TERMREFS, ?UNIFY, ?CACHE, ?REFTOTY, ?TYTOREF, ?SYMTAB]).
+-define(ALL_ETS, [?CACHE, ?SYMTAB, ?TERMREFS]).
 
 -define(TY, dnf_ty_variable).
 -define(NODE, ty_node).
@@ -66,46 +66,41 @@ lookup_ty({ty_ref, _, Ref, _}) ->
 
 % -spec ast_to_erlang_ty(ast:ty(), symtab:t()) -> ty_rec:ty_ref().
 parse(Ty) ->
+  % create a reference, check if is inside the cache
   LocalRef = new_local_ref(Ty),
 
-  % if parsed and unified already, return
-  case ets:lookup(?UNIFY, LocalRef) of
-    [{LocalRef, ReplacedRef}] -> 
-      ReplacedRef;
+  case ets:lookup(?CACHE, LocalRef) of
+    [{LocalRef, Node}] -> 
+      Node;
     _ ->
-      % 0. local snapshot of state
-      RefToTy = maps:from_list(ets:tab2list(?REFTOTY)),
-      TyToRef = maps:from_list(ets:tab2list(?TYTOREF)),
-      Cache = maps:from_list(ets:tab2list(?CACHE)),
-
       % 1. Convert to temporary local representation
       %    Create a temporary type equation with a first entrypoint LocalRef = ...
       %    and parse the type layer by layer
       %    use local type references stored in a local map
-      ({Result = {NewR,NewTUnsorted}, NewCache}) = convert(queue:from_list([{LocalRef, Ty}]), {RefToTy, TyToRef}, Cache),
+      ({{NewR,NewTUnsorted}, _NewCache}) = convert(queue:from_list([{LocalRef, Ty}]), {_RefToTy = #{}, _TyToRef = #{}}, #{}),
+      % can have duplicates, e.g. TODO explain
       NewT = #{K => lists:usort(V) || K := V <- NewTUnsorted},
-      
+
       % 2. Unify the results
       %    There can be many duplicate type references;
       %    these will be substituted with their representative
-      % update global ref, ty mapping, and cache
-      utils:update_ets_from_map(?REFTOTY, NewR),
-      utils:update_ets_from_map(?TYTOREF, NewT),
-      utils:update_ets_from_map(?CACHE, NewCache),
+      {UnifiedRef, UnifiedResult} = unify(LocalRef, {NewR, NewT}),
 
-      % 2.1 unify
-      {UnifiedRef, UnifiedResult} = unify(LocalRef, Result),
-
-      % 2.2 create new type references and replace temporary ones
-      %     return result reference
+      % 3. create new type references and replace temporary ones
+      %    return result reference
       ReplaceRefs = maps:from_list([{Ref, ?NODE:new_ty_node()} || Ref <- maps:keys(UnifiedResult)]),
       {ReplacedRef, ReplacedResults} = replace_all({UnifiedRef, UnifiedResult}, ReplaceRefs),
 
-      % 2.3 define types
+      % 4. define types
       [?NODE:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
 
-      % 2.4 save unify result
-      ets:insert(?UNIFY, {LocalRef, ReplacedRef}),
+      % 5. update global cache, there are now old entries to overwrite
+      %    this invariant has to be kept up inside do_convert
+      %    whenever a new reference is created with new_local_ref(...),
+      %    we need to check the global cache if that reference does not already point
+      %    to a real node inside the global system
+      %    the true = ... check is a sanity check
+      [true = ets:insert_new(?CACHE, {LLocalRef, Node}) || LLocalRef := Node <- ReplaceRefs],
       
       ReplacedRef
   end.
@@ -119,7 +114,6 @@ replace_all({Ref, All}, Map) ->
       end;
     (_) -> error
   end, {Ref, All}).
-  
 
 % -spec group(#{A => list(X)}, A, X) -> #{A := list(X)}.
 group(M, Key, Value) ->
@@ -132,6 +126,8 @@ convert(Queue, Res, LocalCache) ->
       {Res, LocalCache}; 
     _ -> % convert next layer
       {{value, {LocalRef, Ty}}, Q} = queue:out(Queue),
+      % sanity: don't convert something that is already in the global system
+      [] = ets:lookup(?CACHE, LocalRef),
       {ErlangRecOrLocalRef, NewQ, {R1, R2}, NewCache} = do_convert({Ty, Res}, Q, LocalCache),
       convert(NewQ, {R1#{LocalRef => ErlangRecOrLocalRef}, group(R2, ErlangRecOrLocalRef, LocalRef)}, NewCache)
   end.
@@ -144,11 +140,9 @@ do_convert({X = {named, _, Ref, Args}, R = {IdTy, _}}, Q, Cache) ->
   case Cache of
     #{{Ref, Args} := NewRef} ->
       #{NewRef := Ty} = IdTy,
-      % io:format(user, "Cache hit for parse: ~p~n~p -> ~p~n", [Ref, NewRef, Ty]),
       {Ty, Q, R, Cache};
     _ ->
       % find ty in global table
-      % io:format(user,"Lookup: ~p~n", [Ref]),
       ({ty_scheme, [], Ty}) = lookup_ty(Ref),
 
       % TODO apply args to ty scheme
@@ -158,10 +152,14 @@ do_convert({X = {named, _, Ref, Args}, R = {IdTy, _}}, Q, Cache) ->
       
       % create a new reference (ref args pair) and memoize
       NewRef = new_local_ref(X),
-
-      {InternalTy, NewQ, {R0, R1}, C0} = do_convert({NewTy, R}, Q, Cache#{{Ref, Args} => NewRef}),
-      
-      {InternalTy, NewQ, {R0#{NewRef => InternalTy}, group(R1, InternalTy, NewRef)}, C0}
+      case ets:lookup(?CACHE, NewRef) of 
+        [] -> 
+          {InternalTy, NewQ, {R0, R1}, C0} = do_convert({NewTy, R}, Q, Cache#{{Ref, Args} => NewRef}),
+          {InternalTy, NewQ, {R0#{NewRef => InternalTy}, group(R1, InternalTy, NewRef)}, C0};
+        [{NewRef, CachedNode}] -> 
+          InternalTy = ty_node:load(CachedNode),
+          {InternalTy, Q, R, Cache}
+      end
   end;
  
 % built-ins
@@ -193,25 +191,22 @@ do_convert({{negation, Ty}, R}, Q, Cache) ->
 do_convert({{fun_full, Comps, Result}, R}, Q, Cache) ->
   {RevETy, Q0} = lists:foldl(
     fun(Element, {Components, OldQ}) ->
-      % to be converted later, add to queue
-      Id = new_local_ref(Element),
-      {[Id | Components], queue:in({Id, Element}, OldQ)}
+      {IdOrNode, QQ} = queue_if_new(Element, OldQ),
+      {[IdOrNode | Components], QQ}
    end, {[], Q}, Comps),
   ETy = lists:reverse(RevETy),
 
   % add fun result to queue
-  Id = new_local_ref(Result),
-  Q1 = queue:in({Id, Result}, Q0),
+  {IdOrNode, Q1} = queue_if_new(Result, Q0),
     
-  T = ty_functions:singleton(length(Comps), dnf_ty_function:singleton(ty_function:function(ETy, Id))),
+  T = ty_functions:singleton(length(Comps), dnf_ty_function:singleton(ty_function:function(ETy, IdOrNode))),
   {?TY:functions(T), Q1, R, Cache};
 
 do_convert({{tuple, Comps}, R}, Q, Cache) ->
   {RevETy, Q0} = lists:foldl(
     fun(Element, {Components, OldQ}) ->
-      % to be converted later, add to queue
-      Id = new_local_ref(Element),
-      {[Id | Components], queue:in({Id, Element}, OldQ)}
+      {IdOrNode, QQ} = queue_if_new(Element, OldQ),
+      {[IdOrNode | Components], QQ}
     end, {[], Q}, Comps),
   ETy = lists:reverse(RevETy),
     
@@ -240,10 +235,8 @@ do_convert({{nonempty_list, Ty}, R}, Q, Cache) ->
 do_convert({{nonempty_improper_list, Ty, Term}, R}, Q, Cache) ->
   do_convert({{intersection, [{list, Ty}, {negation, Term}]} , R}, Q, Cache);
 do_convert({{improper_list, A, B}, R}, Q, Cache) ->
-  T1 = new_local_ref(A),
-  T2 = new_local_ref(B),
-  Q0 = queue:in({T1, A}, Q),
-  Q1 = queue:in({T2, B}, Q0),
+  {T1, Q0} = queue_if_new(A, Q),
+  {T2, Q1} = queue_if_new(B, Q0),
     
   {?TY:list(dnf_ty_list:singleton(ty_tuple:tuple([T1, T2]))), Q1, R, Cache};
 do_convert({{empty_list}, R}, Q, Cache) ->
@@ -279,26 +272,25 @@ do_convert({{predef, T}, R}, Q, Cache) when T == pid; T == port; T == reference;
 do_convert(T, _Q, _) ->
   erlang:error({"Transformation from ast:ty() to ty_rec:ty() not implemented or malformed type", T}).
 
+queue_if_new(Element, Queue) ->
+  Id = new_local_ref(Element),
+  case ets:lookup(?CACHE, Id) of
+    % to be converted later, add to queue, if not already cached
+    [] -> {Id, queue:in({Id, Element}, Queue)};
+    % if already known, don't process and add a real reference as part of the tuple components
+    [{Id, Node}] -> {Node, Queue}
+  end.
 
 % -spec unify(temporary_ref(), result()) -> {temporary_ref(), #{temporary_ref() => ty_rec()}}.
 unify(Ref, {IdToTy, TyToIds}) ->
   % map with references to unify, pick representatives
-  ToUnify = maps:to_list(#{K => choose_representative(V) || K := V <- TyToIds, length(V) > 1}), 
+  % in previous versions, named_ref existed, which was picked preferrably as the representative
+  % now, we pick the first element
+  ToUnify = maps:to_list(#{K => {H, T} || K := (V = [H | T]) <- TyToIds, length(V) > 1}), 
 
   % replace equivalent refs with representative
-  {UnifiedRef, {UnifiedIdToTy, _UnifiedTyToIds}} = unify(Ref, {IdToTy, TyToIds}, ToUnify),
+  ToReplace = maps:from_list(lists:flatten([[{Single, Represent} || Single <- Dupl ] || {_, {Represent, Dupl}}<- ToUnify])),
 
-  {UnifiedRef, UnifiedIdToTy}.
-
-% -spec choose_representative([temporary_ref()]) -> {temporary_ref(), [temporary_ref()]}.
-% in previous versions, named_ref existed, which was picked preferrably. 
-% now, we pick the first element
-choose_representative([H | T]) -> {H, T}.
-
-unify(Ref, {Db, Old}, All) ->
-  ToReplace = maps:from_list(lists:flatten([[{Single, Represent} || Single <- Dupl ] || {_, {Represent, Dupl}}<- All])),
-
-  T0 = os:system_time(microsecond),
   {NewRef, NewDb} = utils:everywhere(fun
     (RRef = {X, _}) when X == local_ref; X == mu_ref -> 
       case ToReplace of 
@@ -306,10 +298,10 @@ unify(Ref, {Db, Old}, All) ->
         _ -> error
       end;
     (_) -> error
-  end, {Ref, Db}),
-  T1 = os:system_time(microsecond),
+  end, {Ref, IdToTy}),
 
-  {NewRef, {NewDb, Old}}.
+  {NewRef, NewDb}.
+
 
 -spec expand_predef_alias(ast:predef_alias_name()) -> ast:ty().
 expand_predef_alias(term) -> {predef, any};

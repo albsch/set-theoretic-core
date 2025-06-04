@@ -108,7 +108,7 @@ ast_test() ->
       ty_parser:extend_symtab(VarName, AstTyScheme)
     end, System),
 
-    Ty = {named, noloc, {ty_ref, 'ast', ty_singleton, 0}, []},
+    Ty = {named, noloc, {ty_ref, 'ast', ty, 0}, []},
 
     {Time, _} = timer:tc(fun() -> 
       % fprof:trace(start),
