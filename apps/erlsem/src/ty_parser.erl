@@ -8,16 +8,28 @@
 % a mapping from type references to type schemes (of the foreign interfaces)
 -define(SYMTAB, ty_parser_symtab).
 
-% a cache of already parsed results
+% a cache of already-parsed results
 % determines which part of the type needs to be converted
-% if something has been parsed before, replace it with a real references 
-% if not, replace it with a local temporary reference and parse it, replacing it at the end
+% if something has been parsed before, replace it with a real reference
+% if not, replace it with a local temporary reference and parse it, 
+% replacing the temporary reference at the end by a real reference
 -define(CACHE, ty_parser_cache).
 
 -define(ALL_ETS, [?CACHE, ?SYMTAB, ?TERMREFS]).
 
 -define(TY, dnf_ty_variable).
 -define(NODE, ty_node).
+
+-type temporary_ref() :: {local_ref, integer()}. % fresh type references created for the queue
+-type type() :: ?NODE:type().
+-type ty_rec() :: ?TY:type().
+-type ast_ty() :: term(). %TODO ast:ty()
+-type ety_ty_scheme() :: term(). %TODO etylizer ty scheme
+-type ety_ref() :: term(). %TODO etylizer reference
+-type ety_args() :: term(). %TODO [ast:ty()]
+-type database() :: {term(), term()}. 
+-type local_cache() :: {{Ref :: ety_ref(), Args :: ety_args()}, temporary_ref()}. % the local cache should only consist of temporary references
+-type queue() :: queue:queue({temporary_ref(), ast_ty()}).
 
 % global state
 -spec init() -> _.
@@ -36,13 +48,9 @@ clean() ->
   end,
   logger:debug("~p state cleaned", [?MODULE]).
 
--type temporary_ref() :: {local_ref, integer()}. % fresh type references created for the queue
--type type() :: term(). %TODO ?NODE:type().
--type ast_ty() :: term(). %TODO ast:ty()
-
 -spec parse(ast_ty()) -> type().
 parse(Ty) ->
-  % create a reference, check if is inside the cache
+  % create a reference, check if it is inside the cache
   LocalRef = new_local_ref(Ty),
 
   case ets:lookup(?CACHE, LocalRef) of
@@ -53,13 +61,17 @@ parse(Ty) ->
       %    Create a temporary type equation with a first entrypoint LocalRef = ...
       %    and parse the type layer by layer
       %    use local type references stored in a local map
-      ({{NewR,NewTUnsorted}, _NewCache}) = convert(queue:from_list([{LocalRef, Ty}]), {_RefToTy = #{}, _TyToRef = #{}}, #{}),
+      ({{NewR, NewTUnsorted}, _NewCache}) = convert(queue:from_list([{LocalRef, Ty}]), {_RefToTy = #{}, _TyToRef = #{}}, #{}),
       % can have duplicates, e.g. TODO explain
       NewT = #{K => lists:usort(V) || K := V <- NewTUnsorted},
 
       % 2. Unify the results
       %    There can be many duplicate type references;
       %    these will be substituted with their representative
+      %    e.g. any U any    any          type to parse
+      %         ref1         ref2         local temporary references
+      %         internal1    internal1    internal type representations
+      %    replace all ref2 by ref1, so that no unecessary nodes are created
       {UnifiedRef, UnifiedResult} = unify(LocalRef, {NewR, NewT}),
 
       % 3. create new type references and replace temporary ones
@@ -81,11 +93,33 @@ parse(Ty) ->
       ReplacedRef
   end.
 
+% breadth-first traveral using a queue
+% 
+% it is not possible to use a depth-first approach with recursive types and the record data structure ty_rec
+% see: T = {T U integer()}
+% T is not yet defined when parsing the components of the tuple, 
+% but it needs to be, because we need to load the value behind the reference
+% while with breadth-first, we first parse T = {...},
+% then T is defined, 
+% then we can parse the inner components with the possibility of loading T inside {...}
+-spec convert(queue(), database(), local_cache()) -> {database(), local_cache()}.
+convert(Queue, Res, LocalCache) ->
+  case queue:is_empty(Queue) of
+    true -> 
+      {Res, LocalCache}; 
+    _ -> % convert next layer
+      {{value, {LocalRef, Ty}}, Q} = queue:out(Queue),
+      % sanity: don't convert something that is already in the global system
+      [] = ets:lookup(?CACHE, LocalRef),
+      {ErlangRecOrLocalRef, NewQ, {R1, R2}, NewCache} = do_convert({Ty, Res}, Q, LocalCache),
+      convert(NewQ, {R1#{LocalRef => ErlangRecOrLocalRef}, group(R2, ErlangRecOrLocalRef, LocalRef)}, NewCache)
+  end.
+
 % create an unique type reference
 -spec new_local_ref() -> temporary_ref().
 new_local_ref() -> {local_ref, erlang:unique_integer()}.
 
-% new_local_ref(Term) -> {local_ref, erlang:phash2(Term)}.
+-spec new_local_ref(ast_ty()) -> temporary_ref().
 new_local_ref(Term) -> 
   % essentially, this is what we want but is too slow
   % {local_ref, Term}.
@@ -99,20 +133,21 @@ new_local_ref(Term) ->
       UniqueRef
   end.
 
+%TODO this is likely ty_key or ty_ref, check back when integrating with etylizer and fix tests
+-spec extend_symtab(ety_ref(), ety_ty_scheme()) -> _. 
 extend_symtab(Ref, TyScheme) ->
+  % io:format(user,"~p~n~p~n", [Ref, TyScheme]),
   ets:insert(?SYMTAB, {Ref, TyScheme}).
-
-set_symtab(Symtab) ->
-  utils:update_ets_from_map(?SYMTAB, Symtab).
 
 % -spec var_ref(ast:ty_var()) -> temporary_ref().
 % var_ref(Var) -> {mu_ref, Var}.
 
+-spec lookup_ty(ety_ref()) -> ety_ty_scheme().
 lookup_ty({ty_ref, _, Ref, _}) ->
   [{Ref, {ty_scheme, [], Ty}}] = ets:lookup(?SYMTAB, Ref),
   {ty_scheme, [], Ty}.
 
-
+% TODO spec
 replace_all({Ref, All}, Map) ->
   utils:everywhere(fun
     (RRef = {X, _}) when X == local_ref; X == mu_ref ->
@@ -123,27 +158,12 @@ replace_all({Ref, All}, Map) ->
     (_) -> error
   end, {Ref, All}).
 
-% -spec group(#{A => list(X)}, A, X) -> #{A := list(X)}.
+-spec group(#{A => list(X)}, A, X) -> #{A := list(X)}.
 group(M, Key, Value) ->
   maps:update_with(Key, fun(Group) -> [Value | Group] end, [Value], M).
 
-% -spec convert(queue(), symtab:t(), result()) -> result().
-convert(Queue, Res, LocalCache) ->
-  case queue:is_empty(Queue) of
-    true -> 
-      {Res, LocalCache}; 
-    _ -> % convert next layer
-      {{value, {LocalRef, Ty}}, Q} = queue:out(Queue),
-      % sanity: don't convert something that is already in the global system
-      [] = ets:lookup(?CACHE, LocalRef),
-      {ErlangRecOrLocalRef, NewQ, {R1, R2}, NewCache} = do_convert({Ty, Res}, Q, LocalCache),
-      convert(NewQ, {R1#{LocalRef => ErlangRecOrLocalRef}, group(R2, ErlangRecOrLocalRef, LocalRef)}, NewCache)
-  end.
-
-% -spec do_convert({ast:ty(), result()}, queue(), symtab:t(), memo()) -> {ty_rec(), queue(), result()}.
-
-% entrypoint for recursion
-% named
+% entrypoint for recursion: named type
+-spec do_convert({ast_ty(), database()}, queue(), local_cache()) -> {ty_rec(), queue(), database(), local_cache()}.
 do_convert({X = {named, _, Ref, Args}, R = {IdTy, _}}, Q, Cache) ->
   case Cache of
     #{{Ref, Args} := NewRef} ->
@@ -158,14 +178,15 @@ do_convert({X = {named, _, Ref, Args}, R = {IdTy, _}}, Q, Cache) ->
       % NewTy = subst:apply(Map, Ty, no_clean),
       NewTy = Ty,
       
-      % create a new reference (ref args pair) and memoize
       NewRef = new_local_ref(X),
       case ets:lookup(?CACHE, NewRef) of 
         [] -> 
+          % create a new reference (ref args pair), memoize, and add continue converting
           {InternalTy, NewQ, {R0, R1}, C0} = do_convert({NewTy, R}, Q, Cache#{{Ref, Args} => NewRef}),
           {InternalTy, NewQ, {R0#{NewRef => InternalTy}, group(R1, InternalTy, NewRef)}, C0};
         [{NewRef, CachedNode}] -> 
-          InternalTy = ty_node:load(CachedNode),
+          % reuse type representation of the global cache
+          InternalTy = ?NODE:load(CachedNode),
           {InternalTy, Q, R, Cache}
       end
   end;
@@ -176,6 +197,21 @@ do_convert({{predef, none}, R}, Q, Cache) -> {?TY:empty(), Q, R, Cache};
 do_convert({{predef, atom}, R}, Q, Cache) -> {?TY:atom(dnf_ty_atom:any()), Q, R, Cache};
 do_convert({{predef, integer}, R}, Q, Cache) -> {?TY:interval(dnf_ty_interval:any()), Q, R, Cache};
 do_convert({{predef_alias, Alias}, R}, Q, Cache) -> do_convert({expand_predef_alias(Alias), R}, Q, Cache);
+
+% predefined
+do_convert({{empty_list}, R}, Q, Cache) -> {?TY:predefined(dnf_ty_predefined:predefined('[]')), Q, R, Cache};
+do_convert({{predef, T}, R}, Q, Cache) when T == pid; T == port; T == reference; T == float ->
+  {?TY:predefined(dnf_ty_predefined:predefined(T)), Q, R, Cache};
+
+% atoms
+do_convert({{singleton, Atom}, R}, Q, Cache) when is_atom(Atom) ->
+  TAtom = dnf_ty_atom:finite([Atom]),
+  {?TY:atom(TAtom), Q, R, Cache};
+
+% intervals
+do_convert({{range, From, To}, R}, Q, Cache) ->
+  Int = dnf_ty_interval:interval(From, To),
+  {?TY:interval(Int), Q, R, Cache};
 
 % boolean operators
 do_convert({{union, []}, R}, Q, Cache) -> {?TY:empty(), Q, R, Cache};
@@ -196,6 +232,21 @@ do_convert({{negation, Ty}, R}, Q, Cache) ->
   {NewR, Q0, RR0, C0} = do_convert({Ty, R}, Q, Cache),
   {?TY:negate(NewR), Q0, RR0, C0};
 
+% === term rewrites
+do_convert({{nonempty_list, Ty}, R}, Q, Cache) ->
+  do_convert({{nonempty_improper_list, Ty, {empty_list}}, R}, Q, Cache);
+do_convert({{nonempty_improper_list, Ty, Term}, R}, Q, Cache) ->
+  do_convert({{intersection, [{list, Ty}, {negation, Term}]} , R}, Q, Cache);
+do_convert({{list, Ty}, R}, Q, Cache) ->
+  do_convert({
+  {union, [
+    {improper_list, Ty, {empty_list}}, 
+    {empty_list}
+  ]}, R}, Q, Cache);
+
+% === nested data structures 
+% === these can potentially create temporary references and can extend the queue
+ 
 % functions
 do_convert({{fun_full, Domains, CoDomain}, R}, Q, Cache) ->
   {ParsedDomains, Q0} = lists:foldl(
@@ -209,6 +260,7 @@ do_convert({{fun_full, Domains, CoDomain}, R}, Q, Cache) ->
   T = ty_functions:singleton(length(Domains), dnf_ty_function:singleton(ty_function:function(ParsedDomains, ParsedCoDomain))),
   {?TY:functions(T), Q1, R, Cache};
 
+% tuples
 do_convert({{tuple, Comps}, R}, Q, Cache) ->
   {ParsedComponents, Q0} = lists:foldl(
     fun(Element, {Components, OldQ}) ->
@@ -219,33 +271,13 @@ do_convert({{tuple, Comps}, R}, Q, Cache) ->
   T = ty_tuples:singleton(length(Comps), dnf_ty_tuple:singleton(ty_tuple:tuple(ParsedComponents))),
   {?TY:tuples(T), Q0, R, Cache};
 
-do_convert({{singleton, Atom}, R}, Q, Cache) when is_atom(Atom) ->
-  TAtom = dnf_ty_atom:finite([Atom]),
-  {?TY:atom(TAtom), Q, R, Cache};
-
-do_convert({{range, From, To}, R}, Q, Cache) ->
-  Int = dnf_ty_interval:interval(From, To),
-  {?TY:interval(Int), Q, R, Cache};
-
-do_convert({{list, Ty}, R}, Q, Cache) ->
-  do_convert({
-  {union, [
-    {improper_list, Ty, {empty_list}}, 
-    {empty_list}
-  ]}, R}, Q, Cache);
-do_convert({{nonempty_list, Ty}, R}, Q, Cache) ->
-  do_convert({{nonempty_improper_list, Ty, {empty_list}}, R}, Q, Cache);
-do_convert({{nonempty_improper_list, Ty, Term}, R}, Q, Cache) ->
-  do_convert({{intersection, [{list, Ty}, {negation, Term}]} , R}, Q, Cache);
+% lists
 do_convert({{improper_list, A, B}, R}, Q, Cache) ->
   {T1, Q0} = queue_if_new(A, Q),
   {T2, Q1} = queue_if_new(B, Q0),
     
   {?TY:list(dnf_ty_list:singleton(ty_tuple:tuple([T1, T2]))), Q1, R, Cache};
-do_convert({{empty_list}, R}, Q, Cache) ->
-  {?TY:predefined(dnf_ty_predefined:predefined('[]')), Q, R, Cache};
-do_convert({{predef, T}, R}, Q, Cache) when T == pid; T == port; T == reference; T == float ->
-  {?TY:predefined(dnf_ty_predefined:predefined(T)), Q, R, Cache};
+
 
 % % var
 % do_convert({V = {var, A}, R = {IdTy, _}}, Q) ->
@@ -275,16 +307,17 @@ do_convert({{predef, T}, R}, Q, Cache) when T == pid; T == port; T == reference;
 do_convert(T, _Q, _) ->
   erlang:error({"Transformation from ast:ty() to ty_rec:ty() not implemented or malformed type", T}).
 
+-spec queue_if_new(ast_ty(), queue()) -> {type() | temporary_ref(), queue()}.
 queue_if_new(Element, Queue) ->
   Id = new_local_ref(Element),
   case ets:lookup(?CACHE, Id) of
-    % to be converted later, add to queue, if not already cached
+    % to be converted later, add to queue, return temporary reference
     [] -> {Id, queue:in({Id, Element}, Queue)};
-    % if already known, don't process and add a real reference as part of the tuple components
+    % if already known, don't process and return a real reference
     [{Id, Node}] -> {Node, Queue}
   end.
 
-% -spec unify(temporary_ref(), result()) -> {temporary_ref(), #{temporary_ref() => ty_rec()}}.
+-spec unify(temporary_ref(), database()) -> {temporary_ref(), #{temporary_ref() => ty_rec()}}.
 unify(Ref, {IdToTy, TyToIds}) ->
   % map with references to unify, pick representatives
   % in previous versions, named_ref existed, which was picked preferrably as the representative
@@ -306,7 +339,7 @@ unify(Ref, {IdToTy, TyToIds}) ->
   {NewRef, NewDb}.
 
 
--spec expand_predef_alias(ast:predef_alias_name()) -> ast:ty().
+% -spec expand_predef_alias(ast:predef_alias_name()) -> ast:ty(). %TODO
 expand_predef_alias(term) -> {predef, any};
 % TODO better binaries
 expand_predef_alias(binary) -> {bitstring};

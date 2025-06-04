@@ -10,7 +10,6 @@ tuple_test() ->
   {ok, [System]} = file:consult("system_tuple"),
 
   global_state:with_new_state(fun() -> 
-    ty_parser:set_symtab(System),
     maps:foreach(fun(VarName, AstTy) ->
       ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy})
     end, System),
