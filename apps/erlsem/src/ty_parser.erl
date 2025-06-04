@@ -15,7 +15,11 @@
 % replacing the temporary reference at the end by a real reference
 -define(CACHE, ty_parser_cache).
 
--define(ALL_ETS, [?CACHE, ?SYMTAB, ?TERMREFS]).
+% a cache of discarded references which disappear after unification
+% used to re-map local references to the unified reference, if possible
+-define(UNIFY, ty_parser_unify).
+
+-define(ALL_ETS, [?CACHE, ?SYMTAB, ?TERMREFS, ?UNIFY]).
 
 -define(TY, dnf_ty_variable).
 -define(NODE, ty_node).
@@ -93,7 +97,7 @@ parse(Ty) ->
       ReplacedRef
   end.
 
-% breadth-first traveral using a queue
+% breadth-first traversal using a queue
 % 
 % it is not possible to use a depth-first approach with recursive types and the record data structure ty_rec
 % see: T = {T U integer()}
@@ -126,11 +130,20 @@ new_local_ref(Term) ->
   % we can't use hashing, it is fast but leads to collisions
   % {local_ref, erlang:phash2(Term)}.
   % therefore, generate a unique reference and save in a hash table to lookup
-  case ets:lookup(?TERMREFS, Term) of
-    [{Term, Ref}] -> Ref;
+  Reff = case ets:lookup(?TERMREFS, Term) of
+    [{Term, Ref}] -> 
+      Ref;
     _ -> 
       ets:insert(?TERMREFS, {Term, UniqueRef = new_local_ref()}),
       UniqueRef
+  end,
+  % additionally, if that generated reference was unified at the last step,
+  % we replace that generated reference with the unified reference,
+  % to be able to hit the global cache 
+  % (no unified discarded reference appears in the global cache)
+  case ets:lookup(?UNIFY, Reff) of
+    [{Reff, UnifiedRef}] -> UnifiedRef;
+    _ -> Reff 
   end.
 
 %TODO this is likely ty_key or ty_ref, check back when integrating with etylizer and fix tests
@@ -311,7 +324,19 @@ unify(Ref, {IdToTy, TyToIds}) ->
   % map with references to unify, pick representatives
   % in previous versions, named_ref existed, which was picked preferrably as the representative
   % now, we pick the first element
-  ToUnify = maps:to_list(#{K => {H, T} || K := (V = [H | T]) <- TyToIds, length(V) > 1}), 
+  ToUnify = maps:to_list(#{
+    K => 
+      begin 
+        % we can't forget the references which are unified to another reference
+        % when we create a new_local_reference, 
+        % if that is mapped to a reference which was unified before 
+        % that missed reference will not be cached, even though the converting work has been done before already
+        % therefore, add all unified reference to a separate cache
+        % and check whenever we create a local reference that unify cache
+        lists:foreach(fun(E) -> true = ets:insert_new(?UNIFY, {E, H}) end, T),
+        {H, T} 
+      end
+    || K := (V = [H | T]) <- TyToIds, length(V) > 1}), 
 
   % replace equivalent refs with representative
   ToReplace = maps:from_list(lists:flatten([[{Single, Represent} || Single <- Dupl ] || {_, {Represent, Dupl}}<- ToUnify])),

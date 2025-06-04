@@ -1,0 +1,14 @@
+#{
+{ty_key,ast,ty,0} =>
+    {ty_scheme,[],
+     {union,
+      [
+       {named,{loc,"src/ast.erl",415,37},{ty_ref,ast,ty_tuple,0},[]}
+       ]}},
+
+   {ty_key,ast,ty_tuple,0} =>
+    {ty_scheme,[],
+     {tuple,
+      [{singleton,tuple},
+       {list,{named,{loc,"src/ast.erl",405,30},{ty_ref,ast,ty,0},[]}}]}}
+}.

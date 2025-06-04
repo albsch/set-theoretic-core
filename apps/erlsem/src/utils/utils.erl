@@ -29,8 +29,24 @@ everywhere(F, T) ->
                 X when is_map(X) -> #{everywhere(F, K) => everywhere(F, V) || K := V <- X};
                 X -> X
             end;
-        {ok, X} -> X
+        {ok, X} -> X;
+        {rec, X} -> F(F, X)
     end.
+
+everything(F, T) ->
+    TransList = fun(L) -> lists:flatmap(fun(X) -> everything(F, X) end, L) end,
+    case F(T) of
+        error ->
+            case T of
+                X when is_list(X) -> TransList(X);
+                X when is_tuple(X) -> TransList(tuple_to_list(X));
+                X when is_map(X) -> TransList(maps:to_list(X));
+                _ -> []
+            end;
+        {ok, X} -> [X]
+    end.
+
+
 
 replace(Term, Mapping) ->
     replace_term(Term, Mapping).

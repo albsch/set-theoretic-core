@@ -75,9 +75,27 @@ ast_test() ->
   {ok, [System]} = file:consult("system_ast"),
   % ensure all modules are loaded (takes ~20ms)
   [code:ensure_loaded(M) || M <- [
-    dnf_ty_atom, dnf_ty_function, dnf_ty_interval, dnf_ty_list, dnf_ty_predefined,dnf_ty_tuple, ty_variable, ty,
-    dnf_ty_variable, global_state, ty_bool, ty_function, ty_functions, ty_node, ty_parser, ty_rec, ty_tuple, ty_tuples,
-    utils, dnf_ty_bitstring
+    dnf_ty_atom, 
+    dnf_ty_bitstring,
+    dnf_ty_function, 
+    dnf_ty_interval, 
+    dnf_ty_list, 
+    dnf_ty_map,
+    dnf_ty_predefined,
+    dnf_ty_tuple,
+    dnf_ty_variable,
+    global_state,
+    ty_bool, 
+    ty_function, 
+    ty_functions, 
+    ty_node, 
+    ty_parser, 
+    ty_rec, 
+    ty_tuple, 
+    ty_tuples,
+    ty_variable,
+    ty,
+    utils
   ]],
 
   global_state:with_new_state(fun() -> 
@@ -96,6 +114,29 @@ ast_test() ->
       Z
     end),
     io:format(user,"parse> ~p ms~n", [Time/1000]),
+
+    ok
+  end).
+
+
+op_test() ->
+  {ok, [System]} = file:consult("system_rec"),
+
+  global_state:with_new_state(fun() -> 
+    maps:foreach(fun({ty_key,ast,VarName,_Arity}, AstTyScheme) -> ty_parser:extend_symtab(VarName, AstTyScheme) end, System),
+
+    TyRaw = {named, noloc, {ty_ref, 'ast', ty, 0}, []},
+    Ty = ty_parser:parse(TyRaw),
+
+    io:format(user,"~n", []),
+    io:format(user,"~w~n", [Ty]),
+    % [io:format(user,"~w ::~n~w~n", [Node, Rec]) || Node := Rec <- ty_node:dump(Ty)],
+
+    Ty2 = ty_node:intersect(Ty, Ty),
+    io:format(user,"~n", []),
+    io:format(user,"~w~n", [Ty2]),
+    % [io:format(user,"~w ::~n~w~n", [Node, Rec]) || Node := Rec <- ty_node:dump(Ty2)],
+    % io:format(user,"~p~n", [Ty2]),
 
     ok
   end).

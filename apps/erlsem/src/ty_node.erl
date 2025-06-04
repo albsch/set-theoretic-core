@@ -8,9 +8,10 @@
 
 -define(ID, ty_node_id).
 -define(SYSTEM, ty_node_system).
+-define(UNIQUETABLE, ty_record_to_node).
 -define(P, ty_node_p).
 -define(N, ty_node_n).
--define(ALL_ETS, [?ID, ?SYSTEM, ?P, ?N]).
+-define(ALL_ETS, [?ID, ?SYSTEM, ?P, ?N, ?UNIQUETABLE]).
 -define(TY, dnf_ty_variable).
 
 -spec init() -> _.
@@ -24,6 +25,14 @@ init() ->
   end,
   % io:format(user, "ty_node state initialized~n", []).
   ok.
+
+-spec clean() -> _.
+clean() ->
+  case ets:whereis(?ID) of
+      undefined -> ok;
+      _ -> 
+        [ets:delete(T) || T <- ?ALL_ETS]
+  end.
 
 % -record(ty_node, {id :: integer(), definition :: term()}).
 -type type() :: any(). %TODO
@@ -43,30 +52,25 @@ compare({node, _}, {local_ref, _}) -> gt.
 
 
 make(Ty) ->
-  define(new_ty_node(), Ty).
+  Res = ets:lookup(?UNIQUETABLE, Ty),
+  case Res of
+    [{_, Ref}] -> Ref;
+    _ -> define(new_ty_node(), Ty)
+  end.
 
 new_ty_node() ->
   {node, next_id()}.
 
 define(Reference, Node) ->
-  [] = ets:lookup(?SYSTEM, Node),
+  [] = ets:lookup(?SYSTEM, Reference),
   ets:insert(?SYSTEM, {Reference, Node}),
+  [] = ets:lookup(?UNIQUETABLE, Node),
+  ets:insert(?UNIQUETABLE, {Node, Reference}),
   Reference.
 
 next_id() ->
   NextId = ets:update_counter(?ID, id, 1),
   NextId.
-
--spec clean() -> _.
-clean() ->
-  case ets:whereis(?ID) of
-      undefined -> ok;
-      _ -> 
-        ets:delete(?ID),
-        ets:delete(?SYSTEM),
-        ets:delete(?P),
-        ets:delete(?N)
-  end.
 
 load(TyNode) ->
   [{TyNode, Ty}] = ets:lookup(?SYSTEM, TyNode),
@@ -150,3 +154,19 @@ disjunction(Nodes) ->
 
 conjunction(Nodes) ->
   lists:foldl(fun(E, Acc) -> intersect(E, Acc) end, any(), Nodes).
+
+dump(Ty) ->
+  do_dump([Ty], #{}).
+
+do_dump([], Res) -> Res;
+do_dump([Ty | T], Res) ->
+  case maps:is_key(Ty, Res) of
+    true -> do_dump(T, Res);
+    false -> 
+      Rec = load(Ty),
+      MoreTys = utils:everything(
+        fun(E = {node, _}) -> {ok, E};(_) -> error end,
+        Rec
+      ),
+      do_dump(T ++ MoreTys, Res#{Ty => Rec})
+  end.
