@@ -48,7 +48,7 @@ tuple_test() ->
 
 
 slow_test() ->
-  {ok, [System]} = file:consult("system"),
+  {ok, [System]} = file:consult("system_big"),
   % dnf_ty_variable:any(),
 
   global_state:with_new_state(fun() -> 
@@ -89,10 +89,11 @@ ast_test() ->
 
     {Time, _} = timer:tc(fun() -> 
       fprof:trace(start),
-      ty_parser:parse(Ty),
+      Z = ty_parser:parse(Ty),
       fprof:trace(stop),
       fprof:profile(),
-      fprof:analyse()
+      fprof:analyse(),
+      Z
     end),
     io:format(user,"parse> ~p ms~n", [Time/1000]),
 

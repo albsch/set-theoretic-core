@@ -77,7 +77,7 @@ parse(Ty) ->
       % 3. create new type references and replace temporary ones
       %    return result reference
       ReplaceRefs = maps:from_list([{Ref, ?NODE:new_ty_node()} || Ref <- maps:keys(UnifiedResult)]),
-      {ReplacedRef, ReplacedResults} = replace_all({UnifiedRef, UnifiedResult}, ReplaceRefs),
+      {ReplacedRef, ReplacedResults} = utils:replace({UnifiedRef, UnifiedResult}, ReplaceRefs),
 
       % 4. define types
       [?NODE:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
@@ -146,17 +146,6 @@ extend_symtab(Ref, TyScheme) ->
 lookup_ty({ty_ref, _, Ref, _}) ->
   [{Ref, {ty_scheme, [], Ty}}] = ets:lookup(?SYMTAB, Ref),
   {ty_scheme, [], Ty}.
-
-% TODO spec
-replace_all({Ref, All}, Map) ->
-  utils:everywhere(fun
-    (RRef = {X, _}) when X == local_ref; X == mu_ref ->
-      case Map of
-        #{RRef := Replace} -> {ok, Replace};
-        _ -> error
-      end;
-    (_) -> error
-  end, {Ref, All}).
 
 -spec group(#{A => list(X)}, A, X) -> #{A := list(X)}.
 group(M, Key, Value) ->
@@ -326,17 +315,7 @@ unify(Ref, {IdToTy, TyToIds}) ->
 
   % replace equivalent refs with representative
   ToReplace = maps:from_list(lists:flatten([[{Single, Represent} || Single <- Dupl ] || {_, {Represent, Dupl}}<- ToUnify])),
-
-  {NewRef, NewDb} = utils:everywhere(fun
-    (RRef = {X, _}) when X == local_ref; X == mu_ref -> 
-      case ToReplace of 
-        #{RRef := Representative} -> {ok, Representative};
-        _ -> error
-      end;
-    (_) -> error
-  end, {Ref, IdToTy}),
-
-  {NewRef, NewDb}.
+  utils:replace({Ref, IdToTy}, ToReplace).
 
 
 % -spec expand_predef_alias(ast:predef_alias_name()) -> ast:ty(). %TODO

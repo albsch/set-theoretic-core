@@ -32,6 +32,23 @@ everywhere(F, T) ->
         {ok, X} -> X
     end.
 
+replace(Term, Mapping) ->
+    replace_term(Term, Mapping).
+
+replace_term({local_ref, _} = Ref, Mapping) ->
+    case maps:find(Ref, Mapping) of
+        {ok, NewTerm} -> NewTerm;
+        error -> Ref
+    end;
+replace_term(Tuple, Mapping) when is_tuple(Tuple) ->
+    list_to_tuple([replace_term(Element, Mapping) || Element <- tuple_to_list(Tuple)]);
+replace_term([H|T], Mapping) ->
+    [replace_term(H, Mapping) | replace_term(T, Mapping)];
+replace_term(Map, Mapping) when is_map(Map) ->
+    maps:from_list([{replace_term(K, Mapping), replace_term(V, Mapping)} || {K, V} <- maps:to_list(Map)]);
+replace_term(Term, _Mapping) ->
+    Term.
+
 
 size(Term) ->
   (erts_debug:size(Term) * 8)/1024.
