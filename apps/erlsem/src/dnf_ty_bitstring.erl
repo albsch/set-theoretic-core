@@ -1,10 +1,6 @@
--module(ty_bool).
+-module(dnf_ty_bitstring).
 
-% only used as a simple boolean terminal node in a BDD where the leafs are 1 and 0 only.
--compile([export_all, nowarn_export_all]).
--export_type([type/0]).
-
--type type() :: 0 | 1.
+% currently only supported: bitstring yes/no
 
 compare(0, 0) -> 0; compare(1, 1) -> 0; compare(1, 0) -> 1; compare(0, 1) -> -1.
 equal(X, Y) -> X =:= Y.

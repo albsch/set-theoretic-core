@@ -48,7 +48,7 @@ tuple_test() ->
 
 
 slow_test() ->
-  {ok, [System]} = file:consult("system_big"),
+  {ok, [System]} = file:consult("system"),
   % dnf_ty_variable:any(),
 
   global_state:with_new_state(fun() -> 
@@ -77,7 +77,7 @@ ast_test() ->
   [code:ensure_loaded(M) || M <- [
     dnf_ty_atom, dnf_ty_function, dnf_ty_interval, dnf_ty_list, dnf_ty_predefined,dnf_ty_tuple, ty_variable, ty,
     dnf_ty_variable, global_state, ty_bool, ty_function, ty_functions, ty_node, ty_parser, ty_rec, ty_tuple, ty_tuples,
-    utils
+    utils, dnf_ty_bitstring
   ]],
 
   global_state:with_new_state(fun() -> 
@@ -88,11 +88,11 @@ ast_test() ->
     Ty = {named, noloc, {ty_ref, 'ast', ty, 0}, []},
 
     {Time, _} = timer:tc(fun() -> 
-      fprof:trace(start),
+      % fprof:trace(start),
       Z = ty_parser:parse(Ty),
-      fprof:trace(stop),
-      fprof:profile(),
-      fprof:analyse(),
+      % fprof:trace(stop),
+      % fprof:profile(),
+      % fprof:analyse(),
       Z
     end),
     io:format(user,"parse> ~p ms~n", [Time/1000]),

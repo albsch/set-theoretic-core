@@ -8,8 +8,10 @@
     dnf_ty_atom,
     dnf_ty_interval,
     dnf_ty_list,
+    dnf_ty_bitstring,
     ty_tuples,
-    ty_functions
+    ty_functions,
+    dnf_ty_map
   }).
 
 -type type() :: #ty{}.
@@ -77,3 +79,9 @@ list(A) ->
 
 predefined(A) ->
   (empty())#ty{dnf_ty_predefined = A}.
+
+bitstring(A) ->
+  (empty())#ty{dnf_ty_bitstring = A}.
+
+map(A) ->
+  (empty())#ty{dnf_ty_map = A}.
