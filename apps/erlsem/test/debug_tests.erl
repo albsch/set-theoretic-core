@@ -1,5 +1,11 @@
 -module(debug_tests).
 
+init_per_suite(Config) ->
+    % % Load all modules from the project
+    % {ok, Modules} = application:get_key(your_app_name, modules),
+    % lists:foreach(fun code:ensure_loaded/1, Modules),
+    Config.
+
 slow_test_() ->
   {timeout, 60, fun() -> 
     slow_test(),
@@ -43,18 +49,14 @@ tuple_test() ->
 
 slow_test() ->
   {ok, [System]} = file:consult("system"),
-  dnf_ty_variable:any(),
+  % dnf_ty_variable:any(),
 
   global_state:with_new_state(fun() -> 
     AllNames = [begin ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy}), VarName end  || VarName := AstTy <- System],
     [begin
         {Time, Ty} = timer:tc(fun() -> 
-          % fprof:trace(start),
           TT = {named, noloc, {ty_ref, '.', Name, 0}, []},
           Z = ty_parser:parse(TT),
-          % fprof:trace(stop),
-          % fprof:profile(),
-          % fprof:analyse(),
           Z
         end),
         io:format(user,"~p parse> ~p ms~n", [Name, Time/1000]),
@@ -71,8 +73,12 @@ slow_test() ->
 
 ast_test() ->
   {ok, [System]} = file:consult("system_ast"),
-  dnf_ty_variable:any(),
-  % io:format(user,"~p~n", [System]),
+  % ensure all modules are loaded (takes ~20ms)
+  [code:ensure_loaded(M) || M <- [
+    dnf_ty_atom, dnf_ty_function, dnf_ty_interval, dnf_ty_list, dnf_ty_predefined,dnf_ty_tuple, ty_variable, ty,
+    dnf_ty_variable, global_state, ty_bool, ty_function, ty_functions, ty_node, ty_parser, ty_rec, ty_tuple, ty_tuples,
+    utils
+  ]],
 
   global_state:with_new_state(fun() -> 
     maps:foreach(fun({ty_key,ast,VarName,_Arity}, AstTyScheme) ->
@@ -82,12 +88,11 @@ ast_test() ->
     Ty = {named, noloc, {ty_ref, 'ast', ty, 0}, []},
 
     {Time, _} = timer:tc(fun() -> 
-      % fprof:trace(start),
-      Z = ty_parser:parse(Ty),
-      % fprof:trace(stop),
-      % fprof:profile(),
-      % fprof:analyse(),
-      Z
+      fprof:trace(start),
+      ty_parser:parse(Ty),
+      fprof:trace(stop),
+      fprof:profile(),
+      fprof:analyse()
     end),
     io:format(user,"parse> ~p ms~n", [Time/1000]),
 
