@@ -2,12 +2,18 @@
 
 -compile([export_all, nowarn_export_all]).
 
--define(SYMTAB, ty_parser_symtab).
+% a mapping from to-parse terms to a shorter form of local temporary references
 -define(TERMREFS, ty_parser_term_references).
--define(UNIFY, ty_parser_unify).
+
+% a mapping from type references to type schemes (of the foreign interfaces)
+-define(SYMTAB, ty_parser_symtab).
+
+% a cache of already parsed results
+% determines which part of the type needs to be converted
+% if something has been parsed before, replace it with a real references 
+% if not, replace it with a local temporary reference and parse it, replacing it at the end
 -define(CACHE, ty_parser_cache).
--define(REFTOTY, ty_parser_ref_to_ty).
--define(TYTOREF, ty_parser_ty_to_ref).
+
 -define(ALL_ETS, [?CACHE, ?SYMTAB, ?TERMREFS]).
 
 -define(TY, dnf_ty_variable).
@@ -30,41 +36,11 @@ clean() ->
   end,
   logger:debug("~p state cleaned", [?MODULE]).
 
--type temporary_ref() :: 
-    {local_ref, integer()}. % fresh type references created for the queue
+-type temporary_ref() :: {local_ref, integer()}. % fresh type references created for the queue
+-type type() :: term(). %TODO ?NODE:type().
+-type ast_ty() :: term(). %TODO ast:ty()
 
-% create an unique type reference
--spec new_local_ref() -> temporary_ref().
-new_local_ref() -> {local_ref, erlang:unique_integer()}.
-
-% new_local_ref(Term) -> {local_ref, erlang:phash2(Term)}.
-new_local_ref(Term) -> 
-  % essentially, this is what we want but is too slow
-  % {local_ref, Term}.
-  % we can't use hashing, it is fast but leads to collisions
-  % {local_ref, erlang:phash2(Term)}.
-  % therefore, generate a unique reference and save in a hash table to lookup
-  case ets:lookup(?TERMREFS, Term) of
-    [{Term, Ref}] -> Ref;
-    _ -> 
-      ets:insert(?TERMREFS, {Term, UniqueRef = new_local_ref()}),
-      UniqueRef
-  end.
-
-extend_symtab(Ref, TyScheme) ->
-  ets:insert(?SYMTAB, {Ref, TyScheme}).
-
-set_symtab(Symtab) ->
-  utils:update_ets_from_map(?SYMTAB, Symtab).
-
-% -spec var_ref(ast:ty_var()) -> temporary_ref().
-% var_ref(Var) -> {mu_ref, Var}.
-
-lookup_ty({ty_ref, _, Ref, _}) ->
-  [{Ref, {ty_scheme, [], Ty}}] = ets:lookup(?SYMTAB, Ref),
-  {ty_scheme, [], Ty}.
-
-% -spec ast_to_erlang_ty(ast:ty(), symtab:t()) -> ty_rec:ty_ref().
+-spec parse(ast_ty()) -> type().
 parse(Ty) ->
   % create a reference, check if is inside the cache
   LocalRef = new_local_ref(Ty),
@@ -104,6 +80,38 @@ parse(Ty) ->
       
       ReplacedRef
   end.
+
+% create an unique type reference
+-spec new_local_ref() -> temporary_ref().
+new_local_ref() -> {local_ref, erlang:unique_integer()}.
+
+% new_local_ref(Term) -> {local_ref, erlang:phash2(Term)}.
+new_local_ref(Term) -> 
+  % essentially, this is what we want but is too slow
+  % {local_ref, Term}.
+  % we can't use hashing, it is fast but leads to collisions
+  % {local_ref, erlang:phash2(Term)}.
+  % therefore, generate a unique reference and save in a hash table to lookup
+  case ets:lookup(?TERMREFS, Term) of
+    [{Term, Ref}] -> Ref;
+    _ -> 
+      ets:insert(?TERMREFS, {Term, UniqueRef = new_local_ref()}),
+      UniqueRef
+  end.
+
+extend_symtab(Ref, TyScheme) ->
+  ets:insert(?SYMTAB, {Ref, TyScheme}).
+
+set_symtab(Symtab) ->
+  utils:update_ets_from_map(?SYMTAB, Symtab).
+
+% -spec var_ref(ast:ty_var()) -> temporary_ref().
+% var_ref(Var) -> {mu_ref, Var}.
+
+lookup_ty({ty_ref, _, Ref, _}) ->
+  [{Ref, {ty_scheme, [], Ty}}] = ets:lookup(?SYMTAB, Ref),
+  {ty_scheme, [], Ty}.
+
 
 replace_all({Ref, All}, Map) ->
   utils:everywhere(fun
@@ -167,6 +175,7 @@ do_convert({{predef, any}, R}, Q, Cache) -> {?TY:any(), Q, R, Cache};
 do_convert({{predef, none}, R}, Q, Cache) -> {?TY:empty(), Q, R, Cache};
 do_convert({{predef, atom}, R}, Q, Cache) -> {?TY:atom(dnf_ty_atom:any()), Q, R, Cache};
 do_convert({{predef, integer}, R}, Q, Cache) -> {?TY:interval(dnf_ty_interval:any()), Q, R, Cache};
+do_convert({{predef_alias, Alias}, R}, Q, Cache) -> do_convert({expand_predef_alias(Alias), R}, Q, Cache);
 
 % boolean operators
 do_convert({{union, []}, R}, Q, Cache) -> {?TY:empty(), Q, R, Cache};
@@ -188,18 +197,17 @@ do_convert({{negation, Ty}, R}, Q, Cache) ->
   {?TY:negate(NewR), Q0, RR0, C0};
 
 % functions
-do_convert({{fun_full, Comps, Result}, R}, Q, Cache) ->
+do_convert({{fun_full, Domains, CoDomain}, R}, Q, Cache) ->
   {RevETy, Q0} = lists:foldl(
     fun(Element, {Components, OldQ}) ->
       {IdOrNode, QQ} = queue_if_new(Element, OldQ),
       {[IdOrNode | Components], QQ}
-   end, {[], Q}, Comps),
+   end, {[], Q}, Domains),
   ETy = lists:reverse(RevETy),
 
-  % add fun result to queue
-  {IdOrNode, Q1} = queue_if_new(Result, Q0),
+  {IdOrNode, Q1} = queue_if_new(CoDomain, Q0),
     
-  T = ty_functions:singleton(length(Comps), dnf_ty_function:singleton(ty_function:function(ETy, IdOrNode))),
+  T = ty_functions:singleton(length(Domains), dnf_ty_function:singleton(ty_function:function(ETy, IdOrNode))),
   {?TY:functions(T), Q1, R, Cache};
 
 do_convert({{tuple, Comps}, R}, Q, Cache) ->
@@ -220,9 +228,6 @@ do_convert({{singleton, Atom}, R}, Q, Cache) when is_atom(Atom) ->
 do_convert({{range, From, To}, R}, Q, Cache) ->
   Int = dnf_ty_interval:interval(From, To),
   {?TY:interval(Int), Q, R, Cache};
-
-do_convert({{predef_alias, Alias}, R}, Q, Cache) ->
-  do_convert({expand_predef_alias(Alias), R}, Q, Cache);
 
 do_convert({{list, Ty}, R}, Q, Cache) ->
   do_convert({
