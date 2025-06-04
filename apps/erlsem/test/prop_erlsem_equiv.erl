@@ -53,85 +53,82 @@ system(Variables) ->
     maps:from_list(lists:zip(Variables, Formulas))
   ), valid_system(Ty)).
 
-% property that checks if we can parse any random type
+% property tests with fixed timeouts are not too stable, 
+% but randomly generated test cases really shouldn't take longer than these timeouts
+% currently starts failing after with n > 10000
+-define(PARSETIMEOUTMS, 100).
+-define(EMPTYTIMEOUTMS, 50).
+
+% property that checks if we can parse a random type and check emptyness 
+% in a reasonable amount of time
 prop_parse_and_emptiness() -> 
   ?FORALL(X, ?LET(Types, nonempty_list(atom()), system(Types)), begin 
     global_state:with_new_state(fun() ->
-      maps:foreach(fun(VarName, AstTy) ->
-        ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy})
-      end, X),
+      maps:foreach(fun(VarName, AstTy) -> ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy}) end, X),
 
       maps:map(fun(Name, _) -> 
         Ty = {named, noloc, {ty_ref, '.', Name, 0}, []},
-        % T0 = os:system_time(millisecond),
+        T0 = os:system_time(millisecond),
         Parsed = ty_parser:parse(Ty),
-        % maybe 
-        %   true ?= (T00 = os:system_time(millisecond)) - T0 > 100,
-        %   io:format(user,"~p parse> ~p ms~n", [ty, (T00 - T0)]),
-        %   io:format(user,"~p~n", [X]),
-        %   error(exit),
-        %   ok
-        % end,
-        % T1 = os:system_time(millisecond),
-
-        E = ty_node:is_empty(Parsed),
-        % case E of 
-        %   true -> io:format(user, "O", []);
-        %   false -> io:format(user, "X", [])
-        % end,
-        % maybe 
-        %   true ?= (T11 = os:system_time(millisecond)) - T1 > 10,
-        %   io:format(user,"~p is_empty> ~p ms~n", [ty, (T11 - T1)])
-        % end,
-        true
+        true = ((T1 = os:system_time(millisecond)) - T0) < ?PARSETIMEOUTMS,
+        ty_node:is_empty(Parsed),
+        true = (os:system_time(millisecond) - T1) < ?EMPTYTIMEOUTMS
       end, X),
-      true 
+      true
     end)
   end).
 
+% in addition to prop_parse_and_emptiness, 
+% this should ensure that the growing state in ty_parser 
+% won't result in slow down of the whole parser
 prop_parse_and_emptiness_cache() -> 
   ?SETUP(
-      fun() ->
-          global_state:clean(),
-          global_state:init(),
-          T0 = os:system_time(millisecond),
-          fun() -> 
-              io:format("Running cleanup after all tests~n"),
-              T1 = os:system_time(millisecond),
-              io:format(user,"~p ms (~p)~n", [T1-T0, length(ets:tab2list(ty_parser_cache))]),
-              ok
-          end
-      end,
+    fun() ->
+      global_state:clean(),
+      global_state:init(),
+      T00 = os:system_time(millisecond),
+      fun() -> 
+        T11 = os:system_time(millisecond),
+        io:format(user,"~p ms (~p parsed types cached)~n", [T11-T00, length(ets:tab2list(ty_parser_cache))]),
+        global_state:clean(),
+        ok
+      end
+    end,
     ?FORALL(X, ?LET(Types, nonempty_list(atom()), system(Types)), begin 
       maps:foreach(fun(VarName, AstTy) -> ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy}) end, X),
 
       maps:map(fun(Name, _) -> 
         Ty = {named, noloc, {ty_ref, '.', Name, 0}, []},
+        T0 = os:system_time(millisecond),
         Parsed = ty_parser:parse(Ty),
-        true
+        true = ((T1 = os:system_time(millisecond)) - T0) < ?PARSETIMEOUTMS,
+        ty_node:is_empty(Parsed),
+        true = (os:system_time(millisecond) - T1) < ?EMPTYTIMEOUTMS
       end, X),
       true 
     end)
-    ).
+  ).
 
+% generates subtype checks that look like S & !T
 prop_subtype_instances() -> 
   ?FORALL(X, ?LET(Types, nonempty_list(atom()), system(Types)), begin 
     global_state:with_new_state(fun() ->
-      maps:foreach(fun(VarName, AstTy) ->
-        ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy})
-      end, X),
+      maps:foreach(fun(VarName, AstTy) -> ty_parser:extend_symtab(VarName, {ty_scheme, [], AstTy}) end, X),
 
       AllTypes = [ty_parser:parse({named, noloc, {ty_ref, '.', Name, 0}, []}) || {Name, _} <- maps:to_list(X)],
 
       Instances = [ty_node:intersect(A, ty_node:negate(B)) || A <- AllTypes, B <- AllTypes],
-      T0 = os:system_time(millisecond),
-      lists:foreach(fun(Ty) -> ty_node:is_empty(Ty) end, Instances),
-      io:format(user,"~p instances in ~p ms~n", [length(Instances), os:system_time(millisecond) - T0]),
-
+      lists:foreach(fun(Ty) -> 
+        T0 = os:system_time(millisecond),
+        ty_node:is_empty(Ty),
+        true = (os:system_time(millisecond) - T0) < 10 % if something is slower than 10ms -> good random test case
+      end, Instances),
       true 
     end)
   end).
 
+% checks if for each variable the recursive system
+% that variable is only contained under a type constructor (if at all)
 valid_system(System) ->
   lists:all(fun valid_rec/1, maps:to_list(System)).
   

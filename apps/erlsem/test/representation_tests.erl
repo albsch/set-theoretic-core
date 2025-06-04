@@ -8,7 +8,6 @@ redundant_default_test() ->
     % Ty2 = parse({negation, {fun_full, [{predef, any}], {predef, any}}}),
     Ty2 = ty_node:negate(Ty),
     Ty3 = ty_node:intersect(Ty, Ty2),
-    
 
     io:format(user, "~p : ~p~n", [Ty3, ty_node:load(Ty3)]),
     ok

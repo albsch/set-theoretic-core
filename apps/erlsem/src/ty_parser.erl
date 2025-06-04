@@ -198,27 +198,25 @@ do_convert({{negation, Ty}, R}, Q, Cache) ->
 
 % functions
 do_convert({{fun_full, Domains, CoDomain}, R}, Q, Cache) ->
-  {RevETy, Q0} = lists:foldl(
+  {ParsedDomains, Q0} = lists:foldl(
     fun(Element, {Components, OldQ}) ->
       {IdOrNode, QQ} = queue_if_new(Element, OldQ),
-      {[IdOrNode | Components], QQ}
+      {Components ++ [IdOrNode], QQ}
    end, {[], Q}, Domains),
-  ETy = lists:reverse(RevETy),
 
-  {IdOrNode, Q1} = queue_if_new(CoDomain, Q0),
+  {ParsedCoDomain, Q1} = queue_if_new(CoDomain, Q0),
     
-  T = ty_functions:singleton(length(Domains), dnf_ty_function:singleton(ty_function:function(ETy, IdOrNode))),
+  T = ty_functions:singleton(length(Domains), dnf_ty_function:singleton(ty_function:function(ParsedDomains, ParsedCoDomain))),
   {?TY:functions(T), Q1, R, Cache};
 
 do_convert({{tuple, Comps}, R}, Q, Cache) ->
-  {RevETy, Q0} = lists:foldl(
+  {ParsedComponents, Q0} = lists:foldl(
     fun(Element, {Components, OldQ}) ->
       {IdOrNode, QQ} = queue_if_new(Element, OldQ),
-      {[IdOrNode | Components], QQ}
+      {Components ++ [IdOrNode], QQ}
     end, {[], Q}, Comps),
-  ETy = lists:reverse(RevETy),
     
-  T = ty_tuples:singleton(length(Comps), dnf_ty_tuple:singleton(ty_tuple:tuple(ETy))),
+  T = ty_tuples:singleton(length(Comps), dnf_ty_tuple:singleton(ty_tuple:tuple(ParsedComponents))),
   {?TY:tuples(T), Q0, R, Cache};
 
 do_convert({{singleton, Atom}, R}, Q, Cache) when is_atom(Atom) ->
