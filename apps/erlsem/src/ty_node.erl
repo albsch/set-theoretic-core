@@ -50,7 +50,6 @@ compare({local_ref, _Id1}, {local_ref, _Id2}) -> eq;
 compare({local_ref, _}, {node, _}) -> lt;
 compare({node, _}, {local_ref, _}) -> gt.
 
-
 make(Ty) ->
   Res = ets:lookup(?UNIQUETABLE, Ty),
   case Res of
@@ -64,8 +63,15 @@ new_ty_node() ->
 define(Reference, Node) ->
   [] = ets:lookup(?SYSTEM, Reference),
   ets:insert(?SYSTEM, {Reference, Node}),
-  [] = ets:lookup(?UNIQUETABLE, Node),
-  ets:insert(?UNIQUETABLE, {Node, Reference}),
+  case ets:lookup(?UNIQUETABLE, Node) of
+    [] -> 
+      ets:insert(?UNIQUETABLE, {Node, Reference});
+    _ -> 
+      % since the unification process in ty_parser is not global, 
+      % we can have many references pointing to the same node
+      % if that is the case, use the first reference as the representative
+      ok
+  end,
   Reference.
 
 next_id() ->
