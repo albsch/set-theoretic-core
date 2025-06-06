@@ -68,8 +68,9 @@ parse(Ty) ->
       ({{NewR, NewTUnsorted}, _NewCache}) = convert(queue:from_list([{LocalRef, Ty}]), {_RefToTy = #{}, _TyToRef = #{}}, #{}),
       % can have duplicates, e.g. TODO explain
       NewT = #{K => lists:usort(V) || K := V <- NewTUnsorted},
+      % io:format(user,"Result of Converting:~n~p~n~p~n", [NewR, NewT]),
 
-      % 2. Unify the results
+      % 2. (Locally) unify the results
       %    There can be many duplicate type references;
       %    these will be substituted with their representative
       %    e.g. any U any    any          type to parse
@@ -80,11 +81,74 @@ parse(Ty) ->
 
       % 3. create new type references and replace temporary ones
       %    return result reference
+      % io:format(user,"Unified:~n~p~n", [UnifiedResult]),
       ReplaceRefs = maps:from_list([{Ref, ?NODE:new_ty_node()} || Ref <- maps:keys(UnifiedResult)]),
       {ReplacedRef, ReplacedResults} = utils:replace({UnifiedRef, UnifiedResult}, ReplaceRefs),
 
       % 4. define types
-      [?NODE:define(Ref, ToDefineTy) || Ref := ToDefineTy <- ReplacedResults],
+      % 4.1 create a graph, a reverse graph, a condensed graph, then topological sort, then define and replace if already consed
+      Graph = #{Ref => collect_refs(Ref, ReplacedResults) || Ref := _ <- ReplacedResults},
+      RevGraph = utils:reverse_graph(Graph),
+      {Scc, Condensed} = utils:condense(Graph),
+      Components = lists:foldl(fun({Node, Root}, Acc) ->
+          maps:update_with(Root, fun(Nodes) -> [Node | Nodes] end, [Node], Acc)
+      end, #{}, maps:to_list(Scc)),
+
+      Sort = utils:dfs(Condensed),
+      Define = [maps:get(T, Components) || T <- Sort],
+
+
+      DefineAndReplace = fun({{ReplacedRef1, RefMapping, ResultMapping}, Def, Rest}) -> 
+
+        {NewReplacedRef, NewRef, NewRes, NewRest} = lists:foldl(fun(DefineOrReplace, Acc = {ReplacedRef0, Refmapping, ResultMapping0, Rest0}) ->
+            % io:format(user,"Check ~p~n", [DefineOrReplace]),
+            case ?NODE:is_defined(DefineOrReplace) of % TODO explain
+              true -> 
+                % io:format(user,"Already defined: ~p~n", [DefineOrReplace]),
+                Acc;
+              false ->
+                ToDefineTy = maps:get(DefineOrReplace, ResultMapping0),
+                % io:format(user,"Is consed? ~p~n", [ToDefineTy]),
+                case ?NODE:is_consed(ToDefineTy) of
+                  {true, N} -> 
+                    ToDefine = DefineOrReplace,
+                    NodeContainedIn = maps:get(ToDefine, RevGraph, []),
+                    % io:format(user,"Consed already: ~p -> ~p~n", [ToDefine, N]),
+
+                    NewRefmapping = #{K => case V of ToDefine -> N; _ -> V end || K := V <- Refmapping},
+
+                    % remove ToDefine from result mapping, its already consed
+                    SmallerResultMapping = maps:remove(ToDefine, ResultMapping0),
+                    % io:format(user,"Replacing: ~p -> ~p in ~p~n~p~n", [ToDefine, N, NodeContainedIn, SmallerResultMapping]),
+
+                    FinalResultMapping = lists:foldl(fun(E, Acc0) -> 
+                      Val = maps:get(E, Acc0),
+                      % io:format(user,"Val ~p then do ~p => ~p~n", [Val, ToDefine, N]),
+                      Fin = utils:replace(Val, #{ToDefine => N}),
+                      % io:format(user,"Repl: ~p ~n", [Fin]),
+                      Acc0#{E => Fin} 
+                    end, SmallerResultMapping, NodeContainedIn),
+                    % io:format(user,"Fin: ~p~n", [FinalResultMapping]),
+
+                    NewReplacedRef = case ReplacedRef0 of ToDefine -> N; _ -> ReplacedRef0 end,
+
+                    {NewReplacedRef, NewRefmapping, FinalResultMapping, Rest0};
+                  false ->
+                    % io:format(user,"No, normal defining ~p~n~p~n", [DefineOrReplace, ToDefineTy]),
+                    % new node, define and no need to replace
+                    ?NODE:define(DefineOrReplace, ToDefineTy),
+                    Acc
+                end
+              end
+          end, {ReplacedRef1, RefMapping, ResultMapping, Rest}, Def),
+
+        {{NewReplacedRef, NewRef, NewRes}, NewRest}
+      end,
+
+
+      % Not needed to modify the context
+      % TODO refactor
+      {FinalReplacedRef, FinalReplaceRefs, _FinalReplacedResults} = utils:fold_with_context(DefineAndReplace, {ReplacedRef, ReplaceRefs, ReplacedResults}, Define),
 
       % 5. update global cache, there are now old entries to overwrite
       %    this invariant has to be kept up inside do_convert
@@ -92,10 +156,16 @@ parse(Ty) ->
       %    we need to check the global cache if that reference does not already point
       %    to a real node inside the global system
       %    the true = ... check is a sanity check
-      [true = ets:insert_new(?CACHE, {LLocalRef, Node}) || LLocalRef := Node <- ReplaceRefs],
+      [true = ets:insert_new(?CACHE, {LLocalRef, Node}) || LLocalRef := Node <- FinalReplaceRefs],
       
-      ReplacedRef
+      FinalReplacedRef
   end.
+
+collect_refs(Ref, Results) ->
+  utils:everything(fun
+    (E = {node, _}) -> {ok, E};
+    (_) -> error
+  end, maps:get(Ref, Results)).
 
 % breadth-first traversal using a queue
 % 
@@ -125,6 +195,15 @@ new_local_ref() -> {local_ref, erlang:unique_integer()}.
 
 -spec new_local_ref(ast_ty()) -> temporary_ref().
 new_local_ref(Term) -> 
+  % we could apply some simplifications here
+  % &[A] = A
+  % &[...,Empty,...] = Empty
+  % etc
+  % to map more terms to the same temporary reference
+  % but this would likely only make random tests faster
+  % semantic simplifications should happen in the internal representation,
+  % not to make parsing faster
+
   % essentially, this is what we want but is too slow
   % {local_ref, Term}.
   % we can't use hashing, it is fast but leads to collisions

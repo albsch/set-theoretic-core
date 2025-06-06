@@ -57,21 +57,28 @@ make(Ty) ->
     _ -> define(new_ty_node(), Ty)
   end.
 
+is_consed(Ty) ->
+  Res = ets:lookup(?UNIQUETABLE, Ty),
+  case Res of
+    [{Ty, Node}] -> {true, Node};
+    _ -> false
+  end.
+
+is_defined(Node) ->
+  Res = ets:lookup(?SYSTEM, Node),
+  case Res of
+    [{_, _}] -> true;
+    _ -> false
+  end.
+
 new_ty_node() ->
   {node, next_id()}.
 
 define(Reference, Node) ->
   [] = ets:lookup(?SYSTEM, Reference),
+  [] = ets:lookup(?UNIQUETABLE, {Node, Reference}),
   ets:insert(?SYSTEM, {Reference, Node}),
-  case ets:lookup(?UNIQUETABLE, Node) of
-    [] -> 
-      ets:insert(?UNIQUETABLE, {Node, Reference});
-    _ -> 
-      % since the unification process in ty_parser is not global, 
-      % we can have many references pointing to the same node
-      % if that is the case, use the first reference as the representative
-      ok
-  end,
+  ets:insert(?UNIQUETABLE, {Node, Reference}),
   Reference.
 
 next_id() ->
