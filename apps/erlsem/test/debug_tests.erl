@@ -95,6 +95,7 @@ ast_test() ->
     ty_tuples,
     ty_variable,
     ty,
+    tarjan,
     utils
   ]],
 

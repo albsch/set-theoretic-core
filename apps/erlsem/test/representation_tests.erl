@@ -64,21 +64,11 @@ share_topological_recursive_types_test() ->
   global_state:with_new_state(fun() ->
     maps:foreach(fun({ty_key,'.',VarName,_Arity}, AstTyScheme) -> ty_parser:extend_symtab(VarName, AstTyScheme) end, System),
 
-    Ty = {tuple, [ % root
-      {tuple, [{tuple, [{tuple, [{singleton, bar}, {singleton ,foo}]}]}]}, %a %b % d, k
-      {tuple, [{tuple, [{named, noloc, {ty_ref, '.', c, 0}, []}]}]}, % f, c
-      {named, noloc, {ty_ref, '.', e, 0}, []} % e
+    Ty = {tuple, [
+      {tuple, [{tuple, [{tuple, [{singleton, bar}, {singleton ,foo}]}]}]},
+      {tuple, [{tuple, [{named, noloc, {ty_ref, '.', c, 0}, []}]}]},
+      {named, noloc, {ty_ref, '.', e, 0}, []}
     ]},
-    % Graph = #{
-    %     root => [a, f, e]
-    %     a => [b], b => [d, k],
-    %     f => [c], c => [e],
-    %     e => [c, k], k => [], d => []
-    % },
-    % Order of definitions: 
-    %   * the first part of the root tuple should always be shared
-    %   * the 'k' part of e should be shared
-    % [[k],[e,c],[f],[d],[b],[a], [root]]
     TyP = ty_parser:parse(Ty),
 
     Ty2 = {tuple, [ % root

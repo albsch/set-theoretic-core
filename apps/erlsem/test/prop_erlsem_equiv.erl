@@ -54,9 +54,9 @@ system(Variables) ->
   ), valid_system(Ty)).
 
 % property tests with fixed timeouts are not too stable, 
-% but randomly generated test cases really shouldn't take longer than these timeouts
+% but randomly generated test cases shouldn't take longer than these timeouts
 % currently starts failing after with n > 10000
--define(PARSETIMEOUTMS, 100000).
+-define(PARSETIMEOUTMS, 200).
 -define(EMPTYTIMEOUTMS, 50).
 
 % property that checks if we can parse a random type and check emptyness 

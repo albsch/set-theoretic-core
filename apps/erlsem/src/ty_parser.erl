@@ -24,7 +24,7 @@
 -define(TY, dnf_ty_variable).
 -define(NODE, ty_node).
 
--type temporary_ref() :: {local_ref, integer()}. % fresh type references created for the queue
+-type temporary_ref() :: {local_ref, integer()}. % type references created for the queue
 -type type() :: ?NODE:type().
 -type ty_rec() :: ?TY:type().
 -type ast_ty() :: term(). %TODO ast:ty()
@@ -87,9 +87,11 @@ parse(Ty) ->
 
       % 4. define types
       % 4.1 create a graph, a reverse graph, a condensed graph, then topological sort, then define and replace if already consed
-      Graph = #{Ref => collect_refs(Ref, ReplacedResults) || Ref := _ <- ReplacedResults},
+      Graph = #{K => lists:usort(V) || K := V <- #{Ref => collect_refs(Ref, ReplacedResults) || Ref := _ <- ReplacedResults}},
       RevGraph = utils:reverse_graph(Graph),
+
       {Scc, Condensed} = utils:condense(Graph),
+
       Components = lists:foldl(fun({Node, Root}, Acc) ->
           maps:update_with(Root, fun(Nodes) -> [Node | Nodes] end, [Node], Acc)
       end, #{}, maps:to_list(Scc)),
@@ -99,42 +101,32 @@ parse(Ty) ->
 
 
       DefineAndReplace = fun({{ReplacedRef1, RefMapping, ResultMapping}, Def, Rest}) -> 
-
         {NewReplacedRef, NewRef, NewRes, NewRest} = lists:foldl(fun(DefineOrReplace, Acc = {ReplacedRef0, Refmapping, ResultMapping0, Rest0}) ->
-            % io:format(user,"Check ~p~n", [DefineOrReplace]),
-            case ?NODE:is_defined(DefineOrReplace) of % TODO explain
+            case ?NODE:is_defined(DefineOrReplace) of % TODO explain, is this possible?
               true -> 
-                % io:format(user,"Already defined: ~p~n", [DefineOrReplace]),
                 Acc;
               false ->
                 ToDefineTy = maps:get(DefineOrReplace, ResultMapping0),
-                % io:format(user,"Is consed? ~p~n", [ToDefineTy]),
                 case ?NODE:is_consed(ToDefineTy) of
                   {true, N} -> 
                     ToDefine = DefineOrReplace,
                     NodeContainedIn = maps:get(ToDefine, RevGraph, []),
-                    % io:format(user,"Consed already: ~p -> ~p~n", [ToDefine, N]),
 
                     NewRefmapping = #{K => case V of ToDefine -> N; _ -> V end || K := V <- Refmapping},
 
                     % remove ToDefine from result mapping, its already consed
                     SmallerResultMapping = maps:remove(ToDefine, ResultMapping0),
-                    % io:format(user,"Replacing: ~p -> ~p in ~p~n~p~n", [ToDefine, N, NodeContainedIn, SmallerResultMapping]),
 
                     FinalResultMapping = lists:foldl(fun(E, Acc0) -> 
                       Val = maps:get(E, Acc0),
-                      % io:format(user,"Val ~p then do ~p => ~p~n", [Val, ToDefine, N]),
                       Fin = utils:replace(Val, #{ToDefine => N}),
-                      % io:format(user,"Repl: ~p ~n", [Fin]),
                       Acc0#{E => Fin} 
                     end, SmallerResultMapping, NodeContainedIn),
-                    % io:format(user,"Fin: ~p~n", [FinalResultMapping]),
 
                     NewReplacedRef = case ReplacedRef0 of ToDefine -> N; _ -> ReplacedRef0 end,
 
                     {NewReplacedRef, NewRefmapping, FinalResultMapping, Rest0};
                   false ->
-                    % io:format(user,"No, normal defining ~p~n~p~n", [DefineOrReplace, ToDefineTy]),
                     % new node, define and no need to replace
                     ?NODE:define(DefineOrReplace, ToDefineTy),
                     Acc
@@ -146,7 +138,7 @@ parse(Ty) ->
       end,
 
 
-      % Not needed to modify the context
+      % Modifying the context is not needed
       % TODO refactor
       {FinalReplacedRef, FinalReplaceRefs, _FinalReplacedResults} = utils:fold_with_context(DefineAndReplace, {ReplacedRef, ReplaceRefs, ReplacedResults}, Define),
 

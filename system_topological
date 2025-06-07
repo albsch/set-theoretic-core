@@ -7,8 +7,8 @@
 {ty_key,'.',e,0} =>
     {ty_scheme,[],
        {tuple, [
-          {named,noloc,{ty_ref,'.',c,0}, []},  %c
-          {named,noloc,{ty_ref,'.',e,0}, []},  %e
+          {named,noloc,{ty_ref,'.',c,0}, []},
+          {named,noloc,{ty_ref,'.',e,0}, []},
           {singleton, foo} %k
         ]}
        }

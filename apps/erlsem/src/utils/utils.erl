@@ -46,8 +46,6 @@ everything(F, T) ->
         {ok, X} -> [X]
     end.
 
-
-
 replace(Term, Mapping) ->
     replace_term(Term, Mapping).
 
@@ -70,7 +68,6 @@ replace_term(Map, Mapping) when is_map(Map) ->
 replace_term(Term, _Mapping) ->
     Term.
 
-
 size(Term) ->
   (erts_debug:size(Term) * 8)/1024.
 
@@ -79,65 +76,39 @@ update_ets_from_map(EtsTable, LocalMap) ->
   ChangedEntries = maps:fold(
       fun(K, V, Acc) ->
           case ets:lookup(EtsTable, K) of
-              [{K, V}] -> Acc;      % Skip unchanged
-              _ -> [{K, V} | Acc]   % Collect changes
+              [{K, V}] -> Acc;
+              _ -> [{K, V} | Acc]
           end
       end,
       [],
       LocalMap
   ),
   
-  % Bulk-insert changes (faster than one-by-one)
+  % Bulk-insert changes
   ets:insert(EtsTable, ChangedEntries).
 
-
--spec scc(Graph) -> SCCs when
-    Graph :: #{term() => [term()]},
-    SCCs :: #{term() => term()}.
-scc(Graph) ->
-    Nodes = maps:keys(Graph),
-    lists:foldl(fun(Node, Acc) ->
-        case maps:is_key(Node, Acc) of
-            true -> Acc;
-            false -> dfs(Node, Graph, #{}, Acc, 0)
-        end
-    end, #{}, Nodes).
-
-dfs(Node, Graph, Path, SCCs, Depth) ->
-    Children = maps:get(Node, Graph, []),
-    {NewSCCs, Shallowest} = lists:foldl(fun(Child, {AccSCCs, CurrentShallowest}) ->
-        case maps:is_key(Child, Path) of
-            true ->
-                {AccSCCs, shallower_node(CurrentShallowest, Child, Path)};
-            false ->
-                ChildPath = Path#{Node => Depth},
-                ChildSCCs = dfs(Child, Graph, ChildPath, AccSCCs, Depth + 1),
-                ChildShallowest = maps:get(Child, ChildSCCs),
-                {ChildSCCs, shallower_node(CurrentShallowest, ChildShallowest, Path)}
-        end
-    end, {SCCs, Node}, Children),
-    NewSCCs#{Node => Shallowest}.
-
-shallower_node(Old, Candidate, Path) ->
-    case {maps:get(Old, Path, undefined), maps:get(Candidate, Path, undefined)} of
-        {_, undefined} -> Old;
-        {undefined, _} -> Candidate;
-        {DOld, DCand} when DCand < DOld -> Candidate;
-        _ -> Old
-    end.
+map(Graph) ->
+  All = lists:usort(lists:flatten([[K, V] || K := V <- Graph])),
+  {Max, Mapping} = lists:foldl(fun(Node, {Id, Map}) -> {Id + 1, Map#{Node => Id}} end, {0, #{}}, All),
+  Unfilled = #{maps:get(N, Mapping) => [maps:get(NN, Mapping) || NN <- Adj] || N := Adj <- Graph},
+  {#{Id => maps:get(Id, Unfilled, []) || Id <- lists:seq(0, Max-1)}, Mapping}.
 
 
 -spec condense(Graph) -> {SCCs, CondensedGraph} when
     Graph :: #{term() => [term()]},
     SCCs :: #{term() => term()},  % Maps each node to its root (SCC representative)
     CondensedGraph :: #{term() => [term()]}.  % Adjacency list of SCC roots
-
 condense(Graph) ->
-  % First find SCCs using your implementation
-  SCCs = scc(Graph),
+  {MappedGraph, Mapping} = map(Graph),
+  IdNodeMapping = #{Id => Node || Node := Id <- Mapping},
+  G = erlang:list_to_tuple([Adjacency || {_, Adjacency} <- lists:sort(maps:to_list(MappedGraph))]),
+  {SCCs, Map} = tarjan:scc(G),
+
+  ScctoN = #{Id => [maps:get(NN, IdNodeMapping) || NN <- Nodes] || {Id, Nodes} <- SCCs},
+  NtoScc = #{maps:get(K, IdNodeMapping) => V || K := V <- Map},
   
   % Build a mapping from each node to its root (SCC representative)
-  Roots = SCCs,
+  Roots = #{Node => hd(maps:get(Id, ScctoN)) || Node := Id <- NtoScc},
   
   % Get all unique SCC roots
   AllRoots = lists:usort(maps:values(Roots)),
